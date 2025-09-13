@@ -10,12 +10,12 @@ services:
     - ./app:/app
   
   nginx:
-  image: nginx:latest
-  container_name: mywebsite-nginx
-  ports:
-    - "80:80"
-  volumes:
-    - ./app:/usr/share/nginx/html
-    - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-  depends_on: 
-    - app
+    image: nginx:latest
+    container_name: mywebsite-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:/usr/share/nginx/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on: 
+      - app
