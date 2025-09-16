@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Lior Milliger - Portfolio{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+    <nav>
+        <div class="nav-brand">
+            <a href="/">Lior Milliger - DevOps</a>
+        </div>
+        <div class="nav-menu-links">
+            <a href="/">About Me</a>
+            <a href="/tech-in-action">Tech in Action</a>
+            <a href="/my-projects">My Projects</a>
+            <a href="/education">Education</a>
+        </div>
+        <div class="nav-icon-links">
+            <a href="{{ url_for('static', filename='files/LiorMilligerCV.pdf') }}" download class="nav-button">CV</a>
+            <a href="https://github.com/liormilliger" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
+                <i class="fab fa-github"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/lior-milliger/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+                <i class="fab fa-linkedin"></i>
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Lior Milliger. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>

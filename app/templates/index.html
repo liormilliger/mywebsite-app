@@ -1,42 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lior Milliger - Portfolio</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
-<body>
+{% extends "base.html" %}
 
-    <nav>
-        <div class="nav-brand">
-            Lior Milliger - DevOps in Action
-        </div>
-        <div class="nav-links">
-            <a href="{{ url_for('static', filename='files/LiorMilligerCV.pdf') }}" download class="nav-button">CV</a>
-            <a href="https://github.com/liormilliger" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
-                <i class="fab fa-github"></i>
-            </a>
-            <a href="https://www.linkedin.com/in/lior-milliger/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
-                <i class="fab fa-linkedin"></i>
-            </a>
-        </div>
-    </nav>
+{% block title %}Lior Milliger - About Me{% endblock %}
 
-    <main>
-        <img src="{{ url_for('static', filename='files/LiorPhoto.jpg') }}" alt="A photo of Lior Milliger" class="profile-photo">
-
-        <hr class="separator">
-
-        <h1>Welcome to my Website Portfolio.</h1>
-
-        <div class="about-section">
-            <p>
-                Future "About Me" section will go here. You can write a brief introduction about your skills, experience, and passion for DevOps.
-            </p>
-        </div>
-    </main>
-
-</body>
-</html>
+{% block content %}
+<div class="homepage-content">
+    
+    <h1 class="welcome-heading">Welcome to my Portfolio Website</h1>
+    
+    <img src="{{ url_for('static', filename='files/LiorPhoto.jpg') }}" alt="A photo of Lior Milliger" class="profile-photo">
+        
+    <div class="about-text">
+        <p>
+            As a DevOps Engineer looking for a job, I was thinking of ways to step up my game,<br>
+            showing the entire range of my skills, knowledge and abilities, rather than<br>
+            compromising on a one-pager CV, just to meet the job requirements -<br>
+            I decided to build a website that will present… me.
+        </p>
+    </div>
+</div>
+{% endblock %}

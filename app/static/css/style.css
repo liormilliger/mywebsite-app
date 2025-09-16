@@ -5,93 +5,108 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* Navigation Bar Styling */
+/* --- Top Navigation Bar --- */
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2.5rem;
+    background-color: #0c1a2e;
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
 }
 
-.nav-brand {
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 25px; /* Space between links */
-}
-
-.nav-links a {
+nav a {
     color: #ECDFCC;
     text-decoration: none;
-    font-size: 1.6rem; /* Icon size */
     transition: color 0.3s ease-in-out;
 }
 
-.nav-links a:hover {
-    color: #FFFFFF; /* Brighter color on hover */
+.nav-brand a {
+    font-size: 1.3rem;
+    font-weight: bold;
 }
 
-/* CV Button Specific Styling */
-.nav-button {
-    font-size: 1rem; /* Regular text size */
+.nav-menu-links {
+    display: flex;
+    gap: 30px;
+    font-size: 1.1rem;
+}
+
+.nav-menu-links a:hover, .nav-brand a:hover {
+    color: #FFFFFF;
+}
+
+.nav-icon-links {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.nav-icon-links .nav-button {
+    font-size: 1rem;
     padding: 8px 16px;
     border: 1px solid #ECDFCC;
     border-radius: 5px;
     transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
-.nav-button:hover {
+.nav-icon-links .nav-button:hover {
     background-color: #ECDFCC;
     color: #0B192C;
 }
 
-/* Main Content Area */
+.nav-icon-links i {
+    font-size: 1.6rem;
+}
+
+/* --- Main Content Area --- */
 main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 2rem;
+    flex: 1; /* Allows footer to stick to the bottom */
+    padding: 2rem;
 }
 
-/* Profile Photo Styling */
+.homepage-content, .page-content {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
 .profile-photo {
-    margin-top: 1cm;
-    width: 200px; /* Control the size */
+    width: 200px;
     height: 200px;
-    object-fit: cover; /* Prevents stretching */
-    border-radius: 50%; /* Makes it circular */
+    object-fit: cover;
+    border-radius: 50%;
     border: 3px solid #ECDFCC;
+    margin-top: 2rem;
 }
 
-/* Separator Line Styling */
-.separator {
-    margin-top: 1cm;
-    width: 60%;
-    border: none;
-    height: 1px;
-    background-color: rgba(236, 223, 204, 0.3);
-}
-
-/* Welcome Header */
-h1 {
+.welcome-heading {
     font-size: 2.8rem;
     font-weight: 300;
-    text-align: center;
     margin-top: 2rem;
 }
 
-/* Placeholder for About Section */
-.about-section {
-    max-width: 800px;
+.about-text p {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    /* CHANGED: Increased the max-width to give the text more room */
+    max-width: 850px; 
+    margin: 1rem auto 0;
+}
+
+.page-content h1 {
+    font-size: 2.5rem;
+}
+
+/* --- Footer --- */
+footer {
     text-align: center;
-    margin-top: 2rem;
-    font-size: 1.1rem;
-    line-height: 1.6;
+    padding: 1.5rem 0;
+    font-size: 0.9rem;
+    border-top: 1px solid rgba(236, 223, 204, 0.1);
 }
