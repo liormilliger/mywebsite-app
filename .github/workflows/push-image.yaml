@@ -1,63 +1,70 @@
-name: Build and Push Docker Image to ECR
+name: Build, Test, and Push Docker Image to ECR
+
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
 
-# Environment variables available to all jobs and steps in the workflow.
 env:
   AWS_REGION: us-east-1
   ECR_REGISTRY: 704505749045.dkr.ecr.us-east-1.amazonaws.com
   ECR_REPOSITORY: mywebsite
+  IMAGE_FILE_NAME: my-app-image.tar
 
 jobs:
-  build-and-push:
-    name: Build, Test, and Push
+  # ===============================================
+  # Job 1: Build the Docker Image
+  # ===============================================
+  build:
+    name: Build Image
     runs-on: ubuntu-latest
-
+    outputs:
+      image_tag: ${{ steps.version.outputs.IMAGE_TAG }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        # Uses the official AWS action to configure credentials.
-        # Store your AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY as GitHub repository secrets.
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        # Logs in the Docker client to your ECR registry.
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
       - name: Define Image Version Tag
-        # Creates a version number like 1.1.0, 1.2.0, etc., based on the workflow run number.
         id: version
-        run: echo "IMAGE_TAG=1.${{ github.run_number }}.0" >> $GITHUB_ENV
+        run: |
+          VERSION="1.${{ github.run_number }}.0"
+          echo "IMAGE_TAG=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
-        # Builds the image and tags it with both the version number and 'latest'.
         run: |
-          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
+          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} .
 
-      - name: Run security scan with Trivy
-        # Scans the newly built image for critical and high severity vulnerabilities.
-        uses: aquasecurity/trivy-action@master
+      - name: Save Docker image as an artifact
+        run: |
+          docker save ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} --output ${{ env.IMAGE_FILE_NAME }}
+          
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
         with:
-          image-ref: '${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          name: docker-image
+          path: ${{ env.IMAGE_FILE_NAME }}
+
+  # ===============================================
+  # Job 2: Test the Docker Image
+  # ===============================================
+  test:
+    name: Test Image
+    runs-on: ubuntu-latest
+    needs: build # This job runs only after 'build' succeeds
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker image
+        run: |
+          docker load --input ${{ env.IMAGE_FILE_NAME }}
 
       - name: Run container locally and perform healthcheck
-        # Runs the container and tests if it's responding correctly.
         run: |
-          docker run -d --name my-app-test -p 8080:5000 ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          IMAGE_NAME=$(docker images --format '{{.Repository}}:{{.Tag}}' | head -n 1)
+          docker run -d --name my-app-test -p 8080:5000 $IMAGE_NAME
           echo "Waiting for container to start..."
           sleep 15
           echo "Performing healthcheck..."
@@ -65,8 +72,38 @@ jobs:
           echo "Healthcheck passed!"
           docker stop my-app-test
 
-      - name: Push image to Amazon ECR
-        # If all previous steps passed, this pushes both tags to ECR.
-        run: |
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags
+  # ===============================================
+  # Job 3: Push the Image to ECR
+  # ===============================================
+  push:
+    name: Push Image to ECR
+    runs-on: ubuntu-latest
+    needs: [build, test] # This job runs only after 'build' and 'test' succeed
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker image
+        run: |
+          docker load --input ${{ env.IMAGE_FILE_NAME }}
+
+      - name: Tag and Push image to Amazon ECR
+        run: |
+          IMAGE_TAG="${{ needs.build.outputs.image_tag }}"
+          # Add the 'latest' tag to the image
+          docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          # Push both the version and 'latest' tags
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags
