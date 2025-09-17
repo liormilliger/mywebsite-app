@@ -1,0 +1,72 @@
+name: Build and Push Docker Image to ECR
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+# Environment variables available to all jobs and steps in the workflow.
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 704505749045.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REPOSITORY: mywebsite
+
+jobs:
+  build-and-push:
+    name: Build, Test, and Push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        # Uses the official AWS action to configure credentials.
+        # Store your AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY as GitHub repository secrets.
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        # Logs in the Docker client to your ECR registry.
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Define Image Version Tag
+        # Creates a version number like 1.1.0, 1.2.0, etc., based on the workflow run number.
+        id: version
+        run: echo "IMAGE_TAG=1.${{ github.run_number }}.0" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        # Builds the image and tags it with both the version number and 'latest'.
+        run: |
+          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
+
+      - name: Run security scan with Trivy
+        # Scans the newly built image for critical and high severity vulnerabilities.
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Run container locally and perform healthcheck
+        # Runs the container and tests if it's responding correctly.
+        run: |
+          docker run -d --name my-app-test -p 8080:5000 ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          echo "Waiting for container to start..."
+          sleep 15
+          echo "Performing healthcheck..."
+          curl --fail http://localhost:8080/ || exit 1
+          echo "Healthcheck passed!"
+          docker stop my-app-test
+
+      - name: Push image to Amazon ECR
+        # If all previous steps passed, this pushes both tags to ECR.
+        run: |
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags
+
