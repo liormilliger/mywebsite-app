@@ -4,7 +4,255 @@
 
 {% block content %}
 <div class="page-content">
-    <h1>Tech in Action</h1>
-    <p>This page is under construction. Content coming soon!</p>
+    <h1>Tech in Action 💻</h1>
+    <p>Click on a technology from the list on the left to see a sample code snippet or configuration.</p>
+    
+    <div class="tech-container">
+        <div class="tech-list">
+            <ul>
+                <li><a href="#" class="tech-link active" data-target="jenkins">Jenkins</a></li>
+                <li><a href="#" class="tech-link" data-target="github-actions">GitHub Actions</a></li>
+                <li><a href="#" class="tech-link" data-target="terraform">Terraform</a></li>
+                <li><a href="#" class="tech-link" data-target="aws">AWS</a></li>
+                <li><a href="#" class="tech-link" data-target="docker">Docker</a></li>
+                <li><a href="#" class="tech-link" data-target="kubernetes">Kubernetes & Helm</a></li>
+                <li><a href="#" class="tech-link" data-target="argocd">ArgoCD</a></li>
+                <li><a href="#" class="tech-link" data-target="prometheus">Prometheus</a></li>
+                <li><a href="#" class="tech-link" data-target="grafana">Grafana</a></li>
+                <li><a href="#" class="tech-link" data-target="logging">Logging</a></li>
+                <li><a href="#" class="tech-link" data-target="kibana">Kibana</a></li>
+            </ul>
+        </div>
+
+        <div class="tech-display">
+            <div id="jenkins" class="tech-content-panel">
+                <h3>Jenkinsfile (Declarative Pipeline)</h3>
+                <pre><code>pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+                sh 'npm install'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing...'
+                sh 'npm test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying...'
+            }
+        }
+    }
+}</code></pre>
+            </div>
+
+            <div id="github-actions" class="tech-content-panel" style="display: none;">
+                <h3>GitHub Actions Workflow (.yml)</h3>
+                <pre><code>name: CI Pipeline
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run a one-line script
+      run: echo Hello, world!
+    - name: Run a multi-line script
+      run: |
+        echo Add other actions to build,
+        echo test, and deploy your project.</code></pre>
+            </div>
+            
+            <div id="terraform" class="tech-content-panel" style="display: none;">
+                <h3>Terraform (main.tf)</h3>
+                <pre><code>provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "b" {
+  bucket = "my-tf-test-bucket-lior"
+  acl    = "private"
+
+  tags = {
+    Name        = "My bucket"
+    Environment = "Dev"
+  }
+}</code></pre>
+            </div>
+
+            <div id="aws" class="tech-content-panel" style="display: none;">
+              <h3>AWS CLI Command</h3>
+              <pre><code># List all S3 buckets in your account
+aws s3 ls
+
+# Create a new EC2 instance
+aws ec2 run-instances \
+    --image-id ami-0c55b159cbfafe1f0 \
+    --count 1 \
+    --instance-type t2.micro \
+    --key-name MyKeyPair</code></pre>
+            </div>
+
+            <div id="docker" class="tech-content-panel" style="display: none;">
+              <h3>Dockerfile</h3>
+              <pre><code># Use an official Python runtime as a parent image
+FROM python:3.8-slim-buster
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Make port 80 available to the world outside this container
+EXPOSE 80
+
+# Define environment variable
+ENV NAME World
+
+# Run app.py when the container launches
+CMD ["python", "app.py"]</code></pre>
+            </div>
+
+            <div id="kubernetes" class="tech-content-panel" style="display: none;">
+                <h3>Kubernetes Deployment (deployment.yaml)</h3>
+                <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80</code></pre>
+            </div>
+
+            <div id="argocd" class="tech-content-panel" style="display: none;">
+              <h3>ArgoCD Application Manifest</h3>
+              <pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/liormilliger/my-app-repo.git'
+    path: helm-chart
+    targetRevision: HEAD
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: my-app-namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true</code></pre>
+            </div>
+
+            <div id="prometheus" class="tech-content-panel" style="display: none;">
+              <h3>Prometheus Scrape Config (prometheus.yml)</h3>
+              <pre><code>scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node-exporter-host:9100']</code></pre>
+            </div>
+
+            <div id="grafana" class="tech-content-panel" style="display: none;">
+              <h3>Grafana (PromQL Query)</h3>
+              <p>Grafana is a visualization tool. You build dashboards by writing queries against a data source like Prometheus. Here is a sample query:</p>
+              <pre><code># Calculate the 5-minute rate of HTTP requests
+# for the job 'my_app', summed by status code.
+
+rate(http_requests_total{job="my_app"}[5m])
+</code></pre>
+            </div>
+
+            <div id="logging" class="tech-content-panel" style="display: none;">
+              <h3>Structured Logging (JSON Format)</h3>
+              <p>Modern logging often uses a structured format like JSON, which is easy for machines to parse.</p>
+              <pre><code>{
+  "timestamp": "2025-09-17T10:00:00Z",
+  "level": "INFO",
+  "message": "User login successful",
+  "service": "auth-service",
+  "userId": "usr_12345",
+  "sourceIp": "192.168.1.100"
+}</code></pre>
+            </div>
+
+            <div id="kibana" class="tech-content-panel" style="display: none;">
+              <h3>Kibana (KQL Query)</h3>
+              <p>Kibana is the visualization layer for Elasticsearch. You use Kibana Query Language (KQL) to filter logs.</p>
+              <pre><code># Find all successful login events from the auth-service
+
+service: "auth-service" and message: "User login successful" and level: "INFO"
+</code></pre>
+            </div>
+
+        </div>
+    </div>
 </div>
+
+<script>
+    // Wait for the page to fully load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all the clickable links on the left
+        const techLinks = document.querySelectorAll('.tech-link');
+        // Get all the content panels on the right
+        const contentPanels = document.querySelectorAll('.tech-content-panel');
+
+        // Add a click event listener to each link
+        techLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                // Prevent the link from navigating
+                event.preventDefault();
+
+                // Get the target ID from the data-target attribute (e.g., "jenkins")
+                const targetId = this.getAttribute('data-target');
+
+                // Hide all content panels
+                contentPanels.forEach(panel => {
+                    panel.style.display = 'none';
+                });
+
+                // Remove 'active' class from all links
+                techLinks.forEach(l => {
+                    l.classList.remove('active');
+                });
+                
+                // Show the target content panel
+                const targetPanel = document.getElementById(targetId);
+                if (targetPanel) {
+                    targetPanel.style.display = 'block';
+                }
+
+                // Add 'active' class to the clicked link
+                this.classList.add('active');
+            });
+        });
+    });
+</script>
 {% endblock %}
