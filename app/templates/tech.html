@@ -10,82 +10,41 @@
     <div class="tech-container">
         <div class="tech-list">
             <ul>
-                <li><a href="#" class="tech-link active" data-target="jenkins">Jenkins</a></li>
-                <li><a href="#" class="tech-link" data-target="github-actions">GitHub Actions</a></li>
-                <li><a href="#" class="tech-link" data-target="terraform">Terraform</a></li>
-                <li><a href="#" class="tech-link" data-target="aws">AWS</a></li>
+                <li class="has-submenu">
+                    <span class="tech-category">CI <i class="fas fa-chevron-down"></i></span>
+                    <ul class="submenu">
+                        <li><a href="#" class="tech-link" data-target="jenkins">Jenkins</a></li>
+                        <li><a href="#" class="tech-link" data-target="github-actions">GitHub Actions</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <span class="tech-category">IaC <i class="fas fa-chevron-down"></i></span>
+                    <ul class="submenu">
+                        <li><a href="#" class="tech-link" data-target="terraform">Terraform</a></li>
+                        <li><a href="#" class="tech-link" data-target="pulumi">Pulumi</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <span class="tech-category">Observability <i class="fas fa-chevron-down"></i></span>
+                    <ul class="submenu">
+                        <li><a href="#" class="tech-link" data-target="prometheus">Prometheus</a></li>
+                        <li><a href="#" class="tech-link" data-target="grafana">Grafana</a></li>
+                        <li><a href="#" class="tech-link" data-target="kibana">Kibana</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="#" class="tech-link active" data-target="aws">AWS</a></li>
                 <li><a href="#" class="tech-link" data-target="docker">Docker</a></li>
                 <li><a href="#" class="tech-link" data-target="kubernetes">Kubernetes & Helm</a></li>
                 <li><a href="#" class="tech-link" data-target="argocd">ArgoCD</a></li>
-                <li><a href="#" class="tech-link" data-target="prometheus">Prometheus</a></li>
-                <li><a href="#" class="tech-link" data-target="grafana">Grafana</a></li>
                 <li><a href="#" class="tech-link" data-target="logging">Logging</a></li>
-                <li><a href="#" class="tech-link" data-target="kibana">Kibana</a></li>
             </ul>
         </div>
 
         <div class="tech-display">
-            <div id="jenkins" class="tech-content-panel">
-                <h3>Jenkinsfile (Declarative Pipeline)</h3>
-                <pre><code>pipeline {
-    agent any
-    stages {
-        stage('Build') {
-            steps {
-                echo 'Building...'
-                sh 'npm install'
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing...'
-                sh 'npm test'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying...'
-            }
-        }
-    }
-}</code></pre>
-            </div>
-
-            <div id="github-actions" class="tech-content-panel" style="display: none;">
-                <h3>GitHub Actions Workflow (.yml)</h3>
-                <pre><code>name: CI Pipeline
-on: [push]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.</code></pre>
-            </div>
-            
-            <div id="terraform" class="tech-content-panel" style="display: none;">
-                <h3>Terraform (main.tf)</h3>
-                <pre><code>provider "aws" {
-  region = "us-east-1"
-}
-
-resource "aws_s3_bucket" "b" {
-  bucket = "my-tf-test-bucket-lior"
-  acl    = "private"
-
-  tags = {
-    Name        = "My bucket"
-    Environment = "Dev"
-  }
-}</code></pre>
-            </div>
-
-            <div id="aws" class="tech-content-panel" style="display: none;">
+            <div id="aws" class="tech-content-panel">
               <h3>AWS CLI Command</h3>
               <pre><code># List all S3 buckets in your account
 aws s3 ls
@@ -98,30 +57,61 @@ aws ec2 run-instances \
     --key-name MyKeyPair</code></pre>
             </div>
 
+            <div id="jenkins" class="tech-content-panel" style="display: none;">
+                <h3>Jenkinsfile (Declarative Pipeline)</h3>
+                <pre><code>pipeline {
+    agent any
+    stages {
+        stage('Build') { steps { sh 'npm install' } }
+        stage('Test') { steps { sh 'npm test' } }
+        stage('Deploy') { steps { echo 'Deploying...' } }
+    }
+}</code></pre>
+            </div>
+            <div id="github-actions" class="tech-content-panel" style="display: none;">
+                <h3>GitHub Actions Workflow (.yml)</h3>
+                <pre><code>name: CI Pipeline
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run a one-line script
+      run: echo Hello, world!</code></pre>
+            </div>
+            <div id="terraform" class="tech-content-panel" style="display: none;">
+                <h3>Terraform (main.tf)</h3>
+                <pre><code>provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "b" {
+  bucket = "my-tf-test-bucket"
+}</code></pre>
+            </div>
+            <div id="pulumi" class="tech-content-panel" style="display: none;">
+                <h3>Pulumi (index.ts)</h3>
+                <pre><code>import * as aws from "@pulumi/aws";
+
+// Create an AWS resource (S3 Bucket)
+const bucket = new aws.s3.Bucket("my-bucket", {
+    acl: "private",
+});
+
+// Export the name of the bucket
+export const bucketName = bucket.id;
+</code></pre>
+            </div>
             <div id="docker" class="tech-content-panel" style="display: none;">
               <h3>Dockerfile</h3>
-              <pre><code># Use an official Python runtime as a parent image
-FROM python:3.8-slim-buster
-
-# Set the working directory in the container
+              <pre><code>FROM python:3.8-slim-buster
 WORKDIR /app
-
-# Copy the current directory contents into the container at /app
 COPY . /app
-
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Make port 80 available to the world outside this container
+RUN pip install -r requirements.txt
 EXPOSE 80
-
-# Define environment variable
-ENV NAME World
-
-# Run app.py when the container launches
 CMD ["python", "app.py"]</code></pre>
             </div>
-
             <div id="kubernetes" class="tech-content-panel" style="display: none;">
                 <h3>Kubernetes Deployment (deployment.yaml)</h3>
                 <pre><code>apiVersion: apps/v1
@@ -144,7 +134,6 @@ spec:
         ports:
         - containerPort: 80</code></pre>
             </div>
-
             <div id="argocd" class="tech-content-panel" style="display: none;">
               <h3>ArgoCD Application Manifest</h3>
               <pre><code>apiVersion: argoproj.io/v1alpha1
@@ -155,102 +144,80 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/liormilliger/my-app-repo.git'
+    repoURL: 'https://github.com/my-org/my-app.git'
     path: helm-chart
-    targetRevision: HEAD
   destination:
-    server: 'https://kubernetes.default.svc'
-    namespace: my-app-namespace
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true</code></pre>
+    server: 'https://kubernetes.default.svc'</code></pre>
             </div>
-
             <div id="prometheus" class="tech-content-panel" style="display: none;">
               <h3>Prometheus Scrape Config (prometheus.yml)</h3>
               <pre><code>scrape_configs:
   - job_name: 'prometheus'
-    scrape_interval: 5s
     static_configs:
-      - targets: ['localhost:9090']
-
-  - job_name: 'node_exporter'
-    static_configs:
-      - targets: ['node-exporter-host:9100']</code></pre>
+      - targets: ['localhost:9090']</code></pre>
             </div>
-
             <div id="grafana" class="tech-content-panel" style="display: none;">
               <h3>Grafana (PromQL Query)</h3>
-              <p>Grafana is a visualization tool. You build dashboards by writing queries against a data source like Prometheus. Here is a sample query:</p>
-              <pre><code># Calculate the 5-minute rate of HTTP requests
-# for the job 'my_app', summed by status code.
-
-rate(http_requests_total{job="my_app"}[5m])
-</code></pre>
+              <p>Grafana is a visualization tool. Here is a sample query to show CPU usage:</p>
+              <pre><code>100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</code></pre>
             </div>
-
             <div id="logging" class="tech-content-panel" style="display: none;">
               <h3>Structured Logging (JSON Format)</h3>
-              <p>Modern logging often uses a structured format like JSON, which is easy for machines to parse.</p>
               <pre><code>{
   "timestamp": "2025-09-17T10:00:00Z",
   "level": "INFO",
   "message": "User login successful",
-  "service": "auth-service",
-  "userId": "usr_12345",
-  "sourceIp": "192.168.1.100"
+  "service": "auth-service"
 }</code></pre>
             </div>
-
             <div id="kibana" class="tech-content-panel" style="display: none;">
               <h3>Kibana (KQL Query)</h3>
-              <p>Kibana is the visualization layer for Elasticsearch. You use Kibana Query Language (KQL) to filter logs.</p>
-              <pre><code># Find all successful login events from the auth-service
-
-service: "auth-service" and message: "User login successful" and level: "INFO"
-</code></pre>
+              <p>Kibana is a visualization layer for Elasticsearch. You use KQL to filter logs.</p>
+              <pre><code>service: "auth-service" and level: "ERROR"</code></pre>
             </div>
-
         </div>
     </div>
 </div>
 
 <script>
-    // Wait for the page to fully load
     document.addEventListener('DOMContentLoaded', function() {
-        // Get all the clickable links on the left
         const techLinks = document.querySelectorAll('.tech-link');
-        // Get all the content panels on the right
         const contentPanels = document.querySelectorAll('.tech-content-panel');
+        const categories = document.querySelectorAll('.tech-category');
 
-        // Add a click event listener to each link
+        // --- Logic for Toggling Content Panels (Right Side) ---
         techLinks.forEach(link => {
             link.addEventListener('click', function(event) {
-                // Prevent the link from navigating
                 event.preventDefault();
-
-                // Get the target ID from the data-target attribute (e.g., "jenkins")
                 const targetId = this.getAttribute('data-target');
-
-                // Hide all content panels
-                contentPanels.forEach(panel => {
-                    panel.style.display = 'none';
-                });
-
-                // Remove 'active' class from all links
-                techLinks.forEach(l => {
-                    l.classList.remove('active');
-                });
                 
-                // Show the target content panel
+                contentPanels.forEach(panel => panel.style.display = 'none');
+                techLinks.forEach(l => l.classList.remove('active'));
+                
                 const targetPanel = document.getElementById(targetId);
                 if (targetPanel) {
                     targetPanel.style.display = 'block';
                 }
-
-                // Add 'active' class to the clicked link
                 this.classList.add('active');
+            });
+        });
+
+        // --- NEW: Logic for Expanding/Collapsing Sub-menus ---
+        categories.forEach(category => {
+            category.addEventListener('click', function() {
+                // Toggle a class on the category itself for styling (e.g., rotating the icon)
+                this.classList.toggle('open');
+                
+                // Find the next element, which is the <ul> submenu
+                const submenu = this.nextElementSibling;
+                if (submenu && submenu.classList.contains('submenu')) {
+                    // Toggle its visibility
+                    if (submenu.style.display === "block") {
+                        submenu.style.display = "none";
+                    } else {
+                        submenu.style.display = "block";
+                    }
+                }
             });
         });
     });

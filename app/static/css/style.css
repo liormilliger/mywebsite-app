@@ -110,17 +110,16 @@ footer {
     border-top: 1px solid rgba(236, 223, 204, 0.1);
 }
 
-
-/* --- NEW STYLES FOR TECH-IN-ACTION PAGE --- */
+/* --- STYLES FOR TECH-IN-ACTION PAGE --- */
 .tech-container {
     display: flex;
-    gap: 2rem; /* Space between the two columns */
+    gap: 2rem;
     margin-top: 2rem;
     text-align: left;
 }
 
 .tech-list {
-    flex: 1; /* Takes up 1 part of the available space */
+    flex: 1;
     border-right: 1px solid rgba(236, 223, 204, 0.2);
     padding-right: 2rem;
 }
@@ -137,15 +136,18 @@ footer {
     text-decoration: none;
     color: #ECDFCC;
     border-radius: 5px;
-    margin-bottom: 10px;
     transition: background-color 0.3s ease;
+}
+
+/* Standalone items have a small bottom margin */
+.tech-list > ul > li:not(.has-submenu) > a {
+    margin-bottom: 10px;
 }
 
 .tech-list li a:hover {
     background-color: rgba(236, 223, 204, 0.1);
 }
 
-/* Style for the currently active link */
 .tech-list li a.active {
     background-color: #ECDFCC;
     color: #0B192C;
@@ -153,7 +155,7 @@ footer {
 }
 
 .tech-display {
-    flex: 3; /* Takes up 3 parts of the space, making it wider */
+    flex: 3;
 }
 
 .tech-content-panel h3 {
@@ -163,18 +165,53 @@ footer {
     padding-bottom: 10px;
 }
 
-/* Styling for the code blocks */
 .tech-content-panel pre {
-    background-color: #020c1b; /* Even darker blue */
+    background-color: #020c1b;
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 5px;
     padding: 1rem;
-    white-space: pre-wrap; /* Wraps long lines of code */
+    white-space: pre-wrap;
     word-wrap: break-word;
 }
 
 .tech-content-panel code {
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.9rem;
-    color: #a7c5eb; /* Light blue for code text */
+    color: #a7c5eb;
+}
+
+/* --- NEW STYLES for Collapsible Menu --- */
+.tech-category {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: rgba(236, 223, 204, 0.05);
+}
+
+.tech-category:hover {
+    background-color: rgba(236, 223, 204, 0.1);
+}
+
+.tech-category .fas {
+    transition: transform 0.3s ease;
+}
+
+.tech-category.open .fas {
+    transform: rotate(180deg);
+}
+
+.submenu {
+    list-style: none;
+    padding-left: 20px; /* Indent sub-items */
+    display: none; /* Hidden by default */
+}
+
+.submenu li a {
+    font-size: 0.95rem;
 }
