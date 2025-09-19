@@ -216,23 +216,32 @@ footer {
     font-size: 0.95rem;
 }
 
-/* Contact Section Styling */
+/* --- Contact Section Styling (UPDATED for your theme) --- */
 #contact {
     padding: 60px 0;
     text-align: center;
-    background-color: #f9f9f9; /* Light background for contrast */
+    background-color: #0B192C; /* Main body background color */
+    color: #ECDFCC; /* Main body text color */
+}
+
+#contact .container {
+    max-width: 900px; /* Adjust container width for better look */
+    margin: 0 auto;
+    padding: 0 20px; /* Add some padding on sides */
 }
 
 #contact h2 {
-    font-size: 2.5em;
+    font-size: 2.5rem; /* Using rem for consistency */
     margin-bottom: 20px;
-    color: #333;
+    color: #ECDFCC; /* Main body text color */
+    font-weight: 600; /* Slightly bolder for headings */
 }
 
 #contact p {
-    font-size: 1.1em;
+    font-size: 1.1rem;
+    line-height: 1.6;
     margin-bottom: 40px;
-    color: #555;
+    color: rgba(236, 223, 204, 0.8); /* Slightly lighter text for paragraphs */
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
@@ -240,58 +249,64 @@ footer {
 
 .contact-info {
     display: flex;
-    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 30px; /* Space between contact items */
+    gap: 30px;
     margin-top: 30px;
 }
 
 .contact-item {
-    background-color: #fff;
+    background-color: #0c1a2e; /* Darker background, similar to nav */
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Darker shadow */
     padding: 25px;
-    width: calc(33% - 40px); /* Roughly 3 items per row, with gap consideration */
-    min-width: 280px; /* Minimum width for items */
+    width: calc(33% - 40px); /* Roughly 3 items per row */
+    min-width: 280px;
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(236, 223, 204, 0.1); /* Subtle border */
 }
 
 .contact-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4); /* More pronounced hover shadow */
 }
 
 .contact-item .icon {
-    font-size: 2.5em;
-    color: #007bff; /* A prominent color for icons */
+    font-size: 2.8em; /* Slightly larger icons */
+    color: #ECDFCC; /* Icons match main text color */
     margin-bottom: 15px;
-    display: block; /* Ensures icon is on its own line */
+    display: block;
+    transition: color 0.3s ease; /* Smooth icon color transition */
 }
 
 .contact-item a,
 .contact-item span {
-    font-size: 1.1em;
-    color: #333;
+    font-size: 1.15em; /* Slightly larger text */
+    color: #a7c5eb; /* A nice contrasting blue/gray, similar to your code highlighting */
     text-decoration: none;
     display: block;
     margin-top: 10px;
+    line-height: 1.4;
 }
 
 .contact-item a:hover {
-    color: #007bff;
+    color: #ECDFCC; /* Lighter on hover */
     text-decoration: underline;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    #contact h2 {
+        font-size: 2rem;
+    }
     .contact-info {
-        flex-direction: column; /* Stack items vertically on smaller screens */
+        flex-direction: column;
         align-items: center;
     }
 
     .contact-item {
-        width: 90%; /* Make items take more width */
+        width: 90%;
         max-width: 400px;
     }
 }
