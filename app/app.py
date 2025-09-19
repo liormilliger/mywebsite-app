@@ -22,9 +22,9 @@ def projects():
 def education():
     return render_template('education.html')
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
 
-# to make it available outside the container
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

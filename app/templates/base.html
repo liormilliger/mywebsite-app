@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Lior Milliger - Portfolio{% endblock %}</title>
+    <title>{% block title %}Lior Milliger's Website{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -12,15 +12,17 @@
 <body>
 
     <nav>
-        <div class="nav-brand">
+        <!-- <div class="nav-brand">
             <a href="/">Lior Milliger - DevOps</a>
-        </div>
+        </div> -->
         <div class="nav-menu-links">
             <a href="/">Home</a>
             <a href="/about-me">About Me</a>
             <a href="/tech-in-action">Tech in Action</a>
             <a href="/my-projects">My Projects</a>
             <a href="/education">Education</a>
+            <a href="/Contact">Contact</a>
+
         </div>
         <div class="nav-icon-links">
             <a href="{{ url_for('static', filename='files/LiorMilligerCV.pdf') }}" download class="nav-button">CV</a>

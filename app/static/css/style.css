@@ -215,3 +215,83 @@ footer {
 .submenu li a {
     font-size: 0.95rem;
 }
+
+/* Contact Section Styling */
+#contact {
+    padding: 60px 0;
+    text-align: center;
+    background-color: #f9f9f9; /* Light background for contrast */
+}
+
+#contact h2 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+#contact p {
+    font-size: 1.1em;
+    margin-bottom: 40px;
+    color: #555;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-info {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    justify-content: center;
+    gap: 30px; /* Space between contact items */
+    margin-top: 30px;
+}
+
+.contact-item {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    width: calc(33% - 40px); /* Roughly 3 items per row, with gap consideration */
+    min-width: 280px; /* Minimum width for items */
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.contact-item .icon {
+    font-size: 2.5em;
+    color: #007bff; /* A prominent color for icons */
+    margin-bottom: 15px;
+    display: block; /* Ensures icon is on its own line */
+}
+
+.contact-item a,
+.contact-item span {
+    font-size: 1.1em;
+    color: #333;
+    text-decoration: none;
+    display: block;
+    margin-top: 10px;
+}
+
+.contact-item a:hover {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .contact-info {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+        align-items: center;
+    }
+
+    .contact-item {
+        width: 90%; /* Make items take more width */
+        max-width: 400px;
+    }
+}
