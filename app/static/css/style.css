@@ -216,7 +216,6 @@ footer {
     font-size: 0.95rem;
 }
 
-/* --- Contact Section Styling (UPDATED for your theme) --- */
 #contact {
     padding: 60px 0;
     text-align: center;
@@ -225,88 +224,149 @@ footer {
 }
 
 #contact .container {
-    max-width: 900px; /* Adjust container width for better look */
+    max-width: 1200px; /* Increased width to accommodate image */
     margin: 0 auto;
-    padding: 0 20px; /* Add some padding on sides */
+    padding: 0 20px;
 }
 
 #contact h2 {
-    font-size: 2.5rem; /* Using rem for consistency */
+    font-size: 2.5rem;
     margin-bottom: 20px;
-    color: #ECDFCC; /* Main body text color */
-    font-weight: 600; /* Slightly bolder for headings */
+    color: #ECDFCC;
+    font-weight: 600;
 }
 
 #contact p {
     font-size: 1.1rem;
     line-height: 1.6;
     margin-bottom: 40px;
-    color: rgba(236, 223, 204, 0.8); /* Slightly lighter text for paragraphs */
+    color: rgba(236, 223, 204, 0.8);
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
 }
 
+/* NEW: Flex container for contact details and image */
+.contact-layout-wrapper {
+    display: flex;
+    flex-direction: row; /* Details on left, image on right */
+    justify-content: center;
+    align-items: center; /* Vertically align items */
+    gap: 50px; /* Space between the two columns */
+    margin-top: 40px; /* Space below intro text */
+}
+
+.contact-details-column {
+    flex: 1.5; /* Takes more space than the image column */
+    max-width: 700px; /* Max width for details */
+    text-align: left; /* Align contact items to left within its column */
+}
+
+.contact-image-column {
+    flex: 1; /* Takes less space */
+    display: flex; /* Use flex to center image */
+    justify-content: center;
+    align-items: center;
+}
+
+.contact-side-image {
+    max-width: 100%; /* Ensure image scales down */
+    height: auto;
+    max-height: 350px; /* Control max height of the image */
+    animation: pulse 2s infinite alternate; /* Optional: subtle animation */
+}
+
+/* Optional: Keyframes for the pulse animation */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+
+/* Existing contact-info and contact-item styles - ensure they still apply */
 .contact-info {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start; /* Align items to the start for left-aligned column */
     gap: 30px;
-    margin-top: 30px;
+    margin-top: 0; /* Reset margin since wrapper controls spacing */
 }
 
 .contact-item {
-    background-color: #0c1a2e; /* Darker background, similar to nav */
+    background-color: #0c1a2e;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Darker shadow */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     padding: 25px;
-    width: calc(33% - 40px); /* Roughly 3 items per row */
-    min-width: 280px;
-    text-align: center;
+    width: calc(50% - 15px); /* Two items per row within its column */
+    min-width: 250px; /* Adjusted min-width for two-column layout */
+    text-align: left; /* Text alignment within item */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(236, 223, 204, 0.1); /* Subtle border */
+    border: 1px solid rgba(236, 223, 204, 0.1);
 }
 
 .contact-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4); /* More pronounced hover shadow */
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
 }
 
 .contact-item .icon {
-    font-size: 2.8em; /* Slightly larger icons */
-    color: #ECDFCC; /* Icons match main text color */
-    margin-bottom: 15px;
-    display: block;
-    transition: color 0.3s ease; /* Smooth icon color transition */
+    font-size: 2.5em; /* Slightly smaller icons for better text flow */
+    color: #ECDFCC;
+    margin-bottom: 10px; /* Reduced margin */
+    display: inline-block; /* Allow text next to icon */
+    vertical-align: middle; /* Align icon vertically with text */
+    margin-right: 10px;
 }
 
 .contact-item a,
 .contact-item span {
-    font-size: 1.15em; /* Slightly larger text */
-    color: #a7c5eb; /* A nice contrasting blue/gray, similar to your code highlighting */
+    font-size: 1.1em; /* Adjusted font size */
+    color: #a7c5eb;
     text-decoration: none;
-    display: block;
-    margin-top: 10px;
+    display: inline; /* Allow text to flow naturally */
     line-height: 1.4;
+    vertical-align: middle;
 }
 
 .contact-item a:hover {
-    color: #ECDFCC; /* Lighter on hover */
+    color: #ECDFCC;
     text-decoration: underline;
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-    #contact h2 {
-        font-size: 2rem;
+@media (max-width: 992px) { /* Adjust breakpoint for layout change */
+    .contact-layout-wrapper {
+        flex-direction: column; /* Stack columns vertically */
+        gap: 40px;
+    }
+    .contact-details-column {
+        max-width: 100%;
+        text-align: center; /* Center text when stacked */
     }
     .contact-info {
-        flex-direction: column;
-        align-items: center;
+        justify-content: center; /* Center contact items when stacked */
     }
-
     .contact-item {
-        width: 90%;
+        width: 90%; /* Make items take more width */
         max-width: 400px;
+        text-align: center; /* Center text within items when stacked */
+    }
+    .contact-item .icon {
+        display: block; /* Stack icon and text */
+        margin: 0 auto 10px; /* Center icon */
+    }
+    .contact-item a,
+    .contact-item span {
+        display: block; /* Stack icon and text */
+    }
+    .contact-side-image {
+        max-height: 250px; /* Smaller image when stacked */
     }
 }
+
+@media (max-width: 576px) { /* Even smaller screens */
+    .contact-item {
+        width: 100%; /* Full width for items */
+    }
+}
+
