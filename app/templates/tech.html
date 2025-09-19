@@ -3,6 +3,54 @@
 {% block title %}Tech in Action - Lior Milliger{% endblock %}
 
 {% block content %}
+
+<style>
+    /* Style for the technology icons */
+    .tech-icon {
+        width: 40px;  /* Set a fixed width */
+        height: 40px; /* Set a fixed height */
+        object-fit: contain; /* Ensures the icon fits without distortion */
+        margin: 8px;
+        padding: 5px;
+        border-radius: 5px; /* Slightly rounded corners */
+        background-color: #f8f9fa; /* Light background for contrast */
+        border: 1px solid #dee2e6; /* Subtle border */
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        vertical-align: middle; /* Aligns icons with any text links */
+    }
+
+    /* Animate icon on hover */
+    .tech-icon:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Style for the 'active' icon or link */
+    .tech-link.active .tech-icon {
+        border-color: #007bff; /* Highlight color for the selected icon */
+        background-color: #e7f3ff;
+    }
+
+    .tech-link.active {
+        font-weight: bold;
+    }
+
+    /* Adjust submenu display to be a flex row for icons */
+    .tech-list .submenu {
+        display: none; /* Hidden by default, JS will toggle it */
+        flex-wrap: wrap;
+        justify-content: center; /* Center icons within the submenu */
+        padding-left: 0;
+        list-style: none;
+    }
+    
+    /* Override for the JS 'display: block' to make it 'display: flex' */
+    .tech-list .submenu[style*="block"] {
+        display: flex !important;
+        align-items: center;
+    }
+</style>
+
 <div class="page-content">
     <h1>Tech in Action 💻</h1>
     <p>Click on a technology from the list on the left to see a sample code snippet or configuration.</p>
@@ -13,33 +61,75 @@
                 <li class="has-submenu">
                     <span class="tech-category">CI <i class="fas fa-chevron-down"></i></span>
                     <ul class="submenu">
-                        <li><a href="#" class="tech-link" data-target="jenkins">Jenkins</a></li>
-                        <li><a href="#" class="tech-link" data-target="github-actions">GitHub Actions</a></li>
+                        <li>
+                            <a href="#" class="tech-link" data-target="jenkins" title="Jenkins">
+                                <img src="{{ url_for('static', filename='images/tech/Jenkins.png') }}" alt="Jenkins Logo" class="tech-icon">
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="tech-link" data-target="github-actions">GitHub Actions</a>
+                        </li>
                     </ul>
                 </li>
 
                 <li class="has-submenu">
                     <span class="tech-category">IaC <i class="fas fa-chevron-down"></i></span>
                     <ul class="submenu">
-                        <li><a href="#" class="tech-link" data-target="terraform">Terraform</a></li>
-                        <li><a href="#" class="tech-link" data-target="pulumi">Pulumi</a></li>
+                        <li>
+                            <a href="#" class="tech-link" data-target="terraform" title="Terraform">
+                                <img src="{{ url_for('static', filename='images/tech/terraform.svg') }}" alt="Terraform Logo" class="tech-icon">
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="tech-link" data-target="pulumi" title="Pulumi">
+                                <img src="{{ url_for('static', filename='images/tech/Pulumi.svg') }}" alt="Pulumi Logo" class="tech-icon">
+                            </a>
+                        </li>
                     </ul>
                 </li>
-
+                
                 <li class="has-submenu">
                     <span class="tech-category">Observability <i class="fas fa-chevron-down"></i></span>
                     <ul class="submenu">
-                        <li><a href="#" class="tech-link" data-target="prometheus">Prometheus</a></li>
-                        <li><a href="#" class="tech-link" data-target="grafana">Grafana</a></li>
-                        <li><a href="#" class="tech-link" data-target="kibana">Kibana</a></li>
+                        <li>
+                            <a href="#" class="tech-link" data-target="prometheus" title="Prometheus">
+                                <img src="{{ url_for('static', filename='images/tech/Prometheus.svg.png') }}" alt="Prometheus Logo" class="tech-icon">
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="tech-link" data-target="grafana" title="Grafana">
+                                <img src="{{ url_for('static', filename='images/tech/Grafana.svg.png') }}" alt="Grafana Logo" class="tech-icon">
+                            </a>
+                        </li>
+                        <li>
+                             <a href="#" class="tech-link" data-target="kibana">Kibana</a>
+                        </li>
                     </ul>
                 </li>
 
-                <li><a href="#" class="tech-link active" data-target="aws">AWS</a></li>
-                <li><a href="#" class="tech-link" data-target="docker">Docker</a></li>
-                <li><a href="#" class="tech-link" data-target="kubernetes">Kubernetes & Helm</a></li>
-                <li><a href="#" class="tech-link" data-target="argocd">ArgoCD</a></li>
-                <li><a href="#" class="tech-link" data-target="logging">Logging</a></li>
+                <li>
+                    <a href="#" class="tech-link active" data-target="aws" title="AWS">
+                        <img src="{{ url_for('static', filename='images/tech/AWS.svg.png') }}" alt="AWS Logo" class="tech-icon">
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="tech-link" data-target="docker" title="Docker">
+                        <img src="{{ url_for('static', filename='images/tech/docker.png') }}" alt="Docker Logo" class="tech-icon">
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="tech-link" data-target="kubernetes" title="Kubernetes & Helm">
+                        <img src="{{ url_for('static', filename='images/tech/Kubernetes.svg.png') }}" alt="Kubernetes Logo" class="tech-icon">
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="tech-link" data-target="argocd" title="ArgoCD">
+                        <img src="{{ url_for('static', filename='images/tech/argocd.webp') }}" alt="ArgoCD Logo" class="tech-icon">
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="tech-link" data-target="logging">Logging</a>
+                </li>
             </ul>
         </div>
 
@@ -202,7 +292,7 @@ spec:
             });
         });
 
-        // --- NEW: Logic for Expanding/Collapsing Sub-menus ---
+        // --- Logic for Expanding/Collapsing Sub-menus ---
         categories.forEach(category => {
             category.addEventListener('click', function() {
                 // Toggle a class on the category itself for styling (e.g., rotating the icon)
@@ -212,10 +302,10 @@ spec:
                 const submenu = this.nextElementSibling;
                 if (submenu && submenu.classList.contains('submenu')) {
                     // Toggle its visibility
-                    if (submenu.style.display === "block") {
+                    if (submenu.style.display === "block" || submenu.style.display === "flex") {
                         submenu.style.display = "none";
                     } else {
-                        submenu.style.display = "block";
+                        submenu.style.display = "block"; // The CSS will force this to flex
                     }
                 }
             });
