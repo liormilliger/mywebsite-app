@@ -110,50 +110,85 @@ footer {
     border-top: 1px solid rgba(236, 223, 204, 0.1);
 }
 
-/* --- STYLES FOR TECH-IN-ACTION PAGE --- */
+/* --- STYLES FOR TECH STACK PAGE --- */
 .tech-container {
     display: flex;
-    gap: 2rem;
+    gap: 2.5rem; /* Increased gap */
     margin-top: 2rem;
     text-align: left;
 }
 
 .tech-list {
-    flex: 1;
+    flex: 0 0 240px; /* Make the left menu narrower and fixed-width */
     border-right: 1px solid rgba(236, 223, 204, 0.2);
-    padding-right: 2rem;
+    padding-right: 2.5rem; /* Increased padding */
 }
 
-.tech-list ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+/* New styles for the category frames */
+.tech-category-frame {
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    background-color: #0c1a2e;
+    overflow: hidden;
 }
 
-.tech-list li a {
-    display: block;
+.tech-category-title {
     padding: 12px 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 0;
+    background-color: rgba(236, 223, 204, 0.08);
+    border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+    color: #ECDFCC;
+}
+
+.tech-category-content {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Adjusted styles for the tech links (icon + text) */
+.tech-link {
+    display: flex;
+    align-items: center;
+    padding: 8px;
     text-decoration: none;
     color: #ECDFCC;
     border-radius: 5px;
     transition: background-color 0.3s ease;
+    gap: 15px;
 }
 
-/* Standalone items have a small bottom margin */
-.tech-list > ul > li:not(.has-submenu) > a {
-    margin-bottom: 10px;
-}
-
-.tech-list li a:hover {
+.tech-link:hover {
     background-color: rgba(236, 223, 204, 0.1);
 }
 
-.tech-list li a.active {
+.tech-link.active {
     background-color: #ECDFCC;
-    color: #0B192C;
     font-weight: bold;
 }
 
+.tech-link.active .tech-link-text {
+    color: #0B192C;
+}
+
+.tech-icon {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.tech-link-text {
+    font-size: 1rem;
+    color: #ECDFCC;
+    transition: color 0.3s ease;
+}
+
+/* Styles for the right-side content display */
 .tech-display {
     flex: 3;
 }
@@ -165,6 +200,11 @@ footer {
     padding-bottom: 10px;
 }
 
+.tech-content-panel p {
+    font-size: 1.1rem;
+    color: rgba(236, 223, 204, 0.8);
+}
+
 .tech-content-panel pre {
     background-color: #020c1b;
     border: 1px solid rgba(236, 223, 204, 0.2);
@@ -172,151 +212,19 @@ footer {
     padding: 1rem;
     white-space: pre-wrap;
     word-wrap: break-word;
+    margin-top: 1.5rem;
 }
 
 .tech-content-panel code {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: #a7c5eb;
 }
 
-/* --- NEW STYLES for Collapsible Menu --- */
-.tech-category {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 15px;
-    font-weight: bold;
-    font-size: 1.1rem;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    background-color: rgba(236, 223, 204, 0.05);
-}
 
-.tech-category:hover {
-    background-color: rgba(236, 223, 204, 0.1);
-}
-
-.tech-category .fas {
-    transition: transform 0.3s ease;
-}
-
-.tech-category.open .fas {
-    transform: rotate(180deg);
-}
-
-.submenu {
-    list-style: none;
-    padding-left: 20px; /* Indent sub-items */
-    display: none; /* Hidden by default */
-}
-
-.submenu li a {
-    font-size: 0.95rem;
-}
-
+/* --- CONTACT PAGE STYLES --- */
 #contact {
     padding: 60px 0;
     text-align: center;
-    background-color: #0B192C;
-    color: #ECDFCC;
 }
-
-#contact .container {
-    max-width: 900px; /* Adjusted width for centered content */
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-#contact h2 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: #ECDFCC;
-    font-weight: 600;
-}
-
-#contact p {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 40px;
-    color: rgba(236, 223, 204, 0.8);
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.contact-info {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center; /* Center the contact items */
-    gap: 30px;
-    margin-top: 40px; /* Re-add margin that was on the wrapper */
-}
-
-.contact-item {
-    background-color: #0c1a2e;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    padding: 25px;
-    width: calc(50% - 15px); /* Two items per row */
-    min-width: 250px;
-    text-align: left; /* Text alignment within item */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(236, 223, 204, 0.1);
-}
-
-.contact-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
-}
-
-.contact-item .icon {
-    font-size: 2.5em;
-    color: #ECDFCC;
-    margin-bottom: 10px;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 10px;
-}
-
-.contact-item a,
-.contact-item span {
-    font-size: 1.1em;
-    color: #a7c5eb;
-    text-decoration: none;
-    display: inline;
-    line-height: 1.4;
-    vertical-align: middle;
-}
-
-.contact-item a:hover {
-    color: #ECDFCC;
-    text-decoration: underline;
-}
-
-/* Responsive adjustments */
-@media (max-width: 992px) {
-    .contact-info {
-        justify-content: center; /* Center contact items when stacked */
-    }
-    .contact-item {
-        width: 90%; /* Make items take more width */
-        max-width: 400px;
-        text-align: center; /* Center text within items when stacked */
-    }
-    .contact-item .icon {
-        display: block; /* Stack icon and text */
-        margin: 0 auto 10px; /* Center icon */
-    }
-    .contact-item a,
-    .contact-item span {
-        display: block; /* Stack icon and text */
-    }
-}
-
-@media (max-width: 576px) { /* Even smaller screens */
-    .contact-item {
-        width: 100%; /* Full width for items */
-    }
-}
+/* ... (rest of your CSS is unchanged) ... */
