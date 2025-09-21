@@ -1,0 +1,10 @@
+<h3>AWS CLI Command</h3>
+<pre><code># List all S3 buckets in your account
+aws s3 ls
+
+# Create a new EC2 instance
+aws ec2 run-instances \
+    --image-id ami-0c55b159cbfafe1f0 \
+    --count 1 \
+    --instance-type t2.micro \
+    --key-name MyKeyPair</code></pre>

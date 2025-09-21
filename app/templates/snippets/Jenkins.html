@@ -1,0 +1,80 @@
+<h3>Jenkinsfile (Declarative Pipeline)</h3>
+<pre><code>pipeline {
+    agent any
+
+    environment {
+        AWS_REGION     = 'us-east-1'
+        ECR_REGISTRY   = '704505749045.dkr.ecr.us-east-1.amazonaws.com'
+        ECR_REPOSITORY = 'mywebsite'
+        IMAGE_FILE_NAME = 'my-app-image.tar'
+        // Use Jenkins' built-in BUILD_NUMBER to create a version tag
+        IMAGE_TAG      = "1.${env.BUILD_NUMBER}.0"
+    }
+
+    stages {
+        stage('Build Image') {
+            steps {
+                script {
+                    echo "Building image with tag: ${env.IMAGE_TAG}"
+                    sh "docker build -t ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG} ."
+                    sh "docker save ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG} --output ${env.IMAGE_FILE_NAME}"
+                    // Stash the image artifact to use in later stages
+                    stash name: 'docker-image', includes: "${env.IMAGE_FILE_NAME}"
+                }
+            }
+        }
+
+        stage('Test Image') {
+            steps {
+                script {
+                    // Unstash the image from the build stage
+                    unstash 'docker-image'
+                    sh "docker load --input ${env.IMAGE_FILE_NAME}"
+                    
+                    // Run container in background and perform healthcheck
+                    sh """
+                    IMAGE_NAME=${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG}
+                    docker run -d --name my-app-test -p 8080:5000 \$IMAGE_NAME
+                    echo "Waiting for container to start..."
+                    sleep 15
+                    echo "Performing healthcheck..."
+                    curl --fail http://localhost:8080/ || exit 1
+                    echo "Healthcheck passed!"
+                    """
+                }
+            }
+            post {
+                // This block runs after the 'Test Image' stage, regardless of its outcome
+                always {
+                    echo "Cleaning up test container..."
+                    // Use '|| true' to prevent the build from failing if the container doesn't exist
+                    sh "docker stop my-app-test || true"
+                    sh "docker rm my-app-test || true"
+                }
+            }
+        }
+
+        stage('Push Image to ECR') {
+            steps {
+                script {
+                    unstash 'docker-image'
+                    sh "docker load --input ${env.IMAGE_FILE_NAME}"
+
+                    // This block requires the AWS Credentials Binding plugin
+                    // and assumes credentials are stored in Jenkins with the ID 'aws-credentials'
+                    withCredentials([aws(credentials: 'aws-credentials')]) {
+                        // Login to AWS ECR
+                        sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
+                        
+                        // Tag the image with 'latest' as well
+                        sh "docker tag ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG} ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:latest"
+                        
+                        // Push both the version tag and the 'latest' tag
+                        sh "docker push ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY} --all-tags"
+                    }
+                }
+            }
+        }
+    }
+}
+</code></pre>

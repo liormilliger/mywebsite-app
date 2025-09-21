@@ -13,15 +13,15 @@
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">CI/CD</h4>
                 <div class="tech-category-content">
-                    <a href="#" class="tech-link active" data-target="jenkins" title="Jenkins">
+                    <a href="#" class="tech-link active" data-target="jenkins" title="CI/CD automation server">
                         <img src="{{ url_for('static', filename='images/tech/Jenkins.png') }}" alt="Jenkins Logo" class="tech-icon">
                         <span class="tech-link-text">Jenkins</span>
                     </a>
-                    <a href="#" class="tech-link" data-target="github-actions" title="GitHub Actions">
+                    <a href="#" class="tech-link" data-target="github-actions" title="GitHub's CI/CD platform">
                         <img src="{{ url_for('static', filename='images/tech/GitHubActions.png') }}" alt="GitHub Actions Logo" class="tech-icon">
-                        <span class="tech-link-text">GitHub Actions</span>
+                        <span class="tech-link-text">GitHubActions</span>
                     </a>
-                    <a href="#" class="tech-link" data-target="argocd" title="ArgoCD">
+                    <a href="#" class="tech-link" data-target="argocd" title="GitOps continuous delivery tool">
                         <img src="{{ url_for('static', filename='images/tech/argocd.webp') }}" alt="ArgoCD Logo" class="tech-icon">
                         <span class="tech-link-text">ArgoCD</span>
                     </a>
@@ -32,11 +32,11 @@
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Containerization</h4>
                 <div class="tech-category-content">
-                    <a href="#" class="tech-link" data-target="docker" title="Docker">
+                    <a href="#" class="tech-link" data-target="docker" title="Container image build instructions">
                         <img src="{{ url_for('static', filename='images/tech/docker.png') }}" alt="Docker Logo" class="tech-icon">
-                        <span class="tech-link-text">Docker</span>
+                        <span class="tech-link-text">Dockerfile</span>
                     </a>
-                    <a href="#" class="tech-link" data-target="kubernetes" title="Kubernetes & Helm">
+                    <a href="#" class="tech-link" data-target="kubernetes" title="Container orchestration platform">
                         <img src="{{ url_for('static', filename='images/tech/Kubernetes.svg.png') }}" alt="Kubernetes Logo" class="tech-icon">
                         <span class="tech-link-text">Kubernetes</span>
                     </a>
@@ -47,11 +47,11 @@
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Infrastructure as Code</h4>
                 <div class="tech-category-content">
-                    <a href="#" class="tech-link" data-target="terraform" title="Terraform">
+                    <a href="#" class="tech-link" data-target="terraform" title="Infrastructure as Code tool">
                         <img src="{{ url_for('static', filename='images/tech/terraform.svg') }}" alt="Terraform Logo" class="tech-icon">
                         <span class="tech-link-text">Terraform</span>
                     </a>
-                    <a href="#" class="tech-link" data-target="pulumi" title="Pulumi">
+                    <a href="#" class="tech-link" data-target="pulumi" title="Modern Infrastructure as Code">
                         <img src="{{ url_for('static', filename='images/tech/Pulumi.svg') }}" alt="Pulumi Logo" class="tech-icon">
                         <span class="tech-link-text">Pulumi</span>
                     </a>
@@ -62,7 +62,7 @@
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Cloud</h4>
                 <div class="tech-category-content">
-                    <a href="#" class="tech-link" data-target="aws" title="AWS">
+                    <a href="#" class="tech-link" data-target="aws" title="Amazon Web Services cloud platform">
                         <img src="{{ url_for('static', filename='images/tech/AWS.svg.png') }}" alt="AWS Logo" class="tech-icon">
                         <span class="tech-link-text">AWS</span>
                     </a>
@@ -73,11 +73,11 @@
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Observability</h4>
                 <div class="tech-category-content">
-                    <a href="#" class="tech-link" data-target="prometheus" title="Prometheus">
+                    <a href="#" class="tech-link" data-target="prometheus" title="Monitoring and alerting toolkit">
                         <img src="{{ url_for('static', filename='images/tech/Prometheus.svg.png') }}" alt="Prometheus Logo" class="tech-icon">
                         <span class="tech-link-text">Prometheus</span>
                     </a>
-                    <a href="#" class="tech-link" data-target="grafana" title="Grafana">
+                    <a href="#" class="tech-link" data-target="grafana" title="Analytics and monitoring platform">
                         <img src="{{ url_for('static', filename='images/tech/Grafana.svg.png') }}" alt="Grafana Logo" class="tech-icon">
                         <span class="tech-link-text">Grafana</span>
                     </a>
@@ -88,15 +88,15 @@
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Logging</h4>
                 <div class="tech-category-content">
-                     <a href="#" class="tech-link" data-target="fluentbit" title="Fluent Bit">
+                     <a href="#" class="tech-link" data-target="fluentbit" title="Log processor and forwarder">
                         <img src="{{ url_for('static', filename='images/tech/fluentbit.jpeg') }}" alt="Fluent Bit Logo" class="tech-icon">
-                        <span class="tech-link-text">Fluent Bit</span>
+                        <span class="tech-link-text">FluentBit</span>
                     </a>
-                     <a href="#" class="tech-link" data-target="elasticsearch" title="Elasticsearch">
+                     <a href="#" class="tech-link" data-target="elasticsearch" title="Search and analytics engine">
                         <img src="{{ url_for('static', filename='images/tech/elasticsearch-logo.svg') }}" alt="Elasticsearch Logo" class="tech-icon">
-                        <span class="tech-link-text">Elasticsearch</span>
+                        <span class="tech-link-text">ElasticSearch</span>
                     </a>
-                    <a href="#" class="tech-link" data-target="kibana" title="Kibana">
+                    <a href="#" class="tech-link" data-target="kibana" title="Data visualization dashboard">
                         <img src="{{ url_for('static', filename='images/tech/kibana.png') }}" alt="Kibana Logo" class="tech-icon">
                         <span class="tech-link-text">Kibana</span>
                     </a>
@@ -105,325 +105,19 @@
         </div>
 
         <div class="tech-display">
-            <!-- Content Panels -->
-            <div id="jenkins" class="tech-content-panel">
-                <h3>Jenkinsfile (Declarative Pipeline)</h3>
-                <pre><code>pipeline {
-    agent any
-
-    environment {
-        AWS_REGION     = 'us-east-1'
-        ECR_REGISTRY   = 'MY ECR'
-        ECR_REPOSITORY = 'MY REPO'
-        IMAGE_FILE_NAME = 'my-app-image.tar'
-        // Use Jenkins' built-in BUILD_NUMBER to create a version tag
-        IMAGE_TAG      = "1.${env.BUILD_NUMBER}.0"
-    }
-
-    stages {
-        stage('Build Image') {
-            steps {
-                script {
-                    echo "Building image with tag: ${env.IMAGE_TAG}"
-                    sh "docker build -t ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG} ."
-                    sh "docker save ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG} --output ${env.IMAGE_FILE_NAME}"
-                    // Stash the image artifact to use in later stages
-                    stash name: 'docker-image', includes: "${env.IMAGE_FILE_NAME}"
-                }
-            }
-        }
-
-        stage('Test Image') {
-            steps {
-                script {
-                    // Unstash the image from the build stage
-                    unstash 'docker-image'
-                    sh "docker load --input ${env.IMAGE_FILE_NAME}"
-                    
-                    // Run container in background and perform healthcheck
-                    sh """
-                    IMAGE_NAME=${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG}
-                    docker run -d --name my-app-test -p 8080:5000 \$IMAGE_NAME
-                    echo "Waiting for container to start..."
-                    sleep 15
-                    echo "Performing healthcheck..."
-                    curl --fail http://localhost:8080/ || exit 1
-                    echo "Healthcheck passed!"
-                    """
-                }
-            }
-            post {
-                // This block runs after the 'Test Image' stage, regardless of its outcome
-                always {
-                    echo "Cleaning up test container..."
-                    // Use '|| true' to prevent the build from failing if the container doesn't exist
-                    sh "docker stop my-app-test || true"
-                    sh "docker rm my-app-test || true"
-                }
-            }
-        }
-
-        stage('Push Image to ECR') {
-            steps {
-                script {
-                    unstash 'docker-image'
-                    sh "docker load --input ${env.IMAGE_FILE_NAME}"
-
-                    // This block requires the AWS Credentials Binding plugin
-                    // and assumes credentials are stored in Jenkins with the ID 'aws-credentials'
-                    withCredentials([aws(credentials: 'aws-credentials')]) {
-                        // Login to AWS ECR
-                        sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
-                        
-                        // Tag the image with 'latest' as well
-                        sh "docker tag ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG} ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:latest"
-                        
-                        // Push both the version tag and the 'latest' tag
-                        sh "docker push ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY} --all-tags"
-                    }
-                }
-            }
-        }
-    }
-}
-</code></pre>
-            </div>
-            <div id="github-actions" class="tech-content-panel" style="display: none;">
-                <h3>GitHub Actions Workflow (push-image.yaml)</h3>
-                <pre><code>{% raw %}name: Build, Test, and Push Docker Image to ECR
-
-on:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
-
-env:
-  AWS_REGION: us-east-1
-  ECR_REGISTRY: MY ECR_REGISTRY
-  ECR_REPOSITORY: MY REPO
-  IMAGE_FILE_NAME: my-app-image.tar
-
-jobs:
-  build:
-    name: Build Image
-    runs-on: ubuntu-latest
-    outputs:
-      image_tag: ${{ steps.version.outputs.IMAGE_TAG }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Define Image Version Tag
-        id: version
-        run: |
-          VERSION="1.${{ github.run_number }}.0"
-          echo "IMAGE_TAG=${VERSION}" >> $GITHUB_OUTPUT
-
-      - name: Build Docker image
-        run: |
-          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} .
-
-      - name: Save Docker image as an artifact
-        run: |
-          docker save ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} --output ${{ env.IMAGE_FILE_NAME }}
-          
-      - name: Upload image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-image
-          path: ${{ env.IMAGE_FILE_NAME }}
-
-  test:
-    name: Test Image
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Download image artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-image
-
-      - name: Load Docker image
-        run: |
-          docker load --input ${{ env.IMAGE_FILE_NAME }}
-
-      - name: Run container and perform healthcheck
-        run: |
-          IMAGE_NAME=$(docker images --format '{{.Repository}}:{{.Tag}}' | head -n 1)
-          docker run -d --name my-app-test -p 8080:5000 $IMAGE_NAME
-          echo "Waiting for container to start..."
-          sleep 15
-          echo "Performing healthcheck..."
-          curl --fail http://localhost:8080/ || exit 1
-          echo "Healthcheck passed!"
-          docker stop my-app-test
-
-  push:
-    name: Push Image to ECR
-    runs-on: ubuntu-latest
-    needs: [build, test]
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Download image artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-image
-
-      - name: Load Docker image
-        run: |
-          docker load --input ${{ env.IMAGE_FILE_NAME }}
-
-      - name: Tag and Push image to Amazon ECR
-        run: |
-          IMAGE_TAG="${{ needs.build.outputs.image_tag }}"
-          docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags
-{% endraw %}</code></pre>
-            </div>
-            <div id="argocd" class="tech-content-panel" style="display: none;">
-              <h3>ArgoCD Application Manifest</h3>
-              <pre><code>apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: my-app
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: 'https://github.com/my-org/my-app.git'
-    path: helm-chart
-  destination:
-    server: 'https://kubernetes.default.svc'</code></pre>
-            </div>
-            <div id="docker" class="tech-content-panel" style="display: none;">
-              <h3>Dockerfile</h3>
-              <pre><code>FROM python:3.8-slim-buster
-WORKDIR /app
-COPY . /app
-RUN pip install -r requirements.txt
-EXPOSE 80
-CMD ["python", "app.py"]</code></pre>
-            </div>
-             <div id="kubernetes" class="tech-content-panel" style="display: none;">
-                <h3>Kubernetes Deployment (deployment.yaml)</h3>
-                <pre><code>apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80</code></pre>
-            </div>
-            <div id="terraform" class="tech-content-panel" style="display: none;">
-                <h3>Terraform (main.tf)</h3>
-                <pre><code>provider "aws" {
-  region = "us-east-1"
-}
-
-resource "aws_s3_bucket" "b" {
-  bucket = "my-tf-test-bucket"
-}</code></pre>
-            </div>
-            <div id="pulumi" class="tech-content-panel" style="display: none;">
-                <h3>Pulumi (index.ts)</h3>
-                <pre><code>import * as aws from "@pulumi/aws";
-
-// Create an AWS resource (S3 Bucket)
-const bucket = new aws.s3.Bucket("my-bucket", {
-    acl: "private",
-});
-
-// Export the name of the bucket
-export const bucketName = bucket.id;
-</code></pre>
-            </div>
-            <div id="aws" class="tech-content-panel" style="display: none;">
-              <h3>AWS CLI Command</h3>
-              <pre><code># List all S3 buckets in your account
-aws s3 ls
-
-# Create a new EC2 instance
-aws ec2 run-instances \
-    --image-id ami-0c55b159cbfafe1f0 \
-    --count 1 \
-    --instance-type t2.micro \
-    --key-name MyKeyPair</code></pre>
-            </div>
-            <div id="prometheus" class="tech-content-panel" style="display: none;">
-              <h3>Prometheus Scrape Config (prometheus.yml)</h3>
-              <pre><code>scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['localhost:9090']</code></pre>
-            </div>
-            <div id="grafana" class="tech-content-panel" style="display: none;">
-              <h3>Grafana (PromQL Query)</h3>
-              <p>Grafana is a visualization tool. Here is a sample query to show CPU usage:</p>
-              <pre><code>100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</code></pre>
-            </div>
-            <div id="fluentbit" class="tech-content-panel" style="display: none;">
-                <h3>Fluent Bit Configuration (fluent-bit.conf)</h3>
-                <p>This config tails a log file and forwards new entries to Elasticsearch.</p>
-                <pre><code>[SERVICE]
-    Flush        1
-    Daemon       Off
-    Log_Level    info
-
-[INPUT]
-    Name         tail
-    Path         /var/log/app.log
-    Tag          app.log
-
-[OUTPUT]
-    Name         es
-    Match        *
-    Host         elasticsearch-master
-    Port         9200
-    Index        my-app-logs
-    Type         _doc
-</code></pre>
-            </div>
-            <div id="elasticsearch" class="tech-content-panel" style="display: none;">
-                <h3>Elasticsearch Query (REST API)</h3>
-                <p>A simple query to search for logs containing the word "error".</p>
-                <pre><code># Search for logs with level "error"
-GET /my-app-logs/_search
-{
-  "query": {
-    "match": {
-      "message": "error"
-    }
-  }
-}
-</code></pre>
-            </div>
-            <div id="kibana" class="tech-content-panel" style="display: none;">
-              <h3>Kibana (KQL Query)</h3>
-              <p>Kibana is a visualization layer for Elasticsearch. You use KQL to filter logs.</p>
-              <pre><code>service: "auth-service" and level: "ERROR"</code></pre>
-            </div>
+            <div id="jenkins" class="tech-content-panel">{% include 'snippets/Jenkins.html' %}</div>
+            <div id="github-actions" class="tech-content-panel" style="display: none;">{% include 'snippets/GitHubActions.html' %}</div>
+            <div id="argocd" class="tech-content-panel" style="display: none;">{% include 'snippets/ArgoCD.html' %}</div>
+            <div id="docker" class="tech-content-panel" style="display: none;">{% include 'snippets/Dockerfile.html' %}</div>
+            <div id="kubernetes" class="tech-content-panel" style="display: none;">{% include 'snippets/Kubernetes.html' %}</div>
+            <div id="terraform" class="tech-content-panel" style="display: none;">{% include 'snippets/Terraform.html' %}</div>
+            <div id="pulumi" class="tech-content-panel" style="display: none;">{% include 'snippets/Pulumi.html' %}</div>
+            <div id="aws" class="tech-content-panel" style="display: none;">{% include 'snippets/AWS.html' %}</div>
+            <div id="prometheus" class="tech-content-panel" style="display: none;">{% include 'snippets/Prometheus.html' %}</div>
+            <div id="grafana" class="tech-content-panel" style="display: none;">{% include 'snippets/Grafana.html' %}</div>
+            <div id="fluentbit" class="tech-content-panel" style="display: none;">{% include 'snippets/FluentBit.html' %}</div>
+            <div id="elasticsearch" class="tech-content-panel" style="display: none;">{% include 'snippets/ElasticSearch.html' %}</div>
+            <div id="kibana" class="tech-content-panel" style="display: none;">{% include 'snippets/Kibana.html' %}</div>
         </div>
     </div>
 </div>

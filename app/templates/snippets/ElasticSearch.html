@@ -1,0 +1,12 @@
+<h3>Elasticsearch Query (REST API)</h3>
+<p>A simple query to search for logs containing the word "error".</p>
+<pre><code># Search for logs with level "error"
+GET /my-app-logs/_search
+{
+  "query": {
+    "match": {
+      "message": "error"
+    }
+  }
+}
+</code></pre>

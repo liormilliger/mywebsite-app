@@ -1,0 +1,11 @@
+<h3>Pulumi (index.ts)</h3>
+<pre><code>import * as aws from "@pulumi/aws";
+
+// Create an AWS resource (S3 Bucket)
+const bucket = new aws.s3.Bucket("my-bucket", {
+    acl: "private",
+});
+
+// Export the name of the bucket
+export const bucketName = bucket.id;
+</code></pre>

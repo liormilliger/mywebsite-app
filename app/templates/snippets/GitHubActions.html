@@ -1,0 +1,100 @@
+<h3>GitHub Actions Workflow (push-image.yaml)</h3>
+<pre><code>{% raw %}name: Build, Test, and Push Docker Image to ECR
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 704505749045.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REPOSITORY: mywebsite
+  IMAGE_FILE_NAME: my-app-image.tar
+
+jobs:
+  build:
+    name: Build Image
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.version.outputs.IMAGE_TAG }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Define Image Version Tag
+        id: version
+        run: |
+          VERSION="1.${{ github.run_number }}.0"
+          echo "IMAGE_TAG=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} .
+
+      - name: Save Docker image as an artifact
+        run: |
+          docker save ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} --output ${{ env.IMAGE_FILE_NAME }}
+          
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: ${{ env.IMAGE_FILE_NAME }}
+
+  test:
+    name: Test Image
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker image
+        run: |
+          docker load --input ${{ env.IMAGE_FILE_NAME }}
+
+      - name: Run container and perform healthcheck
+        run: |
+          IMAGE_NAME=$(docker images --format '{{.Repository}}:{{.Tag}}' | head -n 1)
+          docker run -d --name my-app-test -p 8080:5000 $IMAGE_NAME
+          echo "Waiting for container to start..."
+          sleep 15
+          echo "Performing healthcheck..."
+          curl --fail http://localhost:8080/ || exit 1
+          echo "Healthcheck passed!"
+          docker stop my-app-test
+
+  push:
+    name: Push Image to ECR
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker image
+        run: |
+          docker load --input ${{ env.IMAGE_FILE_NAME }}
+
+      - name: Tag and Push image to Amazon ECR
+        run: |
+          IMAGE_TAG="${{ needs.build.outputs.image_tag }}"
+          docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags
+{% endraw %}</code></pre>

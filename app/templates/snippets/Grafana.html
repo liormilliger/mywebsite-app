@@ -1,0 +1,3 @@
+<h3>Grafana (PromQL Query)</h3>
+<p>Grafana is a visualization tool. Here is a sample query to show CPU usage:</p>
+<pre><code>100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</code></pre>
