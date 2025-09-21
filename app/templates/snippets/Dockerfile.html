@@ -1,13 +1,7 @@
-FROM python:3.9-slim
-
+<h3>Dockerfile</h3>
+<pre><code>FROM python:3.8-slim-buster
 WORKDIR /app
-
-COPY app/requirements.txt .
-
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY app/ .
-
-EXPOSE 5000
-
-CMD ["python", "app.py"]
+COPY . /app
+RUN pip install -r requirements.txt
+EXPOSE 80
+CMD ["python", "app.py"]</code></pre>
