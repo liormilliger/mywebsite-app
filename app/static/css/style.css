@@ -219,12 +219,12 @@ footer {
 #contact {
     padding: 60px 0;
     text-align: center;
-    background-color: #0B192C; /* Main body background color */
-    color: #ECDFCC; /* Main body text color */
+    background-color: #0B192C;
+    color: #ECDFCC;
 }
 
 #contact .container {
-    max-width: 1200px; /* Increased width to accommodate image */
+    max-width: 900px; /* Adjusted width for centered content */
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -246,50 +246,12 @@ footer {
     margin-right: auto;
 }
 
-/* NEW: Flex container for contact details and image */
-.contact-layout-wrapper {
-    display: flex;
-    flex-direction: row; /* Details on left, image on right */
-    justify-content: center;
-    align-items: center; /* Vertically align items */
-    gap: 50px; /* Space between the two columns */
-    margin-top: 40px; /* Space below intro text */
-}
-
-.contact-details-column {
-    flex: 1.5; /* Takes more space than the image column */
-    max-width: 700px; /* Max width for details */
-    text-align: left; /* Align contact items to left within its column */
-}
-
-.contact-image-column {
-    flex: 1; /* Takes less space */
-    display: flex; /* Use flex to center image */
-    justify-content: center;
-    align-items: center;
-}
-
-.contact-side-image {
-    max-width: 100%; /* Ensure image scales down */
-    height: auto;
-    max-height: 350px; /* Control max height of the image */
-    animation: pulse 2s infinite alternate; /* Optional: subtle animation */
-}
-
-/* Optional: Keyframes for the pulse animation */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.05); }
-}
-
-
-/* Existing contact-info and contact-item styles - ensure they still apply */
 .contact-info {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start; /* Align items to the start for left-aligned column */
+    justify-content: center; /* Center the contact items */
     gap: 30px;
-    margin-top: 0; /* Reset margin since wrapper controls spacing */
+    margin-top: 40px; /* Re-add margin that was on the wrapper */
 }
 
 .contact-item {
@@ -297,8 +259,8 @@ footer {
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     padding: 25px;
-    width: calc(50% - 15px); /* Two items per row within its column */
-    min-width: 250px; /* Adjusted min-width for two-column layout */
+    width: calc(50% - 15px); /* Two items per row */
+    min-width: 250px;
     text-align: left; /* Text alignment within item */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 1px solid rgba(236, 223, 204, 0.1);
@@ -310,20 +272,20 @@ footer {
 }
 
 .contact-item .icon {
-    font-size: 2.5em; /* Slightly smaller icons for better text flow */
+    font-size: 2.5em;
     color: #ECDFCC;
-    margin-bottom: 10px; /* Reduced margin */
-    display: inline-block; /* Allow text next to icon */
-    vertical-align: middle; /* Align icon vertically with text */
+    margin-bottom: 10px;
+    display: inline-block;
+    vertical-align: middle;
     margin-right: 10px;
 }
 
 .contact-item a,
 .contact-item span {
-    font-size: 1.1em; /* Adjusted font size */
+    font-size: 1.1em;
     color: #a7c5eb;
     text-decoration: none;
-    display: inline; /* Allow text to flow naturally */
+    display: inline;
     line-height: 1.4;
     vertical-align: middle;
 }
@@ -334,15 +296,7 @@ footer {
 }
 
 /* Responsive adjustments */
-@media (max-width: 992px) { /* Adjust breakpoint for layout change */
-    .contact-layout-wrapper {
-        flex-direction: column; /* Stack columns vertically */
-        gap: 40px;
-    }
-    .contact-details-column {
-        max-width: 100%;
-        text-align: center; /* Center text when stacked */
-    }
+@media (max-width: 992px) {
     .contact-info {
         justify-content: center; /* Center contact items when stacked */
     }
@@ -359,9 +313,6 @@ footer {
     .contact-item span {
         display: block; /* Stack icon and text */
     }
-    .contact-side-image {
-        max-height: 250px; /* Smaller image when stacked */
-    }
 }
 
 @media (max-width: 576px) { /* Even smaller screens */
@@ -369,4 +320,3 @@ footer {
         width: 100%; /* Full width for items */
     }
 }
-
