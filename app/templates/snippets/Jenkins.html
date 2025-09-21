@@ -161,22 +161,22 @@
                 }
             }
         }
+    }
 </code></pre>
         </div>
     </div>
 </div>
-<pre><code>    }
-    post {
-        always {
-</code></pre>
+
 <div class="code-accordion">
     <div class="accordion-item">
         <button class="accordion-header">
-            <span class="header-title">stage('Clean Up') { ... }</span>
+            <span class="header-title">post { ... }</span>
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>            stage('Clean Up') {
+<pre><code>    post {
+        always {
+            stage('Clean Up') {
                 steps {
                     echo "Cleaning up workspace and local Docker images..."
                     sh "docker rmi ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} || true"
