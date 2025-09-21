@@ -18,6 +18,7 @@ nav {
     padding: 1rem 2.5rem;
     background-color: #0c1a2e;
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+    position: relative; /* Added for mobile menu positioning */
 }
 
 nav a {
@@ -29,6 +30,12 @@ nav a {
 .nav-brand a {
     font-size: 1.3rem;
     font-weight: bold;
+}
+
+.nav-links-container {
+    display: flex;
+    align-items: center;
+    gap: 30px;
 }
 
 .nav-menu-links {
@@ -62,6 +69,14 @@ nav a {
 
 .nav-icon-links i {
     font-size: 1.6rem;
+}
+
+/* Hamburger menu is hidden on desktop by default */
+.hamburger-menu {
+    display: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #ECDFCC;
 }
 
 /* --- Main Content Area --- */
@@ -218,6 +233,22 @@ footer {
     color: #a7c5eb;
 }
 
+/* Style for the introduction box in code snippets */
+.snippet-intro {
+    background-color: rgba(12, 26, 46, 0.7);
+    border-left: 4px solid #ECDFCC;
+    padding: 15px 20px;
+    margin: 2rem 0;
+    border-radius: 0 8px 8px 0;
+    text-align: left;
+}
+
+.snippet-intro p {
+    margin: 0;
+    font-size: 1rem;
+    color: rgba(236, 223, 204, 0.9);
+    line-height: 1.6;
+}
 
 /* --- CONTACT PAGE STYLES --- */
 #contact {
@@ -276,4 +307,124 @@ footer {
 
 .contact-item a:hover {
     text-decoration: underline;
+}
+
+
+/* ========================================= */
+/* ===== RESPONSIVE STYLES FOR MOBILE ====== */
+/* ========================================= */
+@media (max-width: 768px) {
+    
+    /* --- Navigation Bar Adjustments --- */
+    nav {
+        padding: 1rem 1.5rem;
+    }
+
+    .hamburger-menu {
+        display: block; /* Show the hamburger icon */
+    }
+
+    .nav-links-container {
+        display: none; /* Hide the links container by default */
+        position: absolute;
+        top: 100%; /* Position it right below the nav bar */
+        left: 0;
+        width: 100%;
+        background-color: #0c1a2e; /* Same as nav */
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem 0;
+        gap: 0;
+        border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+    }
+
+    /* This class is toggled by JavaScript */
+    .nav-links-container.active {
+        display: flex; /* Show the container when active */
+    }
+
+    .nav-menu-links, .nav-icon-links {
+        flex-direction: column;
+        gap: 1.5rem; /* Space out links vertically */
+        width: 100%;
+    }
+    
+    .nav-menu-links {
+        padding-bottom: 1.5rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid rgba(236, 223, 204, 0.1);
+    }
+
+    /* --- Tech Stack Page Adjustments --- */
+    .tech-container {
+        flex-direction: column; /* Stack the list and display vertically */
+        gap: 1.5rem;
+    }
+    
+    .tech-list {
+        flex: 1 1 auto; /* Allow list to grow/shrink */
+        border-right: none; /* Remove the vertical line */
+        padding-right: 0;
+    }
+    
+    /* --- General Content Adjustments --- */
+    main {
+        padding: 1.5rem;
+    }
+
+    .page-content h1 {
+        font-size: 2rem;
+    }
+}
+
+
+/* --- ACCORDION STYLES FOR CODE SNIPPETS --- */
+.code-accordion {
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    border-radius: 5px;
+    overflow: hidden; /* Ensures the border-radius is respected */
+    background-color: #020c1b;
+}
+
+.accordion-item:not(:last-child) {
+    border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+}
+
+.accordion-header {
+    background-color: #0c1a2e;
+    color: #ECDFCC;
+    cursor: pointer;
+    padding: 12px 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.accordion-header:hover, .accordion-header.active {
+    background-color: #1a2b3c;
+}
+
+.accordion-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+/* Override default pre style for accordion content */
+.accordion-content pre {
+    margin-top: 0;
+    border: none;
+    border-radius: 0;
 }
