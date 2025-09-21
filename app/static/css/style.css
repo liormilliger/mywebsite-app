@@ -428,3 +428,78 @@ footer {
     border: none;
     border-radius: 0;
 }
+/* --- STYLES FOR PIPELINE SIMULATION --- */
+.pipeline-visualizer-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.pipeline-visualizer {
+    display: flex;
+    flex-grow: 1;
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.pipeline-stage {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+    color: rgba(236, 223, 204, 0.6);
+    background-color: #0c1a2e;
+    border-right: 1px solid rgba(236, 223, 204, 0.2);
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.pipeline-stage:last-child {
+    border-right: none;
+}
+
+/* State for in-progress stages */
+.pipeline-stage.running {
+    background-color: #0d47a1; /* A blue color for running */
+    color: #FFFFFF;
+}
+
+/* State for successful stages */
+.pipeline-stage.success {
+    background-color: #1b5e20; /* A dark green for success */
+    color: #FFFFFF;
+}
+
+#reset-pipeline-btn {
+    background-color: transparent;
+    border: 1px solid #ECDFCC;
+    color: #ECDFCC;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#reset-pipeline-btn:hover {
+    background-color: #ECDFCC;
+    color: #0B192C;
+}
+
+/* Styles for the simulated console */
+.console-output {
+    background-color: #000000;
+    border: 1px solid rgba(236, 223, 204, 0.3);
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.console-output pre {
+    margin: 0;
+    padding: 1rem;
+    color: #f0f0f0;
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    border: none; /* Override default pre styles */
+}

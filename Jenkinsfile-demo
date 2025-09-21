@@ -1,0 +1,100 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION     = 'us-east-1'
+        ECR_REGISTRY   = 'ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com'
+        ECR_REPOSITORY = 'my-app'
+        IMAGE_NAME     = "${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}"
+    }
+
+    stages {
+        stage('Poll SCM') {
+            steps {
+                echo "Polling for changes in the source repository..."
+                checkout scm
+                echo "Code fetched successfully."
+            }
+        }
+
+        stage('Unit Test & Lint') {
+            steps {
+                echo "Running unit tests and linting..."
+                sh 'npm install'
+                sh 'npm test' // Assuming a Node.js project for example
+                echo "All tests passed."
+            }
+        }
+
+        stage('Build Image') {
+            steps {
+                script {
+                    echo "Building Docker image..."
+                    sh "docker build -t ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} ."
+                }
+            }
+        }
+
+        stage('Scan Image Layers') {
+            steps {
+                echo "Scanning image for vulnerabilities..."
+                // Example using a fictional scanner tool
+                sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER}"
+                echo "Vulnerability scan completed. No critical issues found."
+            }
+            post {
+                always {
+                    echo "Generating and archiving scan report."
+                    // archiveArtifacts artifacts: 'scan-report.json'
+                }
+            }
+        }
+
+        stage('Test Image') {
+            steps {
+                echo "Running integration tests on the built image..."
+                sh "docker run --name my-app-test ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} &"
+                sh "sleep 10 && curl --fail http://localhost:8080/"
+            }
+            post {
+                always {
+                    echo "Cleaning up integration test container."
+                    sh "docker stop my-app-test || true && docker rm my-app-test || true"
+                }
+            }
+        }
+
+        stage('Tag & Version') {
+            steps {
+                script {
+                    def versionTag = "1.${env.BUILD_NUMBER}.0"
+                    echo "Tagging image with version: ${versionTag}"
+                    sh "docker tag ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} ${env.IMAGE_NAME}:${versionTag}"
+                    sh "docker tag ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} ${env.IMAGE_NAME}:latest"
+                }
+            }
+        }
+
+        stage('Push to ECR') {
+            steps {
+                withCredentials([aws(credentials: 'aws-credentials')]) {
+                    echo "Logging into AWS ECR..."
+                    sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
+                    echo "Pushing image to ECR..."
+                    sh "docker push ${env.IMAGE_NAME} --all-tags"
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            stage('Clean Up') {
+                steps {
+                    echo "Cleaning up workspace and local Docker images..."
+                    sh "docker rmi ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} || true"
+                }
+            }
+        }
+    }
+}

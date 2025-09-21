@@ -2,7 +2,7 @@
 
 <div class="snippet-intro">
     <p>
-        <strong>Why Jenkins?</strong> As a leading open-source automation server, Jenkins provides hundreds of plugins to support building, deploying, and automating any project. It's incredibly flexible and offers a mature, battle-tested platform for creating powerful CI/CD pipelines.
+        <strong>Why Jenkins?</strong> A powerful, open-source automation server with a massive plugin ecosystem, perfect for building, deploying, and automating any CI/CD pipeline.
     </p>
 </div>
 
@@ -18,11 +18,10 @@
         </button>
         <div class="accordion-content">
 <pre><code>    environment {
-        AWS_REGION     = 'REGION'
-        ECR_REGISTRY   = 'MY_ECR_REGISTRY'
-        ECR_REPOSITORY = 'MY_REPO'
-        IMAGE_FILE_NAME = 'my-app-image.tar'
-        IMAGE_TAG      = "1.${env.BUILD_NUMBER}.0"
+        AWS_REGION     = 'us-east-1'
+        ECR_REGISTRY   = 'ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com'
+        ECR_REPOSITORY = 'my-app'
+        IMAGE_NAME     = "${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}"
     }
 </code></pre>
         </div>
@@ -35,6 +34,39 @@
 <div class="code-accordion">
     <div class="accordion-item">
         <button class="accordion-header">
+            <span class="header-title">stage('Poll SCM') { ... }</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code>        stage('Poll SCM') {
+            steps {
+                echo "Polling for changes in the source repository..."
+                checkout scm
+                echo "Code fetched successfully."
+            }
+        }
+</code></pre>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">stage('Unit Test & Lint') { ... }</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code>        stage('Unit Test & Lint') {
+            steps {
+                echo "Running unit tests and linting for Python..."
+                sh 'pip install -r requirements.txt'
+                sh 'pytest'
+                echo "All Python tests passed."
+            }
+        }
+</code></pre>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <button class="accordion-header">
             <span class="header-title">stage('Build Image') { ... }</span>
             <span class="accordion-icon">+</span>
         </button>
@@ -42,17 +74,36 @@
 <pre><code>        stage('Build Image') {
             steps {
                 script {
-                    echo "Building image with tag: ${env.IMAGE_TAG}"
-                    sh "docker build -t ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG} ."
-                    sh "docker save ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG} --output ${env.IMAGE_FILE_NAME}"
-                    stash name: 'docker-image', includes: "${env.IMAGE_FILE_NAME}"
+                    echo "Building Docker image..."
+                    sh "docker build -t ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} ."
                 }
             }
         }
 </code></pre>
         </div>
     </div>
-
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">stage('Scan Image Layers') { ... }</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code>        stage('Scan Image Layers') {
+            steps {
+                echo "Scanning image for vulnerabilities..."
+                sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER}"
+                echo "Vulnerability scan completed. No critical issues found."
+            }
+            post {
+                always {
+                    echo "Generating and archiving scan report."
+                    // archiveArtifacts artifacts: 'scan-report.json'
+                }
+            }
+        }
+</code></pre>
+        </div>
+    </div>
     <div class="accordion-item">
         <button class="accordion-header">
             <span class="header-title">stage('Test Image') { ... }</span>
@@ -61,44 +112,74 @@
         <div class="accordion-content">
 <pre><code>        stage('Test Image') {
             steps {
-                script {
-                    unstash 'docker-image'
-                    sh "docker load --input ${env.IMAGE_FILE_NAME}"
-                    sh """
-                    IMAGE_NAME=${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG}
-                    docker run -d --name my-app-test -p 8080:5000 \$IMAGE_NAME
-                    sleep 15
-                    curl --fail http://localhost:8080/ || exit 1
-                    """
-                }
+                echo "Running integration tests on the built image..."
+                sh "docker run --name my-app-test ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} &"
+                sh "sleep 10 && curl --fail http://localhost:8080/"
             }
             post {
                 always {
-                    sh "docker stop my-app-test || true"
-                    sh "docker rm my-app-test || true"
+                    echo "Cleaning up integration test container."
+                    sh "docker stop my-app-test || true && docker rm my-app-test || true"
                 }
             }
         }
 </code></pre>
         </div>
     </div>
-
     <div class="accordion-item">
         <button class="accordion-header">
-            <span class="header-title">stage('Push Image to ECR') { ... }</span>
+            <span class="header-title">stage('Tag & Version') { ... }</span>
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>        stage('Push Image to ECR') {
+<pre><code>        stage('Tag & Version') {
             steps {
                 script {
-                    unstash 'docker-image'
-                    sh "docker load --input ${env.IMAGE_FILE_NAME}"
-                    withCredentials([aws(credentials: 'aws-credentials')]) {
-                        sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
-                        sh "docker tag ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG} ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:latest"
-                        sh "docker push ${env.ECR_REGISTRY}/${env.ECR_REPOSITORY} --all-tags"
-                    }
+                    def versionTag = "1.${env.BUILD_NUMBER}.0"
+                    echo "Tagging image with version: ${versionTag}"
+                    sh "docker tag ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} ${env.IMAGE_NAME}:${versionTag}"
+                    sh "docker tag ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} ${env.IMAGE_NAME}:latest"
+                }
+            }
+        }
+</code></pre>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">stage('Push to ECR') { ... }</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code>        stage('Push to ECR') {
+            steps {
+                withCredentials([aws(credentials: 'aws-credentials')]) {
+                    echo "Logging into AWS ECR..."
+                    sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
+                    echo "Pushing image to ECR..."
+                    sh "docker push ${env.IMAGE_NAME} --all-tags"
+                }
+            }
+        }
+</code></pre>
+        </div>
+    </div>
+</div>
+<pre><code>    }
+    post {
+        always {
+</code></pre>
+<div class="code-accordion">
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">stage('Clean Up') { ... }</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code>            stage('Clean Up') {
+                steps {
+                    echo "Cleaning up workspace and local Docker images..."
+                    sh "docker rmi ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} || true"
                 }
             }
         }
