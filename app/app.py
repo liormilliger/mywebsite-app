@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
+import os
 
 app = Flask(__name__)
 
@@ -26,5 +27,19 @@ def education():
 def contact():
     return render_template('contact.html')
 
+@app.route('/Jenkinsfile-demo')
+def download_jenkinsfile():
+    # Construct the path to the 'static/files' directory
+    directory = os.path.join(app.root_path, 'static', 'files')
+    try:
+        return send_from_directory(
+            directory=directory,
+            path='Jenkinsfile-demo',
+            as_attachment=True  # This is the crucial part
+        )
+    except FileNotFoundError:
+        return "File not found.", 404
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+

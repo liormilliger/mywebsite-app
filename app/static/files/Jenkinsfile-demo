@@ -17,15 +17,14 @@ pipeline {
             }
         }
 
-        stage('Unit Test & Lint') {
+    stage('Unit Test & Lint') {
             steps {
-                echo "Running unit tests and linting..."
-                sh 'npm install'
-                sh 'npm test' // Assuming a Node.js project for example
-                echo "All tests passed."
+                echo "Running unit tests and linting for Python..."
+                sh 'pip install -r requirements.txt'
+                sh 'pytest'
+                echo "All Python tests passed."
             }
         }
-
         stage('Build Image') {
             steps {
                 script {
