@@ -124,7 +124,6 @@ footer {
     padding-right: 2.5rem; /* Increased padding */
 }
 
-/* New styles for the category frames */
 .tech-category-frame {
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 8px;
@@ -150,7 +149,6 @@ footer {
     gap: 5px;
 }
 
-/* Adjusted styles for the tech links (icon + text) */
 .tech-link {
     display: flex;
     align-items: center;
@@ -188,7 +186,6 @@ footer {
     transition: color 0.3s ease;
 }
 
-/* Styles for the right-side content display */
 .tech-display {
     flex: 3;
 }
@@ -224,7 +221,59 @@ footer {
 
 /* --- CONTACT PAGE STYLES --- */
 #contact {
-    padding: 60px 0;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 0;
     text-align: center;
 }
-/* ... (rest of your CSS is unchanged) ... */
+
+#contact h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+#contact p {
+    font-size: 1.2rem;
+    color: rgba(236, 223, 204, 0.8);
+    max-width: 600px;
+    margin: 0 auto 3rem auto;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem; /* Space between each contact item */
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    background-color: #0c1a2e;
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    width: 100%;
+    max-width: 400px; /* Controls the width of the contact boxes */
+    transition: background-color 0.3s ease;
+}
+
+.contact-item:hover {
+    background-color: rgba(236, 223, 204, 0.05);
+}
+
+.contact-item .icon {
+    font-size: 1.6rem;
+    color: #ECDFCC;
+    margin-right: 1.5rem; /* Space between icon and text */
+}
+
+.contact-item a, .contact-item span {
+    font-size: 1.1rem;
+    color: #ECDFCC;
+    text-decoration: none;
+}
+
+.contact-item a:hover {
+    text-decoration: underline;
+}
