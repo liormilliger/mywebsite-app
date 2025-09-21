@@ -113,8 +113,8 @@
 
     environment {
         AWS_REGION     = 'us-east-1'
-        ECR_REGISTRY   = '704505749045.dkr.ecr.us-east-1.amazonaws.com'
-        ECR_REPOSITORY = 'mywebsite'
+        ECR_REGISTRY   = 'MY ECR'
+        ECR_REPOSITORY = 'MY REPO'
         IMAGE_FILE_NAME = 'my-app-image.tar'
         // Use Jenkins' built-in BUILD_NUMBER to create a version tag
         IMAGE_TAG      = "1.${env.BUILD_NUMBER}.0"
@@ -199,8 +199,8 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REGISTRY: 704505749045.dkr.ecr.us-east-1.amazonaws.com
-  ECR_REPOSITORY: mywebsite
+  ECR_REGISTRY: MY ECR_REGISTRY
+  ECR_REPOSITORY: MY REPO
   IMAGE_FILE_NAME: my-app-image.tar
 
 jobs:
