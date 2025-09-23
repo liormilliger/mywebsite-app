@@ -85,10 +85,20 @@ main {
     padding: 2rem;
 }
 
+/* Shared styles for main content containers */
 .homepage-content, .page-content {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 0 auto; /* Centers the content block horizontally */
+}
+
+/* Specific alignment for the homepage */
+.homepage-content {
     text-align: center;
+}
+
+/* Specific alignment for standard content pages like 'About Me' */
+.page-content {
+    text-align: left;
 }
 
 .profile-photo {
@@ -113,8 +123,11 @@ main {
     margin: 1rem auto 0;
 }
 
+/* MODIFIED: Centered the main title and added space below it */
 .page-content h1 {
     font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 3rem;
 }
 
 /* --- Footer --- */
@@ -329,6 +342,54 @@ footer {
     text-decoration: underline;
 }
 
+/* --- NEW: ABOUT ME PAGE STYLES --- */
+.about-me-container {
+    display: flex;
+    gap: 3rem; /* Space between menu and content */
+}
+
+.about-me-menu {
+    flex: 0 0 180px; /* Fixed width for the menu: doesn't grow, doesn't shrink, base width 200px */
+    position: sticky; /* Makes the menu stick on scroll */
+    top: 2rem; /* The distance from the top it will stick to */
+    align-self: flex-start; /* Aligns the sticky item to the top of the container */
+}
+
+.about-me-menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.about-me-menu a {
+    display: block;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #ECDFCC;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+    font-size: 1.1rem;
+}
+
+.about-me-menu a:hover {
+    background-color: rgba(236, 223, 204, 0.05);
+    border-left-color: #ECDFCC;
+    color: #FFFFFF;
+}
+
+.about-me-content {
+    flex: 1; /* Takes up the remaining space */
+}
+
+.about-me-content section:not(:last-child) {
+    margin-bottom: 3rem; /* Adds space between the content sections */
+}
+
+.about-me-content h2 {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+    margin-bottom: 1.5rem;
+}
 
 /* ========================================= */
 /* ===== RESPONSIVE STYLES FOR MOBILE ====== */
@@ -386,6 +447,17 @@ footer {
         border-right: none; /* Remove the vertical line */
         padding-right: 0;
     }
+
+    /* NEW: About Me Page Adjustments for mobile */
+    .about-me-container {
+        flex-direction: column; /* Stack the menu on top of the content */
+    }
+
+    .about-me-menu {
+        position: static; /* Remove sticky positioning on mobile */
+        border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+        margin-bottom: 2rem;
+    }
     
     /* --- General Content Adjustments --- */
     main {
@@ -394,6 +466,7 @@ footer {
 
     .page-content h1 {
         font-size: 2rem;
+        margin-bottom: 2rem;
     }
 }
 

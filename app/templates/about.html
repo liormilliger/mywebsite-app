@@ -5,7 +5,45 @@
 {% block content %}
 <div class="page-content">
     <h1>About Me</h1>
-    <p>This is my dedicated 'About Me' page. Here I can go into more detail about my background, experience, and professional journey.</p>
-    <p>Content coming soon!</p>
+
+    <div class="about-me-container">
+        <aside class="about-me-menu">
+            <ul>
+                <li><a href="#overture">The Overture</a></li>
+                <li><a href="#transition">The Transition</a></li>
+                <li><a href="#first-movement">First Movement</a></li>
+                <li><a href="#second-movement">Second Movement</a></li>
+            </ul>
+        </aside>
+
+        <main class="about-me-content">
+            <section id="overture">
+                <h2>The Overture: A Foundation in Systems and Discipline</h2>
+                <p>For over 30 years, music was my life. This career, which took me from the Jerusalem Academy of Music to the jazz clubs of New York City, was about more than performance. I specialized in building systems from the ground up. I designed and implemented music education networks for entire municipalities, founded and conducted a 20-piece Big Band, and learned to manage the complex logistics of teams, projects, and performances. This experience taught me discipline, leadership, and how to orchestrate many moving parts to achieve a single goal. My philosophy, captured in the title of an album I recorded in NYC, has always been: <em>“Your Comfort Zone Will Kill You.”</em> It was this mindset that led me to my next great challenge: technology.</p>
+            </section>
+
+            <section id="transition">
+                <h2>The Transition: Composing a Career in Tech</h2>
+                <p>Recognizing the need for a career change to support my family, I dove headfirst into the world of DevOps. I approached this transition with the same intensity I once applied to music theory, systematically building my knowledge stack from the ground up.</p>
+                <ul>
+                    <li><strong>Self-Study:</strong> I began with foundational bootcamps in Python and DevOps, learning core concepts of CI/CD, configuration management (Ansible), and cloud computing (AWS).</li>
+                    <li><strong>Intensive Training:</strong> I was accepted into Develeap’s rigorous 16-week, hands-on DevOps bootcamp. There, I gained deep, practical experience in enterprise-level tooling through large-scale projects.</li>
+                    <li><strong>Core Competencies:</strong> My learning focused on the complete DevOps lifecycle, including Git, Jenkins, Docker, Kubernetes, Terraform, AWS, and observability stacks (Prometheus, Grafana, EFK).</li>
+                    <li><strong>Certifications:</strong> To validate my skills, I earned the <strong>AWS Certified Cloud Practitioner</strong>, <strong>AWS Solutions Architect Associate</strong>, and the <strong>Certified Kubernetes Administrator (CKA)</strong> certifications.</li>
+                </ul>
+            </section>
+
+            <section id="first-movement">
+                <h2>First Movement: My Journey at JFrog</h2>
+                <p>My entry into the tech world was as a DevOps Support Engineer for Infrastructure at JFrog. This role was an intense, real-world crucible where I honed my troubleshooting skills. I supported enterprise customers with their complex DevOps pipelines, diving deep into logs, Java code, and infrastructure issues related to networking, performance, and storage.</p>
+                <p>While I mastered the art of diagnosing problems, I found myself drawn to building the solutions. A project involving FinOps, where I used <strong>Terraform and Lambda</strong> to automate cost-saving measures on our support AWS account, solidified my passion for hands-on DevOps engineering. After over a year of invaluable experience at JFrog, I realized my true calling was not just to support the pipeline, but to build and automate it. This clarity of purpose drives my search for a dedicated DevOps Engineer role where I can fully apply my skills to creating and managing robust cloud infrastructure.</p>
+            </section>
+
+            <section id="second-movement">
+                <h2>Second Movement: Unknown</h2>
+                <p>I am now actively seeking my next challenge—a role where I can apply my comprehensive skills in cloud infrastructure and automation to a collaborative and forward-thinking team. I am eager to contribute to building, scaling, and optimizing robust systems and to continue learning and growing in the dynamic field of DevOps.</p>
+            </section>
+        </main>
+    </div>
 </div>
 {% endblock %}
