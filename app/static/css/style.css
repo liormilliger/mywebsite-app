@@ -658,6 +658,26 @@ footer {
     margin-bottom: 0;
 }
 
+/* Style for the clickable course certificate links */
+.course-link {
+    text-decoration: none; /* Removes the default underline from links */
+    color: inherit; /* Makes the link text use the color of its parent */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.course-link h3 {
+    transition: color 0.3s ease; /* Adds a smooth color transition */
+}
+
+/* On hover, the course title text will brighten slightly */
+.grid-item:hover .course-link h3 {
+    color: #FFFFFF;
+}
+
 /* Styling for the certificate PNG badges */
 .certificate-badge {
     max-width: 100%;
