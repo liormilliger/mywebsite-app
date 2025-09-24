@@ -1,0 +1,21 @@
+<h4>Artifactory - Sample Configuration</h4>
+<p>This is an example of a repository configuration in Artifactory.</p>
+<pre><code class="language-xml">
+&lt;!-- Example: Local Docker repository configuration --&gt;
+&lt;localRepository&gt;
+    &lt;key&gt;docker-local&lt;/key&gt;
+    &lt;type&gt;docker&lt;/type&gt;
+    &lt;description&gt;Local Docker registry&lt;/description&gt;
+    &lt;notes/&gt;
+    &lt;includesPattern&gt;**/*&lt;/includesPattern&gt;
+    &lt;repoLayoutRef&gt;simple-default&lt;/repoLayoutRef&gt;
+    &lt;dockerApiVersion&gt;V2&lt;/dockerApiVersion&gt;
+    &lt;forceNugetAuthentication&gt;false&lt;/forceNugetAuthentication&gt;
+    &lt;blackedOut&gt;false&lt;/blackedOut&gt;
+    &lt;handleReleases&gt;true&lt;/handleReleases&gt;
+    &lt;handleSnapshots&gt;true&lt;/handleSnapshots&gt;
+    &lt;maxUniqueSnapshots&gt;0&lt;/maxUniqueSnapshots&gt;
+    &lt;snapshotVersionBehavior&gt;unique&lt;/snapshotVersionBehavior&gt;
+    &lt;suppressPomConsistencyChecks&gt;true&lt;/suppressPomConsistencyChecks&gt;
+&lt;/localRepository&gt;
+</code></pre>

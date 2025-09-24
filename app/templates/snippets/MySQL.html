@@ -1,0 +1,15 @@
+<h4>MySQL - Create Table Statement</h4>
+<p>An example of a `CREATE TABLE` statement with various column types and constraints.</p>
+<pre><code class="language-sql">
+-- Table structure for storing product information
+CREATE TABLE `products` (
+  `product_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `product_name` VARCHAR(255) NOT NULL,
+  `description` TEXT,
+  `price` DECIMAL(10, 2) NOT NULL,
+  `stock_quantity` INT NOT NULL DEFAULT 0,
+  `category` VARCHAR(100),
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+</code></pre>

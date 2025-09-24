@@ -9,7 +9,6 @@
     
     <div class="tech-container">
         <div class="tech-list">
-            <!-- CI/CD Category -->
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">CI/CD</h4>
                 <div class="tech-category-content">
@@ -28,7 +27,6 @@
                 </div>
             </div>
 
-            <!-- Containerization Category -->
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Containerization</h4>
                 <div class="tech-category-content">
@@ -43,7 +41,6 @@
                 </div>
             </div>
 
-            <!-- IaC Category -->
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Infrastructure as Code</h4>
                 <div class="tech-category-content">
@@ -58,7 +55,30 @@
                 </div>
             </div>
 
-            <!-- Cloud Category -->
+            <div class="tech-category-frame">
+                <h4 class="tech-category-title">Artifact Management</h4>
+                <div class="tech-category-content">
+                    <a href="#" class="tech-link" data-target="aws" title="Amazon Elastic Container Registry">
+                        <img src="{{ url_for('static', filename='images/tech/AWS.svg.png') }}" alt="ECR Logo" class="tech-icon">
+                        <span class="tech-link-text">ECR</span>
+                    </a>
+                    <a href="#" class="tech-link" data-target="artifactory" title="Artifact repository manager">
+                        <img src="{{ url_for('static', filename='images/tech/artifactory-logo.png') }}" alt="Artifactory Logo" class="tech-icon">
+                        <span class="tech-link-text">Artifactory</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="tech-category-frame">
+                <h4 class="tech-category-title">DevSecOps</h4>
+                <div class="tech-category-content">
+                    <a href="#" class="tech-link" data-target="xray" title="JFrog Xray vulnerability scanning">
+                        <img src="{{ url_for('static', filename='images/tech/Jfrog-Xray-logo.png') }}" alt="Xray Logo" class="tech-icon">
+                        <span class="tech-link-text">Xray</span>
+                    </a>
+                </div>
+            </div>
+
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Cloud</h4>
                 <div class="tech-category-content">
@@ -69,7 +89,6 @@
                 </div>
             </div>
 
-            <!-- Observability Category -->
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Observability</h4>
                 <div class="tech-category-content">
@@ -84,7 +103,6 @@
                 </div>
             </div>
 
-            <!-- Logging Category -->
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Logging</h4>
                 <div class="tech-category-content">
@@ -102,6 +120,20 @@
                     </a>
                 </div>
             </div>
+            
+            <div class="tech-category-frame">
+                <h4 class="tech-category-title">Data Management</h4>
+                <div class="tech-category-content">
+                     <a href="#" class="tech-link" data-target="postgresql" title="Relational database system">
+                        <img src="{{ url_for('static', filename='images/tech/postgresql-logo.jpg') }}" alt="PostgreSQL Logo" class="tech-icon">
+                        <span class="tech-link-text">PostgreSQL</span>
+                    </a>
+                     <a href="#" class="tech-link" data-target="mysql" title="Relational database management system">
+                        <img src="{{ url_for('static', filename='images/tech/mysql-logo.png') }}" alt="MySQL Logo" class="tech-icon">
+                        <span class="tech-link-text">MySQL</span>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div class="tech-display">
@@ -112,12 +144,16 @@
             <div id="kubernetes" class="tech-content-panel" style="display: none;">{% include 'snippets/Kubernetes.html' %}</div>
             <div id="terraform" class="tech-content-panel" style="display: none;">{% include 'snippets/Terraform.html' %}</div>
             <div id="pulumi" class="tech-content-panel" style="display: none;">{% include 'snippets/Pulumi.html' %}</div>
+            <div id="artifactory" class="tech-content-panel" style="display: none;">{% include 'snippets/Artifactory.html' %}</div>
+            <div id="xray" class="tech-content-panel" style="display: none;">{% include 'snippets/Xray.html' %}</div>
             <div id="aws" class="tech-content-panel" style="display: none;">{% include 'snippets/AWS.html' %}</div>
             <div id="prometheus" class="tech-content-panel" style="display: none;">{% include 'snippets/Prometheus.html' %}</div>
             <div id="grafana" class="tech-content-panel" style="display: none;">{% include 'snippets/Grafana.html' %}</div>
             <div id="fluentbit" class="tech-content-panel" style="display: none;">{% include 'snippets/FluentBit.html' %}</div>
             <div id="elasticsearch" class="tech-content-panel" style="display: none;">{% include 'snippets/ElasticSearch.html' %}</div>
             <div id="kibana" class="tech-content-panel" style="display: none;">{% include 'snippets/Kibana.html' %}</div>
+            <div id="postgresql" class="tech-content-panel" style="display: none;">{% include 'snippets/PostgreSQL.html' %}</div>
+            <div id="mysql" class="tech-content-panel" style="display: none;">{% include 'snippets/MySQL.html' %}</div>
         </div>
     </div>
 </div>
@@ -159,4 +195,3 @@
     });
 </script>
 {% endblock %}
-

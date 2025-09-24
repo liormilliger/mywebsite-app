@@ -1,0 +1,24 @@
+<h4>JFrog Xray - Policy Rule Example</h4>
+<p>This is an example of a security policy rule in Xray to block artifacts with high-severity vulnerabilities.</p>
+<pre><code class="language-json">
+{
+  "name": "block-high-severity-vulns",
+  "description": "Block download of artifacts with vulnerabilities rated High or above.",
+  "type": "security",
+  "rules": [
+    {
+      "name": "high-severity-rule",
+      "criteria": {
+        "min_severity": "High"
+      },
+      "actions": {
+        "block_download": {
+          "unscanned": false,
+          "active": true
+        },
+        "fail_build": true
+      }
+    }
+  ]
+}
+</code></pre>

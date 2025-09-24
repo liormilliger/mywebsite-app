@@ -1,0 +1,21 @@
+<h4>PostgreSQL - Sample SQL Query</h4>
+<p>A standard SQL query to retrieve user data from multiple tables.</p>
+<pre><code class="language-sql">
+-- Select users and their most recent order
+SELECT
+    u.user_id,
+    u.username,
+    u.email,
+    o.order_id,
+    o.order_date,
+    o.total_amount
+FROM
+    users u
+LEFT JOIN
+    orders o ON u.user_id = o.user_id
+WHERE
+    u.signup_date >= '2025-01-01'
+ORDER BY
+    o.order_date DESC
+LIMIT 10;
+</code></pre>
