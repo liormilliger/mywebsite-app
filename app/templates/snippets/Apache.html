@@ -1,0 +1,36 @@
+<h4>Apache - Reverse Proxy Configuration</h4>
+<p>
+    An Artifactory-style generated configuration for Apache. It redirects HTTP (80) traffic to HTTPS (443),
+    handles SSL termination, and proxies requests to the upstream server.
+</p>
+<pre><code class="language-apache">
+&lt;VirtualHost *:80&gt;
+    ServerName liormilliger.com
+    ServerAlias *.liormilliger.com
+    
+    # Redirect HTTP to HTTPS
+    RewriteEngine on
+    RewriteCond %{HTTPS} off
+    RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+&lt;/VirtualHost&gt;
+
+&lt;VirtualHost *:443&gt;
+    ServerName liormilliger.com
+    
+    ## SSL Configuration
+    SSLEngine on
+    SSLCertificateFile "/etc/httpd/ssl/liormilliger.com.crt"
+    SSLCertificateKeyFile "/etc/httpd/ssl/liormilliger.com.key"
+
+    ## Proxy Configuration
+    ProxyPreserveHost On
+    ProxyRequests Off
+    
+    # Add X-Forwarded-Proto header
+    RequestHeader set X-Forwarded-Proto "https"
+    
+    # Proxy requests to the upstream server
+    ProxyPass / http://liormilliger.com/
+    ProxyPassReverse / http://liormilliger.com/
+&lt;/VirtualHost&gt;
+</code></pre>

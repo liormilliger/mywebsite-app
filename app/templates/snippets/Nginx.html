@@ -1,0 +1,42 @@
+<h4>Nginx - Reverse Proxy Configuration</h4>
+<p>
+    An Artifactory-style generated configuration for Nginx. It redirects HTTP (80) traffic to HTTPS (443),
+    handles SSL termination, and proxies requests to the upstream server.
+</p>
+<pre><code class="language-nginx">
+## add to nginx.conf http block:
+# log_format artifactory '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_time';
+
+server {
+    listen 80;
+    server_name liormilliger.com;
+
+    ## Redirect all HTTP requests to HTTPS
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name liormilliger.com;
+    
+    ## SSL Certificate Configuration
+    ssl_certificate      /etc/nginx/ssl/liormilliger.com.crt;
+    ssl_certificate_key  /etc/nginx/ssl/liormilliger.com.key;
+    
+    ## SSL Protocol and Cipher Configuration
+    ssl_protocols          TLSv1.2 TLSv1.3;
+    ssl_ciphers            HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    ## Proxy Configuration
+    location / {
+        proxy_set_header    Host $host;
+        proxy_set_header    X-Real-IP $remote_addr;
+        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Proto $scheme;
+        
+        proxy_pass          http://liormilliger.com;
+        proxy_read_timeout  900;
+    }
+}
+</code></pre>

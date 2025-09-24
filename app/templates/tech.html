@@ -134,6 +134,20 @@
                     </a>
                 </div>
             </div>
+            
+            <div class="tech-category-frame">
+                <h4 class="tech-category-title">Proxies</h4>
+                <div class="tech-category-content">
+                     <a href="#" class="tech-link" data-target="nginx" title="High-performance web server and reverse proxy">
+                        <img src="{{ url_for('static', filename='images/tech/nginx-logo.png') }}" alt="Nginx Logo" class="tech-icon">
+                        <span class="tech-link-text">Nginx</span>
+                    </a>
+                     <a href="#" class="tech-link" data-target="apache" title="Apache HTTP Server">
+                        <img src="{{ url_for('static', filename='images/tech/apache-logo.webp') }}" alt="Apache Logo" class="tech-icon">
+                        <span class="tech-link-text">Apache</span>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div class="tech-display">
@@ -154,6 +168,8 @@
             <div id="kibana" class="tech-content-panel" style="display: none;">{% include 'snippets/Kibana.html' %}</div>
             <div id="postgresql" class="tech-content-panel" style="display: none;">{% include 'snippets/PostgreSQL.html' %}</div>
             <div id="mysql" class="tech-content-panel" style="display: none;">{% include 'snippets/MySQL.html' %}</div>
+            <div id="nginx" class="tech-content-panel" style="display: none;">{% include 'snippets/Nginx.html' %}</div>
+            <div id="apache" class="tech-content-panel" style="display: none;">{% include 'snippets/Apache.html' %}</div>
         </div>
     </div>
 </div>
