@@ -607,3 +607,85 @@ footer {
     word-wrap: break-word;
     border: none; /* Override default pre styles */
 }
+
+/* --- STYLES FOR EDUCATION PAGE --- */
+.education-section {
+    margin-bottom: 3.5rem;
+}
+
+.education-section h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 300;
+    color: #ECDFCC;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.grid-item {
+    background-color: #0c1a2e; /* Matches your other UI elements */
+    border: 1px solid rgba(236, 223, 204, 0.2); /* Consistent border style */
+    border-radius: 8px; /* Consistent border radius */
+    padding: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 220px;
+    transition: background-color 0.3s ease;
+}
+
+.grid-item:hover {
+    background-color: rgba(236, 223, 204, 0.05); /* Consistent hover effect */
+}
+
+.grid-item h3 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #ECDFCC; /* Main text color */
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.grid-item p {
+    color: rgba(236, 223, 204, 0.8); /* Softer color for secondary text */
+    margin-bottom: 0;
+}
+
+/* Styling for the certificate PNG badges */
+.certificate-badge {
+    max-width: 100%;
+    height: 150px; /* This keeps the badge size consistent */
+    object-fit: contain; /* This prevents the image from stretching or squishing */
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Adds a subtle zoom effect when you hover over the badge's container */
+.grid-item a:hover .certificate-badge {
+    transform: scale(1.05);
+}
+
+.certificate-title {
+    margin-top: auto; /* Pushes title to the bottom of the flex container */
+}
+
+
+/* --- Responsive adjustments for Education page grid --- */
+@media (max-width: 992px) {
+    .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+}

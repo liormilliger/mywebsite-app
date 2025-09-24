@@ -5,6 +5,72 @@
 {% block content %}
 <div class="page-content">
     <h1>Education</h1>
-    <p>This page is under construction. Content coming soon!</p>
+
+    <div id="certificates" class="education-section">
+        <h2>Certificates</h2>
+        <div class="grid-container">
+            <div class="grid-item">
+                <a href="{{ url_for('static', filename='images/tech/AWS-CCP.pdf') }}" target="_blank" rel="noopener noreferrer" title="View Certificate PDF">
+                    <img src="{{ url_for('static', filename='images/tech/AWS-CCP-1.png') }}" alt="AWS Certified Cloud Practitioner Badge" class="certificate-badge">
+                </a>
+                <h3 class="certificate-title">AWS CCP</h3>
+            </div>
+            <div class="grid-item">
+                <a href="{{ url_for('static', filename='images/tech/AWS-SAA.pdf') }}" target="_blank" rel="noopener noreferrer" title="View Certificate PDF">
+                    <img src="{{ url_for('static', filename='images/tech/AWS-SAA-1.png') }}" alt="AWS Certified Solutions Architect Associate Badge" class="certificate-badge">
+                </a>
+                <h3 class="certificate-title">AWS SAA</h3>
+            </div>
+            <div class="grid-item">
+                <a href="{{ url_for('static', filename='images/tech/CKA.pdf') }}" target="_blank" rel="noopener noreferrer" title="View Certificate PDF">
+                    <img src="{{ url_for('static', filename='images/tech/CKA-1.png') }}" alt="Certified Kubernetes Administrator Badge" class="certificate-badge">
+                </a>
+                <h3 class="certificate-title">CKA</h3>
+            </div>
+        </div>
+    </div>
+
+    <div id="courses" class="education-section">
+        <h2>Online Courses</h2>
+        <div class="grid-container">
+            <div class="grid-item">
+                <h3>Python Bootcamp</h3>
+            </div>
+            <div class="grid-item">
+                <h3>DevOps Bootcamp</h3>
+            </div>
+            <div class="grid-item">
+                <h3>GitHub Actions</h3>
+            </div>
+            <div class="grid-item">
+                <h3>CCNA Official Course</h3>
+            </div>
+            <div class="grid-item">
+                <h3>Kafka</h3>
+            </div>
+            <div class="grid-item">
+                <h3>Serverless</h3>
+            </div>
+        </div>
+    </div>
+
+    <div id="degrees" class="education-section">
+        <h2>Academic Degrees</h2>
+        <div class="grid-container">
+            <div class="grid-item">
+                <h3>B.Mus</h3>
+                <p>Bachelor of Music</p>
+            </div>
+            <div class="grid-item">
+                <h3>B.Mus.Ed</h3>
+                <p>Bachelor of Music Education</p>
+            </div>
+            <div class="grid-item">
+                <h3>M.Mus</h3>
+                <p>Master of Music</p>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}
