@@ -1,3 +1,5 @@
+# docker-compose.yml
+
 version: '3.8'
 
 services:
@@ -15,7 +17,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./app:/usr/share/nginx/html
+      # We ONLY need to mount the configuration file.
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on: 
       - app
