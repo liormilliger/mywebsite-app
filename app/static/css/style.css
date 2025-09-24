@@ -24,7 +24,7 @@ nav {
 nav a {
     color: #ECDFCC;
     text-decoration: none;
-    change: color 0.3s ease-in-out;
+    transition: color 0.3s ease-in-out;
 }
 
 .nav-brand a {
@@ -59,7 +59,7 @@ nav a {
     padding: 8px 16px;
     border: 1px solid #ECDFCC;
     border-radius: 5px;
-    change: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 .nav-icon-links .nav-button:hover {
@@ -184,7 +184,7 @@ footer {
     text-decoration: none;
     color: #ECDFCC;
     border-radius: 5px;
-    change: background-color 0.3s ease;
+    transition: background-color 0.3s ease;
     gap: 15px;
 }
 
@@ -211,7 +211,7 @@ footer {
 .tech-link-text {
     font-size: 1rem;
     color: #ECDFCC;
-    change: color 0.3s ease;
+    transition: color 0.3s ease;
 }
 
 .tech-display {
@@ -253,7 +253,7 @@ footer {
 }
 
 .downloadable-title {
-    change: color 0.3s ease;
+    transition: color 0.3s ease;
 }
 
 .download-link:hover .downloadable-title {
@@ -319,7 +319,7 @@ footer {
     padding: 1rem 1.5rem;
     width: 100%;
     max-width: 400px; /* Controls the width of the contact boxes */
-    change: background-color 0.3s ease;
+    transition: background-color 0.3s ease;
 }
 
 .contact-item:hover {
@@ -349,7 +349,7 @@ footer {
 }
 
 .about-me-menu {
-    flex: 0 0 170px; /* Changed from 200px. Fixed width for the menu. */
+    flex: 0 0 178px; /* Changed from 200px. Fixed width for the menu. */
     position: sticky; /* Makes the menu stick on scroll */
     top: 2rem; /* The distance from the top it will stick to */
     align-self: flex-start; /* Aligns the sticky item to the top of the container */
@@ -367,7 +367,7 @@ footer {
     text-decoration: none;
     color: #ECDFCC;
     border-left: 3px solid transparent;
-    change: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
     font-size: 1.1rem;
 }
 
@@ -508,7 +508,7 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    change: background-color 0.3s ease;
+    transition: background-color 0.3s ease;
 }
 
 .accordion-header:hover, .accordion-header.active {
@@ -523,7 +523,7 @@ footer {
 .accordion-content {
     max-height: 0;
     overflow: hidden;
-    change: max-height 0.3s ease-out;
+    transition: max-height 0.3s ease-out;
 }
 
 /* Override default pre style for accordion content */
@@ -556,7 +556,7 @@ footer {
     color: rgba(236, 223, 204, 0.6);
     background-color: #0c1a2e;
     border-right: 1px solid rgba(236, 223, 204, 0.2);
-    change: background-color 0.5s ease, color 0.5s ease;
+    transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 .pipeline-stage:last-child {
@@ -582,7 +582,7 @@ footer {
     padding: 8px 16px;
     border-radius: 5px;
     cursor: pointer;
-    change: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #reset-pipeline-btn:hover {
