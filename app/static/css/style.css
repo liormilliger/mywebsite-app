@@ -15,10 +15,10 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2.5rem;
+    padding: 1rem 1.5rem; 
     background-color: #0c1a2e;
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
-    position: relative; /* Added for mobile menu positioning */
+    position: relative;
 }
 
 nav a {
@@ -40,7 +40,7 @@ nav a {
 
 .nav-menu-links {
     display: flex;
-    gap: 30px;
+    gap: 20px; 
     font-size: 1.1rem;
 }
 
@@ -71,7 +71,6 @@ nav a {
     font-size: 1.6rem;
 }
 
-/* Hamburger menu is hidden on desktop by default */
 .hamburger-menu {
     display: none;
     font-size: 1.8rem;
@@ -81,22 +80,19 @@ nav a {
 
 /* --- Main Content Area --- */
 main {
-    flex: 1; /* Allows footer to stick to the bottom */
+    flex: 1;
     padding: 2rem;
 }
 
-/* Shared styles for main content containers */
 .homepage-content, .page-content {
     max-width: 1200px;
-    margin: 0 auto; /* Centers the content block horizontally */
+    margin: 0 auto;
 }
 
-/* Specific alignment for the homepage */
 .homepage-content {
     text-align: center;
 }
 
-/* Specific alignment for standard content pages like 'About Me' */
 .page-content {
     text-align: left;
 }
@@ -123,7 +119,6 @@ main {
     margin: 1rem auto 0;
 }
 
-/* MODIFIED: Centered the main title and added space below it */
 .page-content h1 {
     font-size: 2.5rem;
     text-align: center;
@@ -141,21 +136,25 @@ footer {
 /* --- STYLES FOR TECH STACK PAGE --- */
 .tech-container {
     display: flex;
-    gap: 2.5rem; /* Increased gap */
+    gap: 2.5rem;
     margin-top: 2rem;
     text-align: left;
 }
 
+/* MODIFIED: Changed the container to a flex column to use 'gap' for precise spacing */
 .tech-list {
-    flex: 0 0 240px; /* Make the left menu narrower and fixed-width */
+    flex: 0 0 240px;
     border-right: 1px solid rgba(236, 223, 204, 0.2);
-    padding-right: 2.5rem; /* Increased padding */
+    padding-right: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* This now controls the minimal space between frames */
 }
 
 .tech-category-frame {
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 8px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0; /* MODIFIED: Removed margin now that the parent container uses 'gap' */
     background-color: #0c1a2e;
     overflow: hidden;
 }
@@ -168,6 +167,10 @@ footer {
     background-color: rgba(236, 223, 204, 0.08);
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
     color: #ECDFCC;
+}
+
+.tech-category-title.long-title {
+    font-size: 0.95rem;
 }
 
 .tech-category-content {
@@ -246,10 +249,9 @@ footer {
     color: #a7c5eb;
 }
 
-/* Style for the new downloadable title link */
 .download-link {
     text-decoration: none;
-    color: inherit; /* Inherits the default text color */
+    color: inherit;
 }
 
 .downloadable-title {
@@ -257,7 +259,7 @@ footer {
 }
 
 .download-link:hover .downloadable-title {
-    color: #FFFFFF; /* Makes text slightly brighter on hover */
+    color: #FFFFFF;
 }
 
 .downloadable-title .fa-download {
@@ -266,7 +268,6 @@ footer {
     opacity: 0.7;
 }
 
-/* Style for the introduction box in code snippets */
 .snippet-intro {
     background-color: rgba(12, 26, 46, 0.7);
     border-left: 4px solid #ECDFCC;
@@ -307,7 +308,7 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem; /* Space between each contact item */
+    gap: 1.5rem;
 }
 
 .contact-item {
@@ -318,7 +319,7 @@ footer {
     border-radius: 8px;
     padding: 1rem 1.5rem;
     width: 100%;
-    max-width: 400px; /* Controls the width of the contact boxes */
+    max-width: 400px;
     transition: background-color 0.3s ease;
 }
 
@@ -329,7 +330,7 @@ footer {
 .contact-item .icon {
     font-size: 1.6rem;
     color: #ECDFCC;
-    margin-right: 1.5rem; /* Space between icon and text */
+    margin-right: 1.5rem;
 }
 
 .contact-item a, .contact-item span {
@@ -345,14 +346,14 @@ footer {
 /* --- NEW: ABOUT ME PAGE STYLES --- */
 .about-me-container {
     display: flex;
-    gap: 3rem; /* Space between menu and content */
+    gap: 3rem;
 }
 
 .about-me-menu {
-    flex: 0 0 178px; /* Changed from 200px. Fixed width for the menu. */
-    position: sticky; /* Makes the menu stick on scroll */
-    top: 2rem; /* The distance from the top it will stick to */
-    align-self: flex-start; /* Aligns the sticky item to the top of the container */
+    flex: 0 0 178px;
+    position: sticky;
+    top: 2rem;
+    align-self: flex-start;
 }
 
 .about-me-menu ul {
@@ -378,11 +379,11 @@ footer {
 }
 
 .about-me-content {
-    flex: 1; /* Takes up the remaining space */
+    flex: 1;
 }
 
 .about-me-content section:not(:last-child) {
-    margin-bottom: 3rem; /* Adds space between the content sections */
+    margin-bottom: 3rem;
 }
 
 .about-me-content h2 {
@@ -391,38 +392,35 @@ footer {
     margin-bottom: 1.5rem;
 }
 
-/* New rules for better text readability */
 .about-me-content p, .about-me-content li {
-    line-height: 1.7; /* Increases spacing between lines in a paragraph */
-    max-width: 75ch;  /* Limits line length for easier reading */
+    line-height: 1.7;
+    max-width: 75ch;
 }
 
 .about-me-content li:not(:last-child) {
-    margin-bottom: 1rem; /* Adds space between each bullet point */
+    margin-bottom: 1rem;
 }
-
 
 /* ========================================= */
 /* ===== RESPONSIVE STYLES FOR MOBILE ====== */
 /* ========================================= */
 @media (max-width: 768px) {
     
-    /* --- Navigation Bar Adjustments --- */
     nav {
         padding: 1rem 1.5rem;
     }
 
     .hamburger-menu {
-        display: block; /* Show the hamburger icon */
+        display: block;
     }
 
     .nav-links-container {
-        display: none; /* Hide the links container by default */
+        display: none;
         position: absolute;
-        top: 100%; /* Position it right below the nav bar */
+        top: 100%;
         left: 0;
         width: 100%;
-        background-color: #0c1a2e; /* Same as nav */
+        background-color: #0c1a2e;
         flex-direction: column;
         text-align: center;
         padding: 1rem 0;
@@ -430,14 +428,13 @@ footer {
         border-bottom: 1px solid rgba(236, 223, 204, 0.2);
     }
 
-    /* This class is toggled by JavaScript */
     .nav-links-container.active {
-        display: flex; /* Show the container when active */
+        display: flex;
     }
 
     .nav-menu-links, .nav-icon-links {
         flex-direction: column;
-        gap: 1.5rem; /* Space out links vertically */
+        gap: 1.5rem;
         width: 100%;
     }
     
@@ -447,30 +444,27 @@ footer {
         border-bottom: 1px solid rgba(236, 223, 204, 0.1);
     }
 
-    /* --- Tech Stack Page Adjustments --- */
     .tech-container {
-        flex-direction: column; /* Stack the list and display vertically */
+        flex-direction: column;
         gap: 1.5rem;
     }
     
     .tech-list {
-        flex: 1 1 auto; /* Allow list to grow/shrink */
-        border-right: none; /* Remove the vertical line */
+        flex: 1 1 auto;
+        border-right: none;
         padding-right: 0;
     }
 
-    /* NEW: About Me Page Adjustments for mobile */
     .about-me-container {
-        flex-direction: column; /* Stack the menu on top of the content */
+        flex-direction: column;
     }
 
     .about-me-menu {
-        position: static; /* Remove sticky positioning on mobile */
+        position: static;
         border-bottom: 1px solid rgba(236, 223, 204, 0.2);
         margin-bottom: 2rem;
     }
     
-    /* --- General Content Adjustments --- */
     main {
         padding: 1.5rem;
     }
@@ -481,12 +475,11 @@ footer {
     }
 }
 
-
 /* --- ACCORDION STYLES FOR CODE SNIPPETS --- */
 .code-accordion {
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 5px;
-    overflow: hidden; /* Ensures the border-radius is respected */
+    overflow: hidden;
     background-color: #020c1b;
 }
 
@@ -526,12 +519,12 @@ footer {
     transition: max-height 0.3s ease-out;
 }
 
-/* Override default pre style for accordion content */
 .accordion-content pre {
     margin-top: 0;
     border: none;
     border-radius: 0;
 }
+
 /* --- STYLES FOR PIPELINE SIMULATION --- */
 .pipeline-visualizer-container {
     display: flex;
@@ -563,15 +556,13 @@ footer {
     border-right: none;
 }
 
-/* State for in-progress stages */
 .pipeline-stage.running {
-    background-color: #0d47a1; /* A blue color for running */
+    background-color: #0d47a1;
     color: #FFFFFF;
 }
 
-/* State for successful stages */
 .pipeline-stage.success {
-    background-color: #1b5e20; /* A dark green for success */
+    background-color: #1b5e20;
     color: #FFFFFF;
 }
 
@@ -590,7 +581,6 @@ footer {
     color: #0B192C;
 }
 
-/* Styles for the simulated console */
 .console-output {
     background-color: #000000;
     border: 1px solid rgba(236, 223, 204, 0.3);
@@ -605,7 +595,7 @@ footer {
     font-size: 0.85rem;
     white-space: pre-wrap;
     word-wrap: break-word;
-    border: none; /* Override default pre styles */
+    border: none;
 }
 
 /* --- STYLES FOR EDUCATION PAGE --- */
@@ -628,9 +618,9 @@ footer {
 }
 
 .grid-item {
-    background-color: #0c1a2e; /* Matches your other UI elements */
-    border: 1px solid rgba(236, 223, 204, 0.2); /* Consistent border style */
-    border-radius: 8px; /* Consistent border radius */
+    background-color: #0c1a2e;
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    border-radius: 8px;
     padding: 1.5rem;
     text-align: center;
     display: flex;
@@ -642,26 +632,25 @@ footer {
 }
 
 .grid-item:hover {
-    background-color: rgba(236, 223, 204, 0.05); /* Consistent hover effect */
+    background-color: rgba(236, 223, 204, 0.05);
 }
 
 .grid-item h3 {
     font-size: 1.25rem;
     font-weight: 500;
-    color: #ECDFCC; /* Main text color */
+    color: #ECDFCC;
     margin-top: 0;
     margin-bottom: 0.5rem;
 }
 
 .grid-item p {
-    color: rgba(236, 223, 204, 0.8); /* Softer color for secondary text */
+    color: rgba(236, 223, 204, 0.8);
     margin-bottom: 0;
 }
 
-/* Style for the clickable course certificate links */
 .course-link {
-    text-decoration: none; /* Removes the default underline from links */
-    color: inherit; /* Makes the link text use the color of its parent */
+    text-decoration: none;
+    color: inherit;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -670,32 +659,28 @@ footer {
 }
 
 .course-link h3 {
-    transition: color 0.3s ease; /* Adds a smooth color transition */
+    transition: color 0.3s ease;
 }
 
-/* On hover, the course title text will brighten slightly */
 .grid-item:hover .course-link h3 {
     color: #FFFFFF;
 }
 
-/* Styling for the certificate PNG badges */
 .certificate-badge {
     max-width: 100%;
-    height: 150px; /* This keeps the badge size consistent */
-    object-fit: contain; /* This prevents the image from stretching or squishing */
+    height: 150px;
+    object-fit: contain;
     margin-bottom: 1rem;
-    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+    transition: transform 0.3s ease;
 }
 
-/* Adds a subtle zoom effect when you hover over the badge's container */
 .grid-item a:hover .certificate-badge {
     transform: scale(1.05);
 }
 
 .certificate-title {
-    margin-top: auto; /* Pushes title to the bottom of the flex container */
+    margin-top: auto;
 }
-
 
 /* --- Responsive adjustments for Education page grid --- */
 @media (max-width: 992px) {

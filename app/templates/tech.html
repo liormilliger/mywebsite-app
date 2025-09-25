@@ -3,6 +3,49 @@
 {% block title %}Tech Stack - Lior Milliger{% endblock %}
 
 {% block content %}
+<style>
+    /* The grid properties for a 2-column layout have been removed. 
+    The categories will now stack vertically in a single column by default.
+    */
+    .tech-list {
+        /* We can add a gap between the frames if desired */
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* Makes the category titles look clickable and adds a dropdown icon */
+    .tech-category-title {
+        cursor: pointer;
+        user-select: none; /* Prevents text from being highlighted on click */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 0.5rem; /* Adds some spacing below the title */
+    }
+
+    /* The dropdown icon (arrow) */
+    .tech-category-title::after {
+        content: '▼'; /* Down arrow for "open" state */
+        font-size: 0.8em;
+        margin-left: 10px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    /* Rotates the arrow when the category is collapsed */
+    .tech-category-title.collapsed::after {
+        transform: rotate(-90deg); /* Right arrow for "closed" state */
+    }
+
+    /* Ensures the tech links inside the dropdown are displayed correctly */
+    .tech-category-content {
+        display: flex; /* Or your original display property */
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+</style>
+
 <div class="page-content">
     <h1>Tech Stack 💻</h1>
     <p>Click on a technology to see a sample code snippet or configuration.</p>
@@ -42,23 +85,19 @@
             </div>
 
             <div class="tech-category-frame">
-                <h4 class="tech-category-title">Infrastructure as Code</h4>
+                <h4 class="tech-category-title">IaC</h4>
                 <div class="tech-category-content">
                     <a href="#" class="tech-link" data-target="terraform" title="Infrastructure as Code tool">
                         <img src="{{ url_for('static', filename='images/tech/terraform.svg') }}" alt="Terraform Logo" class="tech-icon">
                         <span class="tech-link-text">Terraform</span>
                     </a>
-                    <a href="#" class="tech-link" data-target="pulumi" title="Modern Infrastructure as Code">
-                        <img src="{{ url_for('static', filename='images/tech/Pulumi.svg') }}" alt="Pulumi Logo" class="tech-icon">
-                        <span class="tech-link-text">Pulumi</span>
-                    </a>
                 </div>
             </div>
 
             <div class="tech-category-frame">
-                <h4 class="tech-category-title">Artifact Management</h4>
+                <h4 class="tech-category-title long-title">Artifact Management</h4>
                 <div class="tech-category-content">
-                    <a href="#" class="tech-link" data-target="aws" title="Amazon Elastic Container Registry">
+                    <a href="#" class="tech-link" data-target="aws-ecr" title="Amazon Elastic Container Registry">
                         <img src="{{ url_for('static', filename='images/tech/AWS.svg.png') }}" alt="ECR Logo" class="tech-icon">
                         <span class="tech-link-text">ECR</span>
                     </a>
@@ -157,7 +196,7 @@
             <div id="docker" class="tech-content-panel" style="display: none;">{% include 'snippets/Dockerfile.html' %}</div>
             <div id="kubernetes" class="tech-content-panel" style="display: none;">{% include 'snippets/Kubernetes.html' %}</div>
             <div id="terraform" class="tech-content-panel" style="display: none;">{% include 'snippets/Terraform.html' %}</div>
-            <div id="pulumi" class="tech-content-panel" style="display: none;">{% include 'snippets/Pulumi.html' %}</div>
+            <div id="aws-ecr" class="tech-content-panel" style="display: none;">{% include 'snippets/AWS_ECR.html' %}</div>
             <div id="artifactory" class="tech-content-panel" style="display: none;">{% include 'snippets/artifactory.html' %}</div>
             <div id="xray" class="tech-content-panel" style="display: none;">{% include 'snippets/Xray.html' %}</div>
             <div id="aws" class="tech-content-panel" style="display: none;">{% include 'snippets/AWS.html' %}</div>
@@ -175,39 +214,80 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const techLinks = document.querySelectorAll('.tech-link');
-        const contentPanels = document.querySelectorAll('.tech-content-panel');
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Get all necessary elements from the page ---
+    const techLinks = document.querySelectorAll('.tech-link');
+    const contentPanels = document.querySelectorAll('.tech-content-panel');
+    const categoryTitles = document.querySelectorAll('.tech-category-title');
 
-        // Logic for Toggling Content Panels (Right Side)
-        techLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-                event.preventDefault();
-                const targetId = this.getAttribute('data-target');
-                
-                // Hide all panels and remove active class from all links
-                contentPanels.forEach(panel => panel.style.display = 'none');
-                techLinks.forEach(l => l.classList.remove('active'));
-                
-                // Show the target panel and add active class to the clicked link
-                const targetPanel = document.getElementById(targetId);
-                if (targetPanel) {
-                    targetPanel.style.display = 'block';
-                }
-                this.classList.add('active');
-            });
+    // --- Logic for Dropdown Categories ---
+    categoryTitles.forEach(title => {
+        title.addEventListener('click', function() {
+            // Find the content div right after the title
+            const content = this.nextElementSibling;
+            
+            // Toggle 'collapsed' class to change the arrow icon via CSS
+            this.classList.toggle('collapsed');
+            
+            // Toggle the visibility of the content
+            if (this.classList.contains('collapsed')) {
+                content.style.display = 'none';
+            } else {
+                content.style.display = 'flex'; // Use 'flex' to show the tech links
+            }
         });
+    });
 
-        // Initially, hide all panels and then show the one corresponding to the default active link
-        const activeLink = document.querySelector('.tech-link.active');
+    // --- Logic for showing content on the right when a tech link is clicked ---
+    techLinks.forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            const targetId = this.getAttribute('data-target');
+            
+            // Make only the clicked link 'active'
+            techLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show only the corresponding content panel
+            contentPanels.forEach(panel => panel.style.display = 'none');
+            const targetPanel = document.getElementById(targetId);
+            if (targetPanel) {
+                targetPanel.style.display = 'block';
+            }
+        });
+    });
+
+    // --- Function to set the initial state of the page on load ---
+    function initializePage() {
+        // 1. Hide all content panels on the right
         contentPanels.forEach(panel => panel.style.display = 'none');
+        
+        // 2. Find the link that should be active by default (the one with the 'active' class)
+        const activeLink = document.querySelector('.tech-link.active');
+        
+        // 3. Show its corresponding content panel
         if (activeLink) {
             const activeTargetId = activeLink.getAttribute('data-target');
-            const activePanel = document.getElementById(activeTargetId);
-            if (activePanel) {
-                activePanel.style.display = 'block';
-            }
+            document.getElementById(activeTargetId).style.display = 'block';
         }
-    });
+
+        // 4. Collapse all categories except the one containing the active link
+        categoryTitles.forEach(title => {
+            const content = title.nextElementSibling;
+            // If the content div contains the active link, keep it open
+            if (activeLink && content.contains(activeLink)) {
+                content.style.display = 'flex';
+                title.classList.remove('collapsed');
+            } else {
+                // Otherwise, hide it and mark the title as collapsed
+                content.style.display = 'none';
+                title.classList.add('collapsed');
+            }
+        });
+    }
+
+    // Run the initialization function when the page is ready
+    initializePage();
+});
 </script>
 {% endblock %}
