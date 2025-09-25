@@ -1,9 +1,19 @@
 from flask import Flask, render_template, send_from_directory, request
+from prometheus_flask_exporter import PrometheusMetrics
 import os
 import logging
 import time
 
 app = Flask(__name__)
+
+# --- Prometheus Metrics Configuration ---
+# This line creates a /metrics endpoint for Prometheus to scrape
+metrics = PrometheusMetrics(app)
+
+# You can also create custom metrics
+# This creates a static metric with info about the application
+metrics.info('app_info', 'Application info', version='1.0.3')
+
 
 # --- Logging Configuration ---
 handler = logging.StreamHandler()
