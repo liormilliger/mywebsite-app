@@ -3,52 +3,9 @@
 {% block title %}Tech Stack - Lior Milliger{% endblock %}
 
 {% block content %}
-<style>
-    /* The grid properties for a 2-column layout have been removed. 
-    The categories will now stack vertically in a single column by default.
-    */
-    .tech-list {
-        /* We can add a gap between the frames if desired */
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    /* Makes the category titles look clickable and adds a dropdown icon */
-    .tech-category-title {
-        cursor: pointer;
-        user-select: none; /* Prevents text from being highlighted on click */
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 0.5rem; /* Adds some spacing below the title */
-    }
-
-    /* The dropdown icon (arrow) */
-    .tech-category-title::after {
-        content: '▼'; /* Down arrow for "open" state */
-        font-size: 0.8em;
-        margin-left: 10px;
-        transition: transform 0.2s ease-in-out;
-    }
-
-    /* Rotates the arrow when the category is collapsed */
-    .tech-category-title.collapsed::after {
-        transform: rotate(-90deg); /* Right arrow for "closed" state */
-    }
-
-    /* Ensures the tech links inside the dropdown are displayed correctly */
-    .tech-category-content {
-        display: flex; /* Or your original display property */
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-</style>
-
 <div class="page-content">
-    <h1>Tech Stack 💻</h1>
-    <p>Click on a technology to see a sample code snippet or configuration.</p>
+    <h1>Tech Stack</h1>
+    <p>Click on a technology category to see the tools, then select a tool to view a sample code snippet or configuration.</p>
     
     <div class="tech-container">
         <div class="tech-list">
@@ -215,78 +172,81 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // --- Get all necessary elements from the page ---
     const techLinks = document.querySelectorAll('.tech-link');
     const contentPanels = document.querySelectorAll('.tech-content-panel');
-    const categoryTitles = document.querySelectorAll('.tech-category-title');
+    const categoryFrames = document.querySelectorAll('.tech-category-frame');
 
-    // --- Logic for Dropdown Categories ---
-    categoryTitles.forEach(title => {
-        title.addEventListener('click', function() {
-            // Find the content div right after the title
-            const content = this.nextElementSibling;
+    // --- Logic for Dropdown Menus ---
+    categoryFrames.forEach(frame => {
+        const title = frame.querySelector('.tech-category-title');
+        const content = frame.querySelector('.tech-category-content');
+
+        title.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent click from bubbling up to the document
             
-            // Toggle 'collapsed' class to change the arrow icon via CSS
-            this.classList.toggle('collapsed');
-            
-            // Toggle the visibility of the content
-            if (this.classList.contains('collapsed')) {
-                content.style.display = 'none';
-            } else {
-                content.style.display = 'flex'; // Use 'flex' to show the tech links
+            // Check if the clicked dropdown is already open
+            const isAlreadyOpen = content.classList.contains('open');
+
+            // Close all other dropdowns
+            document.querySelectorAll('.tech-category-content.open').forEach(openContent => {
+                openContent.classList.remove('open');
+                openContent.previousElementSibling.classList.remove('active-title');
+            });
+
+            // If it wasn't already open, open it
+            if (!isAlreadyOpen) {
+                content.classList.add('open');
+                title.classList.add('active-title');
             }
         });
     });
 
-    // --- Logic for showing content on the right when a tech link is clicked ---
+    // --- Close dropdowns if clicking anywhere outside ---
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.tech-category-content.open').forEach(openContent => {
+            openContent.classList.remove('open');
+            openContent.previousElementSibling.classList.remove('active-title');
+        });
+    });
+
+    // --- Logic for showing content when a tech link is clicked ---
     techLinks.forEach(link => {
         link.addEventListener('click', function(event) {
             event.preventDefault();
+            event.stopPropagation(); // Stop click from closing the dropdown immediately
             const targetId = this.getAttribute('data-target');
             
-            // Make only the clicked link 'active'
             techLinks.forEach(l => l.classList.remove('active'));
             this.classList.add('active');
             
-            // Show only the corresponding content panel
             contentPanels.forEach(panel => panel.style.display = 'none');
             const targetPanel = document.getElementById(targetId);
             if (targetPanel) {
                 targetPanel.style.display = 'block';
             }
+
+            // Close all dropdowns after selection
+            document.querySelectorAll('.tech-category-content.open').forEach(openContent => {
+                openContent.classList.remove('open');
+                openContent.previousElementSibling.classList.remove('active-title');
+            });
         });
     });
 
-    // --- Function to set the initial state of the page on load ---
+    // --- Set the initial state of the page on load ---
     function initializePage() {
-        // 1. Hide all content panels on the right
         contentPanels.forEach(panel => panel.style.display = 'none');
         
-        // 2. Find the link that should be active by default (the one with the 'active' class)
         const activeLink = document.querySelector('.tech-link.active');
-        
-        // 3. Show its corresponding content panel
         if (activeLink) {
             const activeTargetId = activeLink.getAttribute('data-target');
-            document.getElementById(activeTargetId).style.display = 'block';
-        }
-
-        // 4. Collapse all categories except the one containing the active link
-        categoryTitles.forEach(title => {
-            const content = title.nextElementSibling;
-            // If the content div contains the active link, keep it open
-            if (activeLink && content.contains(activeLink)) {
-                content.style.display = 'flex';
-                title.classList.remove('collapsed');
-            } else {
-                // Otherwise, hide it and mark the title as collapsed
-                content.style.display = 'none';
-                title.classList.add('collapsed');
+            const activePanel = document.getElementById(activeTargetId);
+            if (activePanel) {
+                activePanel.style.display = 'block';
             }
-        });
+        }
     }
 
-    // Run the initialization function when the page is ready
     initializePage();
 });
 </script>

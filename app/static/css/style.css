@@ -119,10 +119,12 @@ main {
     margin: 1rem auto 0;
 }
 
+/* MODIFIED: Reduced margins for the main title */
 .page-content h1 {
     font-size: 2.5rem;
     text-align: center;
-    margin-bottom: 3rem;
+    margin-top: 1rem; /* Reduced top margin */
+    margin-bottom: 2rem; /* Reduced bottom margin */
 }
 
 /* --- Footer --- */
@@ -134,31 +136,34 @@ footer {
 }
 
 /* --- STYLES FOR TECH STACK PAGE --- */
+/* MODIFIED: Changed to a column layout */
 .tech-container {
     display: flex;
+    flex-direction: column; /* Stacks the grid and the display area vertically */
     gap: 2.5rem;
     margin-top: 2rem;
     text-align: left;
 }
 
-/* MODIFIED: Changed the container to a flex column to use 'gap' for precise spacing */
+/* MODIFIED: Converted the list into a 2x5 grid for the top menu */
 .tech-list {
-    flex: 0 0 240px;
-    border-right: 1px solid rgba(236, 223, 204, 0.2);
-    padding-right: 2.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem; /* This now controls the minimal space between frames */
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Creates 5 columns */
+    gap: 1rem; /* Space between the category frames */
+    border-right: none;
+    padding-right: 0;
 }
 
+/* MODIFIED: Add relative positioning for the dropdown content */
 .tech-category-frame {
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 8px;
-    margin-bottom: 0; /* MODIFIED: Removed margin now that the parent container uses 'gap' */
     background-color: #0c1a2e;
-    overflow: hidden;
+    position: relative; /* Crucial for positioning the dropdown */
+    margin-bottom: 0; 
 }
 
+/* MODIFIED: Add dropdown arrow and hover/active states */
 .tech-category-title {
     padding: 12px 15px;
     font-size: 1.1rem;
@@ -167,17 +172,55 @@ footer {
     background-color: rgba(236, 223, 204, 0.08);
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
     color: #ECDFCC;
+    border-radius: 8px; /* Give the title itself rounded corners */
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.tech-category-title:hover, .tech-category-title.active-title {
+    background-color: rgba(236, 223, 204, 0.15);
+}
+
+.tech-category-title::after {
+    content: '▼';
+    font-size: 0.8em;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* When the dropdown is open, the title's bottom corners shouldn't be rounded */
+.tech-category-title.active-title {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .tech-category-title.long-title {
     font-size: 0.95rem;
 }
 
+/* MODIFIED: Styles for the absolute-positioned dropdown menu */
 .tech-category-content {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 100%; /* Position right below the title */
+    left: 0;
+    right: 0; /* Make it span the full width of the frame */
+    z-index: 100; /* Ensure it appears above other content */
+    background-color: #0c1a2e; /* Match the frame color */
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    border-top: none; /* The title already has a bottom border */
+    border-radius: 0 0 8px 8px; /* Round the bottom corners */
     padding: 10px;
-    display: flex;
     flex-direction: column;
     gap: 5px;
+}
+
+/* NEW: This class, toggled by JS, makes the dropdown visible */
+.tech-category-content.open {
+    display: flex;
 }
 
 .tech-link {
@@ -444,17 +487,11 @@ footer {
         border-bottom: 1px solid rgba(236, 223, 204, 0.1);
     }
 
-    .tech-container {
-        flex-direction: column;
-        gap: 1.5rem;
+    /* MODIFIED: Tech stack grid for mobile */
+    .tech-list {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
     }
     
-    .tech-list {
-        flex: 1 1 auto;
-        border-right: none;
-        padding-right: 0;
-    }
-
     .about-me-container {
         flex-direction: column;
     }
