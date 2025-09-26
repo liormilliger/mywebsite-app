@@ -38,6 +38,10 @@
                         <img src="{{ url_for('static', filename='images/tech/Kubernetes.svg.png') }}" alt="Kubernetes Logo" class="tech-icon">
                         <span class="tech-link-text">Kubernetes</span>
                     </a>
+                    <a href="#" class="tech-link" data-target="helm" title="The package manager for Kubernetes">
+                        <img src="{{ url_for('static', filename='images/tech/helm-logo.png') }}" alt="Helm Logo" class="tech-icon">
+                        <span class="tech-link-text">Helm</span>
+                    </a>
                 </div>
             </div>
 
@@ -152,6 +156,7 @@
             <div id="argocd" class="tech-content-panel" style="display: none;">{% include 'snippets/ArgoCD.html' %}</div>
             <div id="docker" class="tech-content-panel" style="display: none;">{% include 'snippets/Dockerfile.html' %}</div>
             <div id="kubernetes" class="tech-content-panel" style="display: none;">{% include 'snippets/Kubernetes.html' %}</div>
+            <div id="helm" class="tech-content-panel" style="display: none;">{% include 'snippets/Helm.html' %}</div>
             <div id="terraform" class="tech-content-panel" style="display: none;">{% include 'snippets/Terraform.html' %}</div>
             <div id="aws-ecr" class="tech-content-panel" style="display: none;">{% include 'snippets/AWS_ECR.html' %}</div>
             <div id="artifactory" class="tech-content-panel" style="display: none;">{% include 'snippets/artifactory.html' %}</div>
@@ -251,3 +256,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

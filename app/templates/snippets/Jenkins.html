@@ -1,16 +1,12 @@
 <a href="/Jenkinsfile-demo" class="download-link" download title="Click to download the file">
-    <h3 class="downloadable-title">Jenkinsfile (Declarative Pipeline) <i class="fas fa-download"></i></h3>
+    <h3 class="downloadable-title">Jenkinsfile<i class="fas fa-download"></i></h3>
 </a>
 
 <div class="snippet-intro">
     <p>
-        The most commonly used, powerful, CI tool, an open-source automation server with a massive plugin ecosystem, perfect for building, deploying, and automating any CI/CD pipeline.
+        The most commonly used, powerful, declarative CI tool, an open-source automation server with a massive plugin ecosystem, perfect for building, deploying, and automating any CI/CD pipeline. I am using the following stages to make sure that I build a resilient and secure image, that will be versioned and pushed to my Artifact storage.
     </p>
 </div>
-
-<pre><code>pipeline {
-    agent any
-</code></pre>
 
 <div class="code-accordion">
     <div class="accordion-item">
@@ -29,9 +25,6 @@
         </div>
     </div>
 </div>
-
-<pre><code>    stages {
-</code></pre>
 
 <div class="code-accordion">
     <div class="accordion-item">

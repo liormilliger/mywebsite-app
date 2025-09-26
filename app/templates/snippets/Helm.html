@@ -1,0 +1,19 @@
+<h3>Helm - The Package Manager for Kubernetes</h3>
+<p>
+    Helm helps you manage Kubernetes applications. Helm Charts are packages of pre-configured Kubernetes resources that can be deployed as a single unit. This example shows the metadata file, <code>Chart.yaml</code>, which defines the chart's properties.
+</p>
+<pre><code>apiVersion: v2
+name: my-website
+description: A Helm chart for deploying my personal website on Kubernetes
+
+# A chart can be either an 'application' or a 'library' chart.
+# Application charts are installable, and library charts provide useful functions.
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, especially when you package it for distribution.
+version: 0.1.0
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application.
+appVersion: "1.0.0"</code></pre>
