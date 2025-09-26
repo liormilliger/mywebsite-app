@@ -1,21 +1,4 @@
-<a href="/github-actions-demo" class="download-link" download="push-image.yaml" title="Click to download the file">
-    <h3 class="downloadable-title">push-image.yaml<i class="fas fa-download"></i></h3>
-</a>
-
-<div class="snippet-intro">
-    <p>
-        A modern, fully-managed CI/CD platform integrated directly into GitHub. This workflow automates building a Docker image, running tests against it, and pushing the final version to Amazon ECR, all triggered by a push to the main branch.
-    </p>
-</div>
-
-<div class="code-accordion">
-    <div class="accordion-item">
-        <button class="accordion-header">
-            <span class="header-title">on: & env:</span>
-            <span class="accordion-icon">+</span>
-        </button>
-        <div class="accordion-content">
-<pre><code>{% raw %}name: Build, Test, and Push Docker Image to ECR
+name: Build, Test, and Push Docker Image to ECR
 
 on:
   push:
@@ -24,19 +7,14 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REGISTRY: ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REGISTRY: 704505749045.dkr.ecr.us-east-1.amazonaws.com
   ECR_REPOSITORY: mywebsite
-  IMAGE_FILE_NAME: my-app-image.tar{% endraw %}
-</code></pre>
-        </div>
-    </div>
-    <div class="accordion-item">
-        <button class="accordion-header">
-            <span class="header-title">jobs: build:</span>
-            <span class="accordion-icon">+</span>
-        </button>
-        <div class="accordion-content">
-<pre><code>{% raw %}jobs:
+  IMAGE_FILE_NAME: my-app-image.tar
+
+jobs:
+  # ===============================================
+  # Job 1: Build the Docker Image
+  # ===============================================
   build:
     name: Build Image
     runs-on: ubuntu-latest
@@ -64,20 +42,15 @@ env:
         uses: actions/upload-artifact@v4
         with:
           name: docker-image
-          path: ${{ env.IMAGE_FILE_NAME }}{% endraw %}
-</code></pre>
-        </div>
-    </div>
-    <div class="accordion-item">
-        <button class="accordion-header">
-            <span class="header-title">jobs: test:</span>
-            <span class="accordion-icon">+</span>
-        </button>
-        <div class="accordion-content">
-<pre><code>{% raw %}  test:
+          path: ${{ env.IMAGE_FILE_NAME }}
+
+  # ===============================================
+  # Job 2: Test the Docker Image
+  # ===============================================
+  test:
     name: Test Image
     runs-on: ubuntu-latest
-    needs: build
+    needs: build # This job runs only after 'build' succeeds
     steps:
       - name: Download image artifact
         uses: actions/download-artifact@v4
@@ -88,7 +61,7 @@ env:
         run: |
           docker load --input ${{ env.IMAGE_FILE_NAME }}
 
-      - name: Run container and perform healthcheck
+      - name: Run container locally and perform healthcheck
         run: |
           IMAGE_NAME=$(docker images --format '{{.Repository}}:{{.Tag}}' | head -n 1)
           docker run -d --name my-app-test -p 8080:5000 $IMAGE_NAME
@@ -97,20 +70,15 @@ env:
           echo "Performing healthcheck..."
           curl --fail http://localhost:8080/ || exit 1
           echo "Healthcheck passed!"
-          docker stop my-app-test{% endraw %}
-</code></pre>
-        </div>
-    </div>
-    <div class="accordion-item">
-        <button class="accordion-header">
-            <span class="header-title">jobs: push:</span>
-            <span class="accordion-icon">+</span>
-        </button>
-        <div class="accordion-content">
-<pre><code>{% raw %}  push:
+          docker stop my-app-test
+
+  # ===============================================
+  # Job 3: Push the Image to ECR
+  # ===============================================
+  push:
     name: Push Image to ECR
     runs-on: ubuntu-latest
-    needs: [build, test]
+    needs: [build, test] # This job runs only after 'build' and 'test' succeed
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -135,9 +103,8 @@ env:
       - name: Tag and Push image to Amazon ECR
         run: |
           IMAGE_TAG="${{ needs.build.outputs.image_tag }}"
+          # Add the 'latest' tag to the image
           docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags{% endraw %}
-</code></pre>
-        </div>
-    </div>
-</div>
+          # Push both the version and 'latest' tags
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags
+          

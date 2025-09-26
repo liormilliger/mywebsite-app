@@ -73,5 +73,20 @@ def download_jenkinsfile():
         app.logger.error(f"[{request.path}] - File not found at path: {os.path.join(directory, 'Jenkinsfile-demo')}")
         return "File not found.", 404
 
+@app.route('/github-actions-demo')
+def download_github_actions():
+    """Provides the GitHub Actions YAML file for download."""
+    # The path to the 'static/files' directory
+    directory = os.path.join(app.root_path, 'static', 'files')
+    try:
+        return send_from_directory(
+            directory, 
+            'githubactions-demo.yaml', 
+            as_attachment=True,
+            download_name='push-image.yaml' # Optional: suggest a different filename to the user
+        )
+    except FileNotFoundError:
+        return "File not found.", 404
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
