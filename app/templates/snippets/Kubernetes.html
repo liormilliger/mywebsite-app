@@ -1,20 +1,22 @@
-<h3>Kubernetes Deployment (deployment.yaml)</h3>
-<pre><code>apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80</code></pre>
+<h3>Kubernetes Manifests & GitOps Strategy</h3>
+
+<div class="snippet-intro">
+    <p>
+        For a complete overview of the Kubernetes files and the repository structure,<br>
+        please visit my Git repository:
+        <a href="https://github.com/liormilliger/mywebsite-k8s.git" target="_blank" rel="noopener noreferrer">https://github.com/liormilliger/mywebsite-k8s.git</a>.
+    </p>
+    <br>
+    <p>
+        After containerizing my application, I create the necessary Kubernetes manifests. <br>
+        This includes Deployment and Service files for each component, ensuring the correct labels and selectors are applied for proper service discovery and management.
+    </p>
+    <br>
+    <p>
+        Additionally, I create an Ingress manifest to manage external access, mapping the routing to my website's domain and securing it with TLS encryption.
+    </p>
+    <br>
+    <p>
+        This repository is managed via a GitOps workflow. I use <strong>Argo CD</strong>, which monitors the repo for changes. To facilitate this, I have also included Argo CD's <strong>Application</strong> manifests, enabling the "app-of-apps" pattern for automated, declarative deployment of any newly pushed images or configuration changes.
+    </p>
+</div>
