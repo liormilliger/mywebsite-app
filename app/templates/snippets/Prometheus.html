@@ -4,32 +4,32 @@
     Prometheus is a very strong monitoring tool that uses a Service Monitor yaml file to scrape metrics from the cluster:
 </p>
 
-<pre><code># servicemonitor.yaml
+<pre><code><span style="color: #2E8B57;"># servicemonitor.yaml</span>
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: mywebsite-servicemonitor
-  # Deploy this ServiceMonitor in the SAME namespace as your application
+  <span style="color: #2E8B57;"># Deploy this ServiceMonitor in the SAME namespace as your application</span>
   namespace: default 
   labels:
-    # IMPORTANT: This label tells the Prometheus instance from the stack to discover this ServiceMonitor.
-    # By default, it looks for 'release: prometheus'.
+    <span style="color: #2E8B57;"># IMPORTANT: This label tells the Prometheus instance from the stack to discover this ServiceMonitor.</span>
+    <span style="color: #2E8B57;"># By default, it looks for 'release: prometheus'.</span>
     release: prometheus 
 spec:
-  # This section selects the Service(s) to monitor.
+  <span style="color: #2E8B57;"># This section selects the Service(s) to monitor.</span>
   selector:
     matchLabels:
-      # This MUST match the label on your application's Service.
+      <span style="color: #2E8B57;"># This MUST match the label on your application's Service.</span>
       app: mywebsite 
-  # This tells the ServiceMonitor to look for the Service in the 'default' namespace.
+  <span style="color: #2E8B57;"># This tells the ServiceMonitor to look for the Service in the 'default' namespace.</span>
   namespaceSelector:
     matchNames:
       - default
-  # This section defines the endpoint to scrape on the selected Service.
+  <span style="color: #2E8B57;"># This section defines the endpoint to scrape on the selected Service.</span>
   endpoints:
-    - port: web # This must match the NAME of the port in your Service definition.
-      path: /metrics # The path where your app exposes Prometheus metrics.
-      interval: 15s # How frequently to scrape metrics.
+    - port: web <span style="color: #2E8B57;"># This must match the NAME of the port in your Service definition.</span>
+      path: /metrics <span style="color: #2E8B57;"># The path where your app exposes Prometheus metrics.</span>
+      interval: 15s <span style="color: #2E8B57;"># How frequently to scrape metrics.</span>
 </code></pre>
 
 <p>
@@ -42,3 +42,4 @@ spec:
     And we can also get the list of all pods by namespace and node:
 </p>
 <img src="static/images/tech/prometheus-pod-list.png" alt="Prometheus table showing pod list" style="width: 100%; border-radius: 8px; margin-top: 1rem;">
+
