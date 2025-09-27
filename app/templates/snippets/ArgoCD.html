@@ -1,13 +1,13 @@
-<h3>ArgoCD Application Manifest</h3>
-<pre><code>apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: my-app
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: 'https://github.com/my-org/my-app.git'
-    path: helm-chart
-  destination:
-    server: 'https://kubernetes.default.svc'</code></pre>
+<h3>ArgoCD</h3>
+<p>ArgoCD, as part of GitOps, serves as a CD tool that manages the deployment state. <br>
+   It listens to a git repository and react to changes within it and auto deploys. <br>
+   I created app-of-apps application file that deploys few applications - I used my website application helm chart, <br>
+   alongside with additional applications to support my app environment - Security, Load Balancing and Observability.</p>
+<br><br>
+<img src="{{ url_for('static', filename='images/tech/argocd-appofapps.png') }}" alt="ArgoCD App of Apps View" style="width:100%; max-width:800px; margin: 1rem auto; display: block; border-radius: 8px;">
+<br><br>
+<p>ArgoCD can visualize the deployment components im different view ,and enables multiple options for sync, <br>
+   self/auto-healing and cluster-state check to validate the existing state is aligned with the desired state.</p>
+<p>I chose to present this view to show the website application on all its components as ArgoCD shows it.</p>
+<br><br>
+<img src="{{ url_for('static', filename='images/tech/argocd-app-view.png') }}" alt="ArgoCD Application View" style="width:100%; max-width:800px; margin: 1rem auto; display: block; border-radius: 8px;">
