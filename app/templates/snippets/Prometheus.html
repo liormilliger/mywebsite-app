@@ -1,5 +1,44 @@
-<h3>Prometheus Scrape Config (prometheus.yml)</h3>
-<pre><code>scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['localhost:9090']</code></pre>
+<h3>Prometheus</h3>
+
+<p>
+    Prometheus is a very strong monitoring tool that uses a Service Monitor yaml file to scrape metrics from the cluster:
+</p>
+
+<pre><code># servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mywebsite-servicemonitor
+  # Deploy this ServiceMonitor in the SAME namespace as your application
+  namespace: default 
+  labels:
+    # IMPORTANT: This label tells the Prometheus instance from the stack to discover this ServiceMonitor.
+    # By default, it looks for 'release: prometheus'.
+    release: prometheus 
+spec:
+  # This section selects the Service(s) to monitor.
+  selector:
+    matchLabels:
+      # This MUST match the label on your application's Service.
+      app: mywebsite 
+  # This tells the ServiceMonitor to look for the Service in the 'default' namespace.
+  namespaceSelector:
+    matchNames:
+      - default
+  # This section defines the endpoint to scrape on the selected Service.
+  endpoints:
+    - port: web # This must match the NAME of the port in your Service definition.
+      path: /metrics # The path where your app exposes Prometheus metrics.
+      interval: 15s # How frequently to scrape metrics.
+</code></pre>
+
+<p>
+    We can expose the UI by port forwarding its service, and use the PromQL to get data
+    such as CPU usage of pods per node:
+</p>
+<img src="static/images/tech/prometheus-graph.png" alt="Prometheus Graph showing CPU usage" style="width: 100%; border-radius: 8px; margin-top: 1rem;">
+
+<p style="margin-top: 1.5rem;">
+    And we can also get the list of all pods by namespace and node:
+</p>
+<img src="static/images/tech/prometheus-pod-list.png" alt="Prometheus table showing pod list" style="width: 100%; border-radius: 8px; margin-top: 1rem;">
