@@ -1,3 +1,57 @@
-<h3>Grafana (PromQL Query)</h3>
-<p>Grafana is a visualization tool. Here is a sample query to show CPU usage:</p>
-<pre><code>100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</code></pre>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafana</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 2em;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        hr {
+            margin: 2em 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Grafana for Observability</h2>
+    <p>
+        I use Grafana as part of the Prometheus stack, as it provides visualization to the Prometheus Metrics (Observability). Grafana uses Dashboards and transfers the Prometheus scrapings and PromQL to present system metrics in a visualized manner, such as gauges, graphs and more, in real time.
+    </p>
+
+    <h4>Visualizations in Action</h4>
+    <p>Metrics can be displayed in various formats for a quick, real-time status check. For example, gauges are great for showing current network bandwidth:</p>
+    <img src="static/images/tech/Grafana-network-gauge.png" alt="Grafana dashboard with network bandwidth gauges">
+
+    <p>Time-series graphs are perfect for visualizing resource usage over time for different services in a Kubernetes cluster:</p>
+    <img src="static/images/tech/Grafana-cpu-mem-usage.png" alt="Grafana dashboard showing CPU and Memory usage graphs">
+    
+    <p>You can also get a detailed breakdown of resource consumption by each component (pod) directly from the dashboard:</p>
+    <img src="static/images/tech/Grafana-pod-list.png" alt="Grafana dashboard listing pods and their resource usage">
+
+    <hr>
+
+    <h3>Grafana & PromQL</h3>
+    <p>Grafana is a visualization tool that builds upon data sources like Prometheus. Panels are built using queries written in PromQL (Prometheus Query Language). Here is a sample query to calculate and show CPU usage:</p>
+    <pre><code>100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</code></pre>
+
+</body>
+</html>
