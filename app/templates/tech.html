@@ -9,11 +9,10 @@
     
     <div class="tech-container">
         <div class="tech-list">
-            <!-- CI/CD Category -->
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">CI/CD</h4>
                 <div class="tech-category-content">
-                    <a href="#" class="tech-link active" data-target="jenkins" title="CI/CD automation server">
+                    <a href="#" class="tech-link" data-target="jenkins" title="CI/CD automation server">
                         <img src="{{ url_for('static', filename='images/tech/Jenkins.png') }}" alt="Jenkins Logo" class="tech-icon">
                         <span class="tech-link-text">Jenkins</span>
                     </a>
@@ -28,7 +27,6 @@
                 </div>
             </div>
 
-            <!-- Containerization Category -->
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">Containerization</h4>
                 <div class="tech-category-content">
@@ -47,7 +45,6 @@
                 </div>
             </div>
             
-            <!-- Other categories follow the same pattern... -->
             <div class="tech-category-frame">
                 <h4 class="tech-category-title">IaC</h4>
                 <div class="tech-category-content">
@@ -154,7 +151,9 @@
         </div>
 
         <div class="tech-display">
-            <div id="jenkins" class="tech-content-panel">{% include 'snippets/Jenkins.html' %}</div>
+            <div id="tech-home" class="tech-content-panel">{% include 'snippets/tech-home.html' %}</div>
+            
+            <div id="jenkins" class="tech-content-panel" style="display: none;">{% include 'snippets/Jenkins.html' %}</div>
             <div id="github-actions" class="tech-content-panel" style="display: none;">{% include 'snippets/GitHubActions.html' %}</div>
             <div id="argocd" class="tech-content-panel" style="display: none;">{% include 'snippets/ArgoCD.html' %}</div>
             <div id="docker" class="tech-content-panel" style="display: none;">{% include 'snippets/Dockerfile.html' %}</div>
@@ -190,18 +189,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const content = frame.querySelector('.tech-category-content');
 
         title.addEventListener('click', (event) => {
-            event.stopPropagation(); // Prevent click from bubbling up to the document
-            
-            // Check if the clicked dropdown is already open
+            event.stopPropagation();
             const isAlreadyOpen = content.classList.contains('open');
-
-            // Close all other dropdowns
             document.querySelectorAll('.tech-category-content.open').forEach(openContent => {
                 openContent.classList.remove('open');
                 openContent.previousElementSibling.classList.remove('active-title');
             });
-
-            // If it wasn't already open, open it
             if (!isAlreadyOpen) {
                 content.classList.add('open');
                 title.classList.add('active-title');
@@ -221,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
     techLinks.forEach(link => {
         link.addEventListener('click', function(event) {
             event.preventDefault();
-            event.stopPropagation(); // Stop click from closing the dropdown immediately
+            event.stopPropagation();
             const targetId = this.getAttribute('data-target');
             
             techLinks.forEach(l => l.classList.remove('active'));
@@ -233,7 +226,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 targetPanel.style.display = 'block';
             }
 
-            // Close all dropdowns after selection
             document.querySelectorAll('.tech-category-content.open').forEach(openContent => {
                 openContent.classList.remove('open');
                 openContent.previousElementSibling.classList.remove('active-title');
@@ -242,16 +234,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- Set the initial state of the page on load ---
+    // CHANGE #3: Modified this function to show the new home panel by default
     function initializePage() {
+        // Hide all panels
         contentPanels.forEach(panel => panel.style.display = 'none');
         
-        const activeLink = document.querySelector('.tech-link.active');
-        if (activeLink) {
-            const activeTargetId = activeLink.getAttribute('data-target');
-            const activePanel = document.getElementById(activeTargetId);
-            if (activePanel) {
-                activePanel.style.display = 'block';
-            }
+        // Show the tech-home panel by default
+        const homePanel = document.getElementById('tech-home');
+        if (homePanel) {
+            homePanel.style.display = 'block';
         }
     }
 
@@ -259,4 +250,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
-
