@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-            <div class="tech-category-frame">
+            {# <div class="tech-category-frame">
                 <h4 class="tech-category-title">Logging</h4>
                 <div class="tech-category-content">
                      <a href="#" class="tech-link" data-target="fluentbit" title="Log processor and forwarder">
@@ -117,6 +117,20 @@
                     <a href="#" class="tech-link" data-target="kibana" title="Data visualization dashboard">
                         <img src="{{ url_for('static', filename='images/tech/kibana.png') }}" alt="Kibana Logo" class="tech-icon">
                         <span class="tech-link-text">Kibana</span>
+                    </a>
+                </div>
+            </div> #}
+
+            <div class="tech-category-frame">
+                <h4 class="tech-category-title">Scripting</h4>
+                <div class="tech-category-content">
+                     <a href="#" class="tech-link" data-target="python" title="General-purpose programming language">
+                        <img src="{{ url_for('static', filename='images/tech/Python-logo.png') }}" alt="Python Logo" class="tech-icon">
+                        <span class="tech-link-text">Python</span>
+                    </a>
+                     <a href="#" class="tech-link" data-target="bash" title="Unix shell and command language">
+                        <img src="{{ url_for('static', filename='images/tech/Bash_Logo.png') }}" alt="Bash Logo" class="tech-icon">
+                        <span class="tech-link-text">Bash</span>
                     </a>
                 </div>
             </div>
@@ -166,9 +180,11 @@
             <div id="aws" class="tech-content-panel" style="display: none;">{% include 'snippets/AWS.html' %}</div>
             <div id="prometheus" class="tech-content-panel" style="display: none;">{% include 'snippets/Prometheus.html' %}</div>
             <div id="grafana" class="tech-content-panel" style="display: none;">{% include 'snippets/Grafana.html' %}</div>
-            <div id="fluentbit" class="tech-content-panel" style="display: none;">{% include 'snippets/FluentBit.html' %}</div>
+            {# <div id="fluentbit" class="tech-content-panel" style="display: none;">{% include 'snippets/FluentBit.html' %}</div>
             <div id="elasticsearch" class="tech-content-panel" style="display: none;">{% include 'snippets/ElasticSearch.html' %}</div>
-            <div id="kibana" class="tech-content-panel" style="display: none;">{% include 'snippets/Kibana.html' %}</div>
+            <div id="kibana" class="tech-content-panel" style="display: none;">{% include 'snippets/Kibana.html' %}</div> #}
+            <div id="python" class="tech-content-panel" style="display: none;">{% include 'snippets/Python.html' %}</div>
+            <div id="bash" class="tech-content-panel" style="display: none;">{% include 'snippets/Bash.html' %}</div>
             <div id="postgresql" class="tech-content-panel" style="display: none;">{% include 'snippets/PostgreSQL.html' %}</div>
             <div id="mysql" class="tech-content-panel" style="display: none;">{% include 'snippets/MySQL.html' %}</div>
             <div id="nginx" class="tech-content-panel" style="display: none;">{% include 'snippets/Nginx.html' %}</div>

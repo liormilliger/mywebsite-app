@@ -1,0 +1,136 @@
+<!--
+This block adds styling to the code. The colors are chosen for good contrast and readability.
+- 'pre' and 'code' tags are used to display preformatted text, preserving spaces and line breaks.
+- Different colors are assigned to Python keywords, comments, strings, and other elements.
+-->
+<style>
+    .code-container {
+        background-color: #2d2d2d; /* Dark background for the code block */
+        color: #f8f8f2; /* Light text color for contrast */
+        border-radius: 8px;
+        padding: 20px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+        overflow-x: auto; /* Allows horizontal scrolling if code is too wide */
+        border: 1px solid #444;
+    }
+    .code-container pre {
+        margin: 0;
+    }
+    .code-keyword { color: #ff79c6; } /* Pink for keywords like 'from', 'import', 'def' */
+    .code-string { color: #f1fa8c; } /* Yellow for strings */
+    .code-comment { color: #6272a4; font-style: italic; } /* Bluish-grey for comments */
+    .code-function { color: #50fa7b; } /* Green for function names */
+    .code-decorator { color: #ffb86c; } /* Orange for decorators like @app.route */
+    .code-number { color: #bd93f9; } /* Purple for numbers */
+    .code-class { color: #8be9fd; } /* Cyan for class names */
+</style>
+
+<h4>Python: Flask Web Application</h4>
+<p>
+    This is the main application file (`app.py`) for my website. It's a Python web application built using the <strong>Flask</strong> framework.
+    <br>Key features demonstrated in this script include:
+</p>
+<ul>
+    <li><strong>Routing:</strong> Each `@app.route` decorator defines a URL endpoint (like `/` for the home page) and links it to a Python function.</li>
+    <li><strong>Templating:</strong> The `render_template()` function renders HTML templates, allowing dynamic content to be displayed.</li>
+    <li><strong>Logging:</strong> It includes a custom logging setup to record application events, such as page visits and errors, in a structured format.</li>
+    <li><strong>Metrics for Prometheus:</strong> It uses the `prometheus-flask-exporter` library to expose a `/metrics` endpoint, making it easy to monitor the application's performance with Prometheus.</li>
+    <li><strong>File Downloads:</strong> The `/Jenkinsfile-demo` route shows how to securely send a file from the server for the user to download.</li>
+</ul>
+
+<div class="code-container">
+<pre><code><span class="code-keyword">from</span> flask <span class="code-keyword">import</span> Flask, render_template, send_from_directory, request
+<span class="code-keyword">from</span> prometheus_flask_exporter <span class="code-keyword">import</span> PrometheusMetrics
+<span class="code-keyword">import</span> os
+<span class="code-keyword">import</span> logging
+<span class="code-keyword">import</span> time
+
+app = <span class="code-class">Flask</span>(__name__)
+
+<span class="code-comment"># --- Prometheus Metrics Configuration ---</span>
+<span class="code-comment"># This line creates a /metrics endpoint for Prometheus to scrape</span>
+metrics = <span class="code-class">PrometheusMetrics</span>(app)
+
+<span class="code-comment"># You can also create custom metrics</span>
+<span class="code-comment"># This creates a static metric with info about the application</span>
+metrics.info(<span class="code-string">'app_info'</span>, <span class="code-string">'Application info'</span>, version=<span class="code-string">'1.0.3'</span>)
+
+
+<span class="code-comment"># --- Logging Configuration ---</span>
+handler = logging.<span class="code-class">StreamHandler</span>()
+formatter = logging.<span class="code-class">Formatter</span>(
+    <span class="code-string">'%(asctime)s UTC [%(levelname)s] - %(message)s'</span>
+)
+formatter.converter = time.gmtime
+handler.setFormatter(formatter)
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.INFO)
+
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/'</span>)
+<span class="code-keyword">def</span> <span class="code-function">home</span>():
+    app.logger.info(<span class="code-string">f"[{request.path}] - Home page accessed."</span>)
+    <span class="code-comment"># Example of a warning log</span>
+    app.logger.warning(<span class="code-string">f"[{request.path}] - This is a sample warning message for demonstration."</span>)
+    <span class="code-keyword">return</span> render_template(<span class="code-string">'index.html'</span>)
+
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/about-me'</span>)
+<span class="code-keyword">def</span> <span class="code-function">about</span>():
+    app.logger.info(<span class="code-string">f"[{request.path}] - About Me page accessed."</span>)
+    <span class="code-keyword">return</span> render_template(<span class="code-string">'about.html'</span>)
+
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/tech-in-action'</span>)
+<span class="code-keyword">def</span> <span class="code-function">tech</span>():
+    app.logger.info(<span class="code-string">f"[{request.path}] - Tech in Action page accessed."</span>)
+    <span class="code-keyword">return</span> render_template(<span class="code-string">'tech.html'</span>)
+
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/my-projects'</span>)
+<span class="code-keyword">def</span> <span class="code-function">projects</span>():
+    app.logger.info(<span class="code-string">f"[{request.path}] - My Projects page accessed."</span>)
+    <span class="code-keyword">return</span> render_template(<span class="code-string">'projects.html'</span>)
+
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/education'</span>)
+<span class="code-keyword">def</span> <span class="code-function">education</span>():
+    app.logger.info(<span class="code-string">f"[{request.path}] - Education page accessed."</span>)
+    <span class="code-keyword">return</span> render_template(<span class="code-string">'education.html'</span>)
+
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/contact'</span>)
+<span class="code-keyword">def</span> <span class="code-function">contact</span>():
+    app.logger.info(<span class="code-string">f"[{request.path}] - Contact page accessed."</span>)
+    <span class="code-keyword">return</span> render_template(<span class="code-string">'contact.html'</span>)
+
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/Jenkinsfile-demo'</span>)
+<span class="code-keyword">def</span> <span class="code-function">download_jenkinsfile</span>():
+    <span class="code-comment"># Construct the path to the 'static/files' directory</span>
+    directory = os.path.join(app.root_path, <span class="code-string">'static'</span>, <span class="code-string">'files'</span>)
+    <span class="code-keyword">try</span>:
+        app.logger.info(<span class="code-string">f"[{request.path}] - Attempting to send file 'Jenkinsfile-demo'."</span>)
+        <span class="code-keyword">return</span> send_from_directory(
+            directory=directory,
+            path=<span class="code-string">'Jenkinsfile-demo'</span>,
+            as_attachment=<span class="code-keyword">True</span>  <span class="code-comment"># This is the crucial part</span>
+        )
+    <span class="code-keyword">except</span> <span class="code-class">FileNotFoundError</span>:
+        <span class="code-comment"># Example of an error log</span>
+        app.logger.error(<span class="code-string">f"[{request.path}] - File not found at path: {os.path.join(directory, 'Jenkinsfile-demo')}"</span>)
+        <span class="code-keyword">return</span> <span class="code-string">"File not found."</span>, <span class="code-number">404</span>
+
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/github-actions-demo'</span>)
+<span class="code-keyword">def</span> <span class="code-function">download_github_actions</span>():
+    <span class="code-string">"""Provides the GitHub Actions YAML file for download."""</span>
+    <span class="code-comment"># The path to the 'static/files' directory</span>
+    directory = os.path.join(app.root_path, <span class="code-string">'static'</span>, <span class="code-string">'files'</span>)
+    <span class="code-keyword">try</span>:
+        <span class="code-keyword">return</span> send_from_directory(
+            directory, 
+            <span class="code-string">'githubactions-demo.yaml'</span>, 
+            as_attachment=<span class="code-keyword">True</span>,
+            download_name=<span class="code-string">'push-image.yaml'</span> <span class="code-comment"># Optional: suggest a different filename to the user</span>
+        )
+    <span class="code-keyword">except</span> <span class="code-class">FileNotFoundError</span>:
+        <span class="code-keyword">return</span> <span class="code-string">"File not found."</span>, <span class="code-number">404</span>
+    
+<span class="code-keyword">if</span> __name__ == <span class="code-string">'__main__'</span>:
+    app.run(host=<span class="code-string">'0.0.0.0'</span>, port=<span class="code-number">5000</span>)
+</code></pre>
+</div>

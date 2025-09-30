@@ -1,0 +1,104 @@
+<!--
+This block adds styling for the Bash code.
+- A dark theme is used for the code container.
+- Colors are assigned to comments, keywords, strings, and commands to improve readability.
+-->
+<style>
+    .code-container-bash {
+        background-color: #2d2d2d; /* Dark background for the code block */
+        color: #f8f8f2; /* Light text color for contrast */
+        border-radius: 8px;
+        padding: 20px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+        overflow-x: auto; /* Allows horizontal scrolling for long lines */
+        border: 1px solid #444;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+    .code-container-bash pre {
+        margin: 0;
+    }
+    .bash-comment { color: #6272a4; font-style: italic; } /* Bluish-grey for comments */
+    .bash-keyword { color: #ff79c6; } /* Pink for keywords like 'if', 'export' */
+    .bash-string { color: #f1fa8c; } /* Yellow for strings */
+    .bash-command { color: #8be9fd; } /* Cyan for commands like 'aws', 'jq' */
+    .bash-variable { color: #bd93f9; } /* Purple for variables */
+</style>
+
+<h4>Bash: AWS EC2 Shutdown Automation</h4>
+<p>
+    This Bash script automates the process of shutting down running EC2 instances in an AWS account. It's a practical example of using the AWS CLI for cost management, especially in development or testing environments where resources don't need to run 24/7.
+</p>
+<ul>
+    <li><strong>AWS CLI:</strong> The script leverages the `aws ec2` command-line tool to interact with the AWS API.</li>
+    <li><strong>JSON Parsing:</strong> It uses `jq`, a lightweight and flexible command-line JSON processor, to parse the output from the AWS CLI.</li>
+    <li><strong>Automation:</strong> The script is designed to be run automatically by a scheduler like cron, ensuring resources are consistently managed without manual intervention.</li>
+</ul>
+
+<h4>ec2_shutdown.sh</h4>
+<div class="code-container-bash">
+<pre><code><span class="bash-comment">#!/bin/bash</span>
+
+<span class="bash-comment"># --- AWS Credentials ---</span>
+<span class="bash-comment"># Best practice is to configure these as environment variables or use an IAM role.</span>
+<span class="bash-comment"># Avoid hardcoding credentials in scripts.</span>
+<span class="bash-keyword">export</span> <span class="bash-variable">AWS_ACCESS_KEY_ID</span>=<span class="bash-string">"YOUR_AWS_ACCESS_KEY_ID"</span>
+<span class="bash-keyword">export</span> <span class="bash-variable">AWS_SECRET_ACCESS_KEY</span>=<span class="bash-string">"YOUR_AWS_SECRET_ACCESS_KEY"</span>
+<span class="bash-keyword">export</span> <span class="bash-variable">AWS_DEFAULT_REGION</span>=<span class="bash-string">"us-east-1"</span> <span class="bash-comment"># Change to your default region</span>
+
+<span class="bash-keyword">echo</span> <span class="bash-string">"Fetching list of running EC2 instances..."</span>
+
+<span class="bash-comment"># Get a list of all running EC2 instance IDs</span>
+<span class="bash-comment"># --filters "Name=instance-state-name,Values=running" -> Filters for instances that are currently running.</span>
+<span class="bash-comment"># --query "Reservations[].Instances[].InstanceId" -> Narrows down the JSON output to just the instance IDs.</span>
+<span class="bash-comment"># --output json -> Specifies the output format.</span>
+<span class="bash-comment"># | jq -r '.[]' -> Pipes the JSON output to jq, which formats it as a raw string list.</span>
+INSTANCE_IDS=$(<span class="bash-command">aws</span> ec2 describe-instances --filters <span class="bash-string">"Name=instance-state-name,Values=running"</span> --query <span class="bash-string">"Reservations[].Instances[].InstanceId"</span> --output json | <span class="bash-command">jq</span> -r <span class="bash-string">'.[]'</span>)
+
+<span class="bash-comment"># Check if there are any running instances</span>
+<span class="bash-keyword">if</span> [ -z <span class="bash-string">"<span class="bash-variable">${INSTANCE_IDS}</span>"</span> ]; <span class="bash-keyword">then</span>
+    <span class="bash-keyword">echo</span> <span class="bash-string">"No running EC2 instances found."</span>
+    <span class="bash-keyword">exit</span> 0
+<span class="bash-keyword">fi</span>
+
+<span class="bash-keyword">echo</span> <span class="bash-string">"Found running instances: <span class="bash-variable">${INSTANCE_IDS}</span>"</span>
+<span class="bash-keyword">echo</span> <span class="bash-string">"Initiating shutdown..."</span>
+
+<span class="bash-comment"># Shutdown the instances</span>
+<span class="bash-comment"># Note: This command just initiates the shutdown. It doesn't wait for them to stop.</span>
+<span class="bash-command">aws</span> ec2 stop-instances --instance-ids <span class="bash-variable">${INSTANCE_IDS}</span>
+
+<span class="bash-keyword">echo</span> <span class="bash-string">"Shutdown command issued for all running instances."</span>
+</code></pre>
+</div>
+
+<h4>Scheduling with Cron</h4>
+<p>
+    To run this script automatically every day, you can use a <strong>cronjob</strong>, a time-based job scheduler in Unix-like operating systems.
+</p>
+<ol>
+    <li>
+        <strong>Make the script executable:</strong> First, you need to give the script permission to be executed.
+        <div class="code-container-bash"><pre><code>chmod +x /path/to/your/ec2_shutdown.sh</code></pre></div>
+    </li>
+    <li>
+        <strong>Edit the crontab:</strong> Open the crontab file for editing by running the command below. This file contains the schedule of cron entries to be run.
+        <div class="code-container-bash"><pre><code>crontab -e</code></pre></div>
+    </li>
+    <li>
+        <strong>Add the cron entry:</strong> Add the following line to the file. This will schedule the script to run every morning at 1:00 AM.
+        <div class="code-container-bash">
+<pre><code><span class="bash-comment"># Minute (0-59)  Hour (0-23)  Day of month (1-31)  Month (1-12)  Day of week (0-6)  Command to run</span>
+   <span class="bash-string">0               1              * * * /path/to/your/ec2_shutdown.sh >> /path/to/your/cron.log 2>&1</span></code></pre>
+        </div>
+        <p>
+            <strong>Explanation of the line:</strong>
+            <ul>
+                <li><code>0 1 * * *</code>: This means "at minute 0 of hour 1 on every day of every month of every day of the week."</li>
+                <li><code>/path/to/your/ec2_shutdown.sh</code>: The absolute path to your script.</li>
+                <li><code>>> /path/to/your/cron.log 2>&1</code>: This is important for logging. It appends the script's output (stdout) and any errors (stderr) to a log file, which helps in debugging if the script fails to run.</li>
+            </ul>
+        </p>
+    </li>
+</ol>
