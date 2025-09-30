@@ -742,3 +742,38 @@ footer {
         grid-template-columns: 1fr;
     }
 }
+
+/* --- COMPACT STYLES FOR EDUCATION PAGE --- */
+
+/* Reduce the space between the main sections */
+.education-section {
+    margin-bottom: 2.5rem; /* Original was 3.5rem */
+}
+
+/* Reduce the space below each section title */
+.education-section h2 {
+    margin-bottom: 1.5rem; /* Original was 2rem */
+}
+
+/* Reduce the gap between the grid items */
+.grid-container {
+    gap: 1rem; /* Original was 1.5rem */
+}
+
+/* Make the grid items themselves shorter and less padded */
+.grid-item {
+    min-height: auto;   /* This is the key change: removes the fixed 220px height */
+    padding: 1rem;      /* Original was 1.5rem */
+}
+
+/* Make the certificate badges smaller */
+.certificate-badge {
+    height: 110px;          /* Original was 150px */
+    margin-bottom: 0.5rem;  /* Original was 1rem */
+}
+
+/* Tweak heading and paragraph spacing inside the items for a tighter fit */
+.grid-item h3 {
+    margin-bottom: 0.25rem; /* Original was 0.5rem */
+    font-size: 1.15rem;     /* Original was 1.25rem */
+}

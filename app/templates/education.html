@@ -4,23 +4,19 @@
 
 {% block content %}
 <div class="page-content">
-    <!-- Certificates Section -->
     <div id="certificates" class="education-section">
         <h2>Certificates</h2>
         <div class="grid-container">
-            <!-- AWS CCP -->
             <div class="grid-item">
                 <a href="{{ url_for('static', filename='images/tech/AWS-CCP.pdf') }}" target="_blank" rel="noopener noreferrer" title="View AWS CCP Certificate PDF">
                     <img src="{{ url_for('static', filename='images/education/CCP-badge.png') }}" alt="AWS Certified Cloud Practitioner Badge" class="certificate-badge">
                 </a>
             </div>
-            <!-- AWS SAA -->
             <div class="grid-item">
                 <a href="{{ url_for('static', filename='images/tech/AWS-SAA.pdf') }}" target="_blank" rel="noopener noreferrer" title="View AWS SAA Certificate PDF">
                     <img src="{{ url_for('static', filename='images/education/SAA-badge.png') }}" alt="AWS Certified Solutions Architect Associate Badge" class="certificate-badge">
                 </a>
             </div>
-            <!-- CKA -->
             <div class="grid-item">
                 <a href="{{ url_for('static', filename='images/tech/CKA.pdf') }}" target="_blank" rel="noopener noreferrer" title="View CKA Certificate PDF">
                     <img src="{{ url_for('static', filename='images/education/CKA-badge.png') }}" alt="Certified Kubernetes Administrator Badge" class="certificate-badge">
@@ -29,9 +25,8 @@
         </div>
     </div>
 
-    <!-- Online Courses Section -->
     <div id="courses" class="education-section">
-        <h2>Online Courses</h2>
+        <h2>Bootcamps & Courses</h2>
         <div class="grid-container">
             <div class="grid-item">
                 <a href="https://udemy-certificate.s3.amazonaws.com/image/UC-abc961ff-8f59-44fa-b947-16a7ee2fd51d.jpg" target="_blank" rel="noopener noreferrer" class="course-link">
@@ -44,11 +39,16 @@
                 </a>
             </div>
             <div class="grid-item">
+                <a href="{{ url_for('static', filename='images/education/Develeap-certificate.jpg') }}" target="_blank" rel="noopener noreferrer" class="course-link">
+                    <h3>Develeap Bootcamp</h3>
+                </a>
+            </div>
+            <div class="grid-item">
                 <a href="https://udemy-certificate.s3.amazonaws.com/image/UC-f6c31cbe-98e2-483a-9e37-97717beb78d8.jpg" target="_blank" rel="noopener noreferrer" class="course-link">
                     <h3>GitHub Actions</h3>
                 </a>
             </div>
-            <div class="grid-item">
+            <!-- <div class="grid-item">
                 <h3>CCNA Official Course</h3>
             </div>
             <div class="grid-item">
@@ -56,11 +56,10 @@
             </div>
             <div class="grid-item">
                 <h3>Serverless</h3>
-            </div>
+            </div> -->
         </div>
     </div>
 
-    <!-- Academic Degrees Section -->
     <div id="degrees" class="education-section">
         <h2>Academic Degrees</h2>
         <div class="grid-container">
