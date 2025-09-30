@@ -1,24 +1,115 @@
-<h4>JFrog Xray - Policy Rule Example</h4>
-<p>This is an example of a security policy rule in Xray to block artifacts with high-severity vulnerabilities.</p>
-<pre><code class="language-json">
+<h3 class="downloadable-title">JFrog Xray</h3>
+
+<div class="snippet-intro">
+    <p>
+        JFrog Xray is a universal software composition analysis (SCA) solution that helps you secure your software supply chain. Below, you can explore a sample security policy and a representative vulnerability scan for a common Docker image.
+    </p>
+</div>
+
+<div class="code-accordion">
+    
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">Policy Rule JSON Snippet</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+            <div style="padding: 15px 25px;">
+                <h2>Understanding a Security Policy</h2>
+                <p>This snippet defines an automated security rule for JFrog Xray.</p>
+                <pre><code class="language-json">
+<span class="comment">// This is the main policy object.</span>
 {
-  "name": "block-high-severity-vulns",
-  "description": "Block download of artifacts with vulnerabilities rated High or above.",
-  "type": "security",
-  "rules": [
+  <span class="key">"name"</span>: <span class="string">"block-high-severity-vulns"</span>,
+  <span class="key">"description"</span>: <span class="string">"Block download of artifacts with vulnerabilities rated High or above."</span>,
+  <span class="key">"type"</span>: <span class="string">"security"</span>,
+  <span class="key">"rules"</span>: [
     {
-      "name": "high-severity-rule",
-      "criteria": {
-        "min_severity": "High"
+      <span class="key">"name"</span>: <span class="string">"high-severity-rule"</span>,
+      <span class="key">"criteria"</span>: {
+        <span class="key">"min_severity"</span>: <span class="string">"High"</span>
       },
-      "actions": {
-        "block_download": {
-          "unscanned": false,
-          "active": true
-        },
-        "fail_build": true
+      <span class="key">"actions"</span>: {
+        <span class="key">"fail_build"</span>: <span class="boolean">true</span>
       }
     }
   ]
 }
 </code></pre>
+                <ul>
+                    <li><strong>What it is:</strong> A security policy written in JSON that acts as an automated guard for your software components.</li>
+                    <li><strong>What it does:</strong> It instructs Xray to automatically <strong>fail the build process</strong> if any component has a vulnerability rated "High" or worse.</li>
+                    <li><strong>Why it matters:</strong> This enforces a "shift-left" security model by catching critical issues early in development, preventing vulnerable code from ever reaching production.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">JFrog Xray Scan Report Summary</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+            <div style="padding: 15px 25px;">
+                <p><strong>Image:</strong> <code>python:3.9-slim</code><br>
+                <strong>Summary:</strong> This section displays a sample vulnerability report for the `python:3.9-slim` Docker image.</p>
+                
+                <h3>Vulnerability Details</h3>
+                
+                <h4>🔴 High Severity Vulnerabilities</h4>
+                <table class="vulnerability-table">
+                    <thead>
+                        <tr>
+                            <th>Package</th>
+                            <th>Vulnerability ID</th>
+                            <th>CVSS Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>libssl1.1</code></td>
+                            <td>CVE-2023-3817</td>
+                            <td>7.4</td>
+                        </tr>
+                        <tr>
+                            <td><code>libexpat1</code></td>
+                            <td>CVE-2022-43680</td>
+                            <td>8.8</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>🟠 Medium Severity Vulnerabilities</h4>
+                 <table class="vulnerability-table">
+                    <thead>
+                        <tr>
+                            <th>Package</th>
+                            <th>Vulnerability ID</th>
+                            <th>CVSS Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ncurses-base</code></td>
+                            <td>CVE-2022-29458</td>
+                            <td>6.8</td>
+                        </tr>
+                        <tr>
+                            <td><code>apt</code></td>
+                            <td>CVE-2021-33624</td>
+                            <td>5.9</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <hr style="border-color: rgba(236, 223, 204, 0.2); margin: 1.5rem 0;" />
+
+                <ul>
+                    <li><strong>Key Takeaway:</strong> Most vulnerabilities discovered are not in the Python code itself, but in the underlying <strong>Debian operating system packages</strong> (like `libssl`) that the image is built upon.</li>
+                    <li><strong>What it shows:</strong> The report highlights specific security issues (identified by their CVE numbers), categorizes them by severity, and provides a CVSS score to measure their potential impact.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
