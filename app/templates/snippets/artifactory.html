@@ -1,21 +1,87 @@
-<h4>Artifactory - Sample Configuration</h4>
-<p>This is an example of a repository configuration in Artifactory.</p>
-<pre><code class="language-xml">
-&lt;!-- Example: Local Docker repository configuration --&gt;
-&lt;localRepository&gt;
-    &lt;key&gt;docker-local&lt;/key&gt;
-    &lt;type&gt;docker&lt;/type&gt;
-    &lt;description&gt;Local Docker registry&lt;/description&gt;
-    &lt;notes/&gt;
-    &lt;includesPattern&gt;**/*&lt;/includesPattern&gt;
-    &lt;repoLayoutRef&gt;simple-default&lt;/repoLayoutRef&gt;
-    &lt;dockerApiVersion&gt;V2&lt;/dockerApiVersion&gt;
-    &lt;forceNugetAuthentication&gt;false&lt;/forceNugetAuthentication&gt;
-    &lt;blackedOut&gt;false&lt;/blackedOut&gt;
-    &lt;handleReleases&gt;true&lt;/handleReleases&gt;
-    &lt;handleSnapshots&gt;true&lt;/handleSnapshots&gt;
-    &lt;maxUniqueSnapshots&gt;0&lt;/maxUniqueSnapshots&gt;
-    &lt;snapshotVersionBehavior&gt;unique&lt;/snapshotVersionBehavior&gt;
-    &lt;suppressPomConsistencyChecks&gt;true&lt;/suppressPomConsistencyChecks&gt;
-&lt;/localRepository&gt;
+<h4>Artifactory - Sample Configurations</h4>
+<p>Artifactory is a powerful tool for artifact management, supporting numerous clients and integrating with external components like databases and storage providers. Below are two primary configuration file examples.</p>
+
+<hr style="border: none; border-top: 1px solid rgba(236, 223, 204, 0.1); margin: 2rem 0;">
+
+<h5>1. system.yaml - High Availability Configuration</h5>
+<p>This YAML file is used to configure core Artifactory settings. The following example enables High Availability by defining a node identity and connecting to an external PostgreSQL database, which is a requirement for an HA cluster.</p>
+<pre><code class="language-yaml"><span class="comment"># artifactory/var/etc/system.yaml</span>
+
+<span class="comment"># Shared configuration block for both Artifactory and Access services</span>
+<span class="key">shared:</span>
+  <span class="key">database:</span>
+    <span class="key">type:</span> <span class="string">postgresql</span>
+    <span class="key">driver:</span> <span class="string">org.postgresql.Driver</span>
+    <span class="key">url:</span> <span class="string">jdbc:postgresql://your-postgres-host:5432/artifactory</span>
+    <span class="key">username:</span> <span class="string">artifactory</span>
+    <span class="key">password:</span> <span class="string">password</span>
+
+<span class="comment"># Artifactory-specific configuration</span>
+<span class="key">artifactory:</span>
+  <span class="key">ha:</span>
+    <span class="key">enabled:</span> <span class="boolean">true</span>
+    <span class="key">node:</span>
+      <span class="key">id:</span> <span class="string">"art-node-01"</span>      <span class="comment"># Unique ID for this node</span>
+      <span class="key">ip:</span> <span class="string">"192.168.1.101"</span>     <span class="comment"># Mock IP for this node</span>
+      <span class="key">taskAffinity:</span> <span class="string">"any"</span>   <span class="comment"># Allows any node to run tasks</span>
 </code></pre>
+<div class="explanation">
+    <ul>
+        <li><strong>Database Configuration:</strong> The <code>shared.database</code> block is critical for HA. All nodes in the cluster must point to the same external database to share state and metadata.</li>
+        <li><strong>HA Enabled:</strong> The <code>ha.enabled: true</code> flag activates the high-availability mode for the node.</li>
+        <li><strong>Node Identity:</strong> Each node in the cluster needs a unique <code>id</code> and its own <code>ip</code> for inter-node communication.</li>
+        <li><strong>Task Affinity:</strong> The setting <code>taskAffinity: "any"</code> is key for resilience. It allows background maintenance tasks to be executed by any available node in the cluster, ensuring that critical operations continue even if one node becomes unavailable.</li>
+    </ul>
+</div>
+
+<hr style="border: none; border-top: 1px solid rgba(236, 223, 204, 0.1); margin: 2rem 0;">
+
+<h5>2. binarystore.xml - S3 Sharded Filestore</h5>
+<p>This XML file configures a highly available and performant filestore by sharding binaries across multiple S3 backends. This method enhances I/O throughput and provides data redundancy.</p>
+<pre><code class="language-xml"><span class="key">&lt;config</span> <span class="key">version=</span><span class="string">"2"</span><span class="key">&gt;</span>
+ <span class="key">&lt;chain&gt;</span> <span class="comment">&lt;!-- template="s3-sharding" --&gt;</span>
+        <span class="key">&lt;provider</span> <span class="key">id=</span><span class="string">"cache-fs"</span> <span class="key">type=</span><span class="string">"cache-fs"</span><span class="key">&gt;</span>
+            <span class="key">&lt;provider</span> <span class="key">type=</span><span class="string">"sharding"</span> <span class="key">id=</span><span class="string">"sharding"</span><span class="key">&gt;</span>               
+                <span class="key">&lt;sub-provider</span> <span class="key">type=</span><span class="string">"state-aware-s3"</span> <span class="key">id=</span><span class="string">"s3-shard1"</span><span class="key">/&gt;</span>
+                <span class="key">&lt;sub-provider</span> <span class="key">type=</span><span class="string">"state-aware-s3"</span> <span class="key">id=</span><span class="string">"s3-shard2"</span><span class="key">/&gt;</span>
+            <span class="key">&lt;/provider&gt;</span>
+        <span class="key">&lt;/provider&gt;</span>
+    <span class="key">&lt;/chain&gt;</span>   
+
+   <span class="key">&lt;provider</span> <span class="key">id=</span><span class="string">"sharding"</span> <span class="key">type=</span><span class="string">"sharding"</span><span class="key">&gt;</span>
+      <span class="key">&lt;redundancy&gt;</span>2<span class="key">&lt;/redundancy&gt;</span>
+   <span class="key">&lt;/provider&gt;</span>
+   
+   <span class="key">&lt;provider</span> <span class="key">id=</span><span class="string">"s3-shard1"</span> <span class="key">type=</span><span class="string">"state-aware-s3"</span><span class="key">&gt;</span>
+      <span class="key">&lt;endpoint&gt;</span>http://s3.amazonaws.com<span class="key">&lt;/endpoint&gt;</span>
+      <span class="key">&lt;bucketName&gt;</span>bucket1<span class="key">&lt;/bucketName&gt;</span>
+      <span class="key">&lt;path&gt;</span>path1<span class="key">&lt;/path&gt;</span>
+      <span class="key">&lt;region&gt;</span>us-east-1<span class="key">&lt;/region&gt;</span>
+      <span class="key">&lt;provider.id&gt;</span>aws-s3<span class="key">&lt;/provider.id&gt;</span>
+      <span class="key">&lt;identity&gt;</span>AK...-accessKeyId<span class="key">&lt;/identity&gt;</span>
+      <span class="key">&lt;credential&gt;</span>ePE...-secretAccessKey<span class="key">&lt;/credential&gt;</span>
+      <span class="key">&lt;enableSignedUrlRedirect&gt;</span>true<span class="key">&lt;/enableSignedUrlRedirect&gt;</span>
+      <span class="key">&lt;signedUrlExpirySeconds&gt;</span>3600<span class="key">&lt;/signedUrlExpirySeconds&gt;</span>
+   <span class="key">&lt;/provider&gt;</span>
+   
+   <span class="key">&lt;provider</span> <span class="key">id=</span><span class="string">"s3-shard2"</span> <span class="key">type=</span><span class="string">"state-aware-s3"</span><span class="key">&gt;</span>
+      <span class="key">&lt;endpoint&gt;</span>http://s3.amazonaws.com<span class="key">&lt;/endpoint&gt;</span>
+      <span class="key">&lt;bucketName&gt;</span>bucket2<span class="key">&lt;/bucketName&gt;</span>
+      <span class="key">&lt;path&gt;</span>path2<span class="key">&lt;/path&gt;</span>
+      <span class="key">&lt;region&gt;</span>us-east-1<span class="key">&lt;/region&gt;</span>
+      <span class="key">&lt;provider.id&gt;</span>aws-s3<span class="key">&lt;/provider.id&gt;</span>
+      <span class="key">&lt;identity&gt;</span>AK...-accessKeyId<span class="key">&lt;/identity&gt;</span>
+      <span class="key">&lt;credential&gt;</span>ePE...-secretAccessKey<span class="key">&lt;/credential&gt;</span>
+      <span class="key">&lt;enableSignedUrlRedirect&gt;</span>true<span class="key">&lt;/enableSignedUrlRedirect&gt;</span>
+      <span class="key">&lt;signedUrlExpirySeconds&gt;</span>3600<span class="key">&lt;/signedUrlExpirySeconds&gt;</span>
+   <span class="key">&lt;/provider&gt;</span>
+<span class="key">&lt;/config&gt;</span>
+</code></pre>
+<div class="explanation">
+    <ul>
+        <li><strong>Provider Chain:</strong> The configuration uses a <code>cache-fs</code> provider to serve frequently accessed artifacts from a local cache, which then delegates to the <code>sharding</code> provider for persistent storage.</li>
+        <li><strong>Sharding and Redundancy:</strong> The <code>sharding</code> provider manages two underlying S3 providers (<code>s3-shard1</code> and <code>s3-shard2</code>). The <code>&lt;redundancy&gt;2&lt;/redundancy&gt;</code> tag is the key to this configuration: it instructs Artifactory to write every uploaded artifact to <strong>both</strong> shards. This provides a complete, real-time backup of the data across two different S3 buckets.</li>
+        <li><strong>State-Aware S3 Provider:</strong> The <code>state-aware-s3</code> type is a specific S3 provider that helps maintain consistency between Artifactory's database and the S3 object store. Each provider points to a unique S3 bucket (<code>bucket1</code>, <code>bucket2</code>).</li>
+        <li><strong>Signed URL Redirect:</strong> Setting <code>&lt;enableSignedUrlRedirect&gt;true&lt;/enableSignedUrlRedirect&gt;</code> offloads traffic from Artifactory. When a user requests a download, Artifactory generates a temporary, secure link directly to the S3 object and redirects the client, allowing the client to download directly from AWS. This significantly improves performance and scalability.</li>
+    </ul>
+</div>
