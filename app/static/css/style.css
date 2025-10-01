@@ -884,3 +884,66 @@ footer {
     border-radius: 4px;
     font-size: 0.9em;
 }
+
+/* ========================================= */
+/* ========= STYLES FOR PROJECTS PAGE ======== */
+/* ========================================= */
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.project-card {
+    background-color: #0c1a2e;
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.project-card h2 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1.3rem;
+    color: #ECDFCC;
+}
+
+.project-card p {
+    flex-grow: 1; /* Pushes the link to the bottom */
+    color: rgba(236, 223, 204, 0.8);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.project-links a {
+    color: #ECDFCC;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 8px 12px;
+    border: 1px solid rgba(236, 223, 204, 0.5);
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.project-links a:hover {
+    background-color: #ECDFCC;
+    color: #0B192C;
+}
+
+.project-links a .fa-github {
+    font-size: 1.2rem;
+}
