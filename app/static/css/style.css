@@ -72,11 +72,9 @@ nav a {
 }
 
 .hamburger-menu {
-    display: none;
-    font-size: 1.8rem;
-    cursor: pointer;
-    color: #ECDFCC;
+    display: none; /* Hamburger menu is no longer used */
 }
+
 
 /* --- Main Content Area --- */
 main {
@@ -119,12 +117,11 @@ main {
     margin: 1rem auto 0;
 }
 
-/* MODIFIED: Reduced margins for the main title */
 .page-content h1 {
     font-size: 2.5rem;
     text-align: center;
-    margin-top: 1rem; /* Reduced top margin */
-    margin-bottom: 2rem; /* Reduced bottom margin */
+    margin-top: 1rem;
+    margin-bottom: 2rem;
 }
 
 /* --- Footer --- */
@@ -136,34 +133,30 @@ footer {
 }
 
 /* --- STYLES FOR TECH STACK PAGE --- */
-/* MODIFIED: Changed to a column layout */
 .tech-container {
     display: flex;
-    flex-direction: column; /* Stacks the grid and the display area vertically */
+    flex-direction: column;
     gap: 2.5rem;
     margin-top: 2rem;
     text-align: left;
 }
 
-/* MODIFIED: Converted the list into a 2x5 grid for the top menu */
 .tech-list {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* Creates 5 columns */
-    gap: 1rem; /* Space between the category frames */
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
     border-right: none;
     padding-right: 0;
 }
 
-/* MODIFIED: Add relative positioning for the dropdown content */
 .tech-category-frame {
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 8px;
     background-color: #0c1a2e;
-    position: relative; /* Crucial for positioning the dropdown */
+    position: relative;
     margin-bottom: 0; 
 }
 
-/* MODIFIED: Add dropdown arrow and hover/active states */
 .tech-category-title {
     padding: 12px 15px;
     font-size: 1.1rem;
@@ -172,7 +165,7 @@ footer {
     background-color: rgba(236, 223, 204, 0.08);
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
     color: #ECDFCC;
-    border-radius: 8px; /* Give the title itself rounded corners */
+    border-radius: 8px;
     cursor: pointer;
     user-select: none;
     display: flex;
@@ -191,7 +184,6 @@ footer {
     transition: transform 0.2s ease-in-out;
 }
 
-/* When the dropdown is open, the title's bottom corners shouldn't be rounded */
 .tech-category-title.active-title {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -201,24 +193,22 @@ footer {
     font-size: 0.95rem;
 }
 
-/* MODIFIED: Styles for the absolute-positioned dropdown menu */
 .tech-category-content {
-    display: none; /* Hidden by default */
+    display: none;
     position: absolute;
-    top: 100%; /* Position right below the title */
+    top: 100%;
     left: 0;
-    right: 0; /* Make it span the full width of the frame */
-    z-index: 100; /* Ensure it appears above other content */
-    background-color: #0c1a2e; /* Match the frame color */
+    right: 0;
+    z-index: 100;
+    background-color: #0c1a2e;
     border: 1px solid rgba(236, 223, 204, 0.2);
-    border-top: none; /* The title already has a bottom border */
-    border-radius: 0 0 8px 8px; /* Round the bottom corners */
+    border-top: none;
+    border-radius: 0 0 8px 8px;
     padding: 10px;
     flex-direction: column;
     gap: 5px;
 }
 
-/* NEW: This class, toggled by JS, makes the dropdown visible */
 .tech-category-content.open {
     display: flex;
 }
@@ -312,14 +302,14 @@ footer {
 }
 
 .snippet-intro a {
-    color: inherit; /* Use the same color as the parent text */
-    text-decoration: none; /* Remove the underline */
-    font-weight: bold; /* Make the link bold */
+    color: inherit;
+    text-decoration: none;
+    font-weight: bold;
     transition: color 0.3s ease;
 }
 
 .snippet-intro a:hover {
-    color: #FFFFFF; /* Make the link slightly brighter on hover */
+    color: #FFFFFF;
 }
 
 .snippet-intro {
@@ -397,7 +387,7 @@ footer {
     text-decoration: underline;
 }
 
-/* --- NEW: ABOUT ME PAGE STYLES --- */
+/* --- ABOUT ME PAGE STYLES --- */
 .about-me-container {
     display: flex;
     gap: 3rem;
@@ -453,74 +443,6 @@ footer {
 
 .about-me-content li:not(:last-child) {
     margin-bottom: 1rem;
-}
-
-/* ========================================= */
-/* ===== RESPONSIVE STYLES FOR MOBILE ====== */
-/* ========================================= */
-@media (max-width: 768px) {
-    
-    nav {
-        padding: 1rem 1.5rem;
-    }
-
-    .hamburger-menu {
-        display: block;
-    }
-
-    .nav-links-container {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background-color: #0c1a2e;
-        flex-direction: column;
-        text-align: center;
-        padding: 1rem 0;
-        gap: 0;
-        border-bottom: 1px solid rgba(236, 223, 204, 0.2);
-    }
-
-    .nav-links-container.active {
-        display: flex;
-    }
-
-    .nav-menu-links, .nav-icon-links {
-        flex-direction: column;
-        gap: 1.5rem;
-        width: 100%;
-    }
-    
-    .nav-menu-links {
-        padding-bottom: 1.5rem;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid rgba(236, 223, 204, 0.1);
-    }
-
-    /* MODIFIED: Tech stack grid for mobile */
-    .tech-list {
-        grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
-    }
-    
-    .about-me-container {
-        flex-direction: column;
-    }
-
-    .about-me-menu {
-        position: static;
-        border-bottom: 1px solid rgba(236, 223, 204, 0.2);
-        margin-bottom: 2rem;
-    }
-    
-    main {
-        padding: 1.5rem;
-    }
-
-    .page-content h1 {
-        font-size: 2rem;
-        margin-bottom: 2rem;
-    }
 }
 
 /* --- ACCORDION STYLES FOR CODE SNIPPETS --- */
@@ -648,12 +570,12 @@ footer {
 
 /* --- STYLES FOR EDUCATION PAGE --- */
 .education-section {
-    margin-bottom: 3.5rem;
+    margin-bottom: 2.5rem;
 }
 
 .education-section h2 {
+    margin-bottom: 1.5rem;
     text-align: center;
-    margin-bottom: 2rem;
     font-size: 2rem;
     font-weight: 300;
     color: #ECDFCC;
@@ -662,20 +584,20 @@ footer {
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .grid-item {
     background-color: #0c1a2e;
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1rem;
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 220px;
+    min-height: auto;
     transition: background-color 0.3s ease;
 }
 
@@ -684,11 +606,11 @@ footer {
 }
 
 .grid-item h3 {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 500;
     color: #ECDFCC;
     margin-top: 0;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .grid-item p {
@@ -700,6 +622,7 @@ footer {
     text-decoration: none;
     color: inherit;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
@@ -715,10 +638,10 @@ footer {
 }
 
 .certificate-badge {
+    height: 110px;
     max-width: 100%;
-    height: 150px;
     object-fit: contain;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     transition: transform 0.3s ease;
 }
 
@@ -730,51 +653,7 @@ footer {
     margin-top: auto;
 }
 
-/* --- Responsive adjustments for Education page grid --- */
-@media (max-width: 992px) {
-    .grid-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .grid-container {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* --- COMPACT STYLES FOR EDUCATION PAGE --- */
-.education-section {
-    margin-bottom: 2.5rem;
-}
-
-.education-section h2 {
-    margin-bottom: 1.5rem;
-}
-
-.grid-container {
-    gap: 1rem;
-}
-
-.grid-item {
-    min-height: auto;
-    padding: 1rem;
-}
-
-.certificate-badge {
-    height: 110px;
-    margin-bottom: 0.5rem;
-}
-
-.grid-item h3 {
-    margin-bottom: 0.25rem;
-    font-size: 1.15rem;
-}
-
-/* ========================================= */
-/* ===== STYLES FOR XRAY.HTML PAGE ====== */
-/* ========================================= */
-
+/* --- STYLES FOR XRAY.HTML PAGE --- */
 .xray-container h2 {
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
     padding-bottom: 10px;
@@ -788,7 +667,7 @@ footer {
 }
 
 .xray-container pre {
-    background: #020c1b; /* Darker background for code */
+    background: #020c1b;
     color: #f8f8f2;
     padding: 20px;
     border-radius: 6px;
@@ -826,35 +705,21 @@ footer {
 }
 
 /* Syntax Highlighting for the code block */
-.xray-container .key {
-    color: #9cdcfe; /* Light blue for JSON keys */
-}
-.xray-container .string {
-    color: #ce9178; /* Orange for string values */
-}
-.xray-container .boolean {
-    color: #569cd6; /* Blue for booleans */
-}
-.xray-container .comment {
-    color: #6a9955; /* Green for comments */
-    font-style: italic;
-}
-/* ========================================= */
-/* == STYLES FOR ACCORDION & VULN TABLE == */
-/* ========================================= */
+.xray-container .key { color: #9cdcfe; }
+.xray-container .string { color: #ce9178; }
+.xray-container .boolean { color: #569cd6; }
+.xray-container .comment { color: #6a9955; font-style: italic; }
 
-/* When the accordion header is active, rotate the icon */
+/* --- STYLES FOR ACCORDION & VULN TABLE --- */
 .accordion-header.active .accordion-icon {
     transform: rotate(45deg);
     transition: transform 0.3s ease-in-out;
 }
 
-/* Style for the + / - icon */
 .accordion-header .accordion-icon {
     transition: transform 0.3s ease-in-out;
 }
 
-/* Styling for the vulnerability tables inside the accordion */
 .vulnerability-table {
     width: 100%;
     border-collapse: collapse;
@@ -885,10 +750,7 @@ footer {
     font-size: 0.9em;
 }
 
-/* ========================================= */
-/* ========= STYLES FOR PROJECTS PAGE ======== */
-/* ========================================= */
-
+/* --- STYLES FOR PROJECTS PAGE --- */
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -919,7 +781,7 @@ footer {
 }
 
 .project-card p {
-    flex-grow: 1; /* Pushes the link to the bottom */
+    flex-grow: 1;
     color: rgba(236, 223, 204, 0.8);
     font-size: 1rem;
     line-height: 1.6;
@@ -946,4 +808,150 @@ footer {
 
 .project-links a .fa-github {
     font-size: 1.2rem;
+}
+
+
+/* ========================================= */
+/* ===== RESPONSIVE STYLES FOR MOBILE ====== */
+/* ========================================= */
+
+/* --- Tablet and Larger Phones (up to 992px) --- */
+@media (max-width: 992px) {
+    .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tech-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* --- Main Mobile Breakpoint (up to 768px) --- */
+@media (max-width: 768px) {
+    
+    /* --- General Adjustments --- */
+    main {
+        padding: 1.5rem 1rem;
+    }
+
+    /* --- Typography --- */
+    .welcome-heading { font-size: 2.2rem; }
+    .page-content h1, #contact h2 { font-size: 2rem; }
+    .about-text p, #contact p { font-size: 1.1rem; }
+    
+    /* --- NEW COMPACT MOBILE NAVIGATION --- */
+    nav {
+        flex-direction: column; /* Stack brand and links vertically */
+        align-items: center; /* Center-align the items */
+        padding: 0.75rem 1rem;
+        gap: 0.75rem; /* Space between brand and the links container */
+    }
+    
+    .hamburger-menu {
+        display: none; /* Ensure hamburger is hidden */
+    }
+
+    .nav-links-container {
+        display: flex;
+        flex-wrap: wrap; /* Allow links to wrap to a new line */
+        justify-content: center; /* Center the links horizontally */
+        gap: 10px 20px; /* Vertical and horizontal gap between items */
+        width: 100%;
+    }
+
+    .nav-menu-links {
+        gap: 20px; /* Spacing between menu text links */
+        padding: 0;
+        margin: 0;
+        border: none;
+    }
+
+    .nav-menu-links a {
+        font-size: 0.9rem; /* Reduce font size to fit more links */
+    }
+
+    .nav-icon-links {
+        gap: 20px; /* Spacing between icons and button */
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-icon-links .nav-button {
+        font-size: 0.85rem;
+        padding: 5px 10px; /* Reduce button padding */
+    }
+
+    .nav-icon-links i {
+        font-size: 1.4rem; /* Slightly reduce icon size */
+    }
+    
+    /* --- Homepage --- */
+    .profile-photo { width: 150px; height: 150px; }
+
+    /* --- Tech Stack Page --- */
+    .tech-list { grid-template-columns: repeat(2, 1fr); }
+    
+    /* --- About Me Page --- */
+    .about-me-container { flex-direction: column; }
+    .about-me-menu {
+        position: static;
+        border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+        margin-bottom: 2rem;
+        align-self: stretch;
+    }
+    .about-me-menu ul {
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+     .about-me-menu ul::-webkit-scrollbar { display: none; }
+    .about-me-menu a {
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        white-space: nowrap;
+        padding: 12px;
+    }
+    .about-me-menu a:hover {
+        border-left: none;
+        border-bottom-color: #ECDFCC;
+    }
+    
+    /* --- Education Page --- */
+    .grid-container { grid-template-columns: 1fr; }
+
+    /* --- Pipeline Simulation --- */
+    .pipeline-visualizer-container { flex-direction: column; align-items: stretch; }
+    .pipeline-visualizer { flex-direction: column; }
+    .pipeline-stage { border-right: none; border-bottom: 1px solid rgba(236, 223, 204, 0.2); }
+    .pipeline-stage:last-child { border-bottom: none; }
+    #reset-pipeline-btn { margin-top: 1rem; }
+
+    /* --- Tables (like Vulnerability Table) --- */
+    .accordion-content {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .vulnerability-table { min-width: 600px; }
+    
+    /* --- Projects Page --- */
+    .projects-grid { grid-template-columns: 1fr; }
+}
+
+/* --- Smaller Mobile Breakpoint (up to 480px) --- */
+@media (max-width: 480px) {
+    main { padding: 1rem 0.75rem; }
+    .welcome-heading { font-size: 1.8rem; }
+    .page-content h1, #contact h2 { font-size: 1.7rem; }
+    .tech-list { grid-template-columns: 1fr; }
+    .contact-item {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    .contact-item .icon {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
 }
