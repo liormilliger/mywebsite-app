@@ -21,7 +21,7 @@ This website is part of a larger cloud-native project, deployed on AWS EKS. The 
 
 This repository includes:
 
--   `Dockerfile`: A multi-stage Dockerfile that containerizes the Flask application, creating a lightweight and optimized image.
+-   `Dockerfile`: A simple Dockerfile that containerizes the Flask application, creating a lightweight and optimized image.
 -   `docker-compose.yml`: A Docker Compose file that orchestrates the application and an Nginx service. The Nginx service acts as a reverse proxy, serving static files and exposing the application on the standard port `80`, rather than the default Flask port (`5000`).
 
 ## 💻 Running the Application Locally
