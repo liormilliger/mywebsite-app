@@ -1,7 +1,5 @@
 Flask
 prometheus-flask-exporter
-Flask
 gunicorn
 psycopg2-binary
-prometheus-flask-exporter
 click

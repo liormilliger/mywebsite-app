@@ -3,7 +3,7 @@ from prometheus_flask_exporter import PrometheusMetrics
 import os
 import logging
 import time
-from db import init_db_command, log_visitor
+from db import init_db_command, log_visitor, get_db
 
 app = Flask(__name__)
 
