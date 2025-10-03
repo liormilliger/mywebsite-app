@@ -3,15 +3,18 @@ from prometheus_flask_exporter import PrometheusMetrics
 import os
 import logging
 import time
+from db import init_db_command, log_visitor
 
 app = Flask(__name__)
 
-# --- Prometheus Metrics Configuration ---
-# This line creates a /metrics endpoint for Prometheus to scrape
-metrics = PrometheusMetrics(app)
+# --- Database Setup ---
+# Initialize the database and register a command to run it from the command line if needed.
+app.teardown_appcontext(lambda e: get_db().close())
+app.cli.add_command(init_db_command)
 
-# You can also create custom metrics
-# This creates a static metric with info about the application
+
+# --- Prometheus Metrics Configuration ---
+metrics = PrometheusMetrics(app)
 metrics.info('app_info', 'Application info', version='1.0.3')
 
 
@@ -25,10 +28,23 @@ handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.INFO)
 
+# --- Middleware to Log Every Visit ---
+@app.before_request
+def log_request_info():
+    """
+    This function runs before every single request to the application.
+    It calls our database logic to log the visitor's information.
+    """
+    # We don't want to log requests for static files (css, js, images)
+    if not request.path.startswith('/static'):
+        log_visitor()
+
+
+# --- Application Routes ---
+
 @app.route('/')
 def home():
     app.logger.info(f"[{request.path}] - Home page accessed.")
-    # Example of a warning log
     app.logger.warning(f"[{request.path}] - This is a sample warning message for demonstration.")
     return render_template('index.html')
 
@@ -59,34 +75,31 @@ def contact():
 
 @app.route('/Jenkinsfile-demo')
 def download_jenkinsfile():
-    # Construct the path to the 'static/files' directory
     directory = os.path.join(app.root_path, 'static', 'files')
     try:
         app.logger.info(f"[{request.path}] - Attempting to send file 'Jenkinsfile-demo'.")
         return send_from_directory(
             directory=directory,
             path='Jenkinsfile-demo',
-            as_attachment=True  # This is the crucial part
+            as_attachment=True
         )
     except FileNotFoundError:
-        # Example of an error log
         app.logger.error(f"[{request.path}] - File not found at path: {os.path.join(directory, 'Jenkinsfile-demo')}")
         return "File not found.", 404
 
 @app.route('/github-actions-demo')
 def download_github_actions():
     """Provides the GitHub Actions YAML file for download."""
-    # The path to the 'static/files' directory
     directory = os.path.join(app.root_path, 'static', 'files')
     try:
         return send_from_directory(
-            directory, 
-            'githubactions-demo.yaml', 
+            directory,
+            'githubactions-demo.yaml',
             as_attachment=True,
-            download_name='push-image.yaml' # Optional: suggest a different filename to the user
+            download_name='push-image.yaml'
         )
     except FileNotFoundError:
         return "File not found.", 404
-    
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
