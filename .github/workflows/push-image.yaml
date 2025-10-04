@@ -29,7 +29,6 @@ jobs:
       - name: Define Image Version Tag
         id: version
         run: |
-          # Create a dynamic version tag based on the branch and run number
           BRANCH_NAME=$(echo ${{ github.ref_name }} | sed 's/[^a-zA-Z0-9]/-/g')
           VERSION="1.${{ github.run_number }}-${BRANCH_NAME}"
           echo "IMAGE_TAG=${VERSION}" >> $GITHUB_OUTPUT
@@ -48,12 +47,11 @@ jobs:
 
   # ===============================================
   # Job 2: Run Integration Tests with Docker Compose
-  # This job now includes all the database checks.
   # ===============================================
   integration-test:
     name: Run Integration Tests
     runs-on: ubuntu-latest
-    needs: build # Depends only on the build job
+    needs: build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -73,7 +71,7 @@ jobs:
 
       - name: Start services using Docker Compose
         env:
-          # This variable will be picked up by docker-compose.ci.yaml
+          # This variable is passed to docker-compose.ci.yaml
           WEB_IMAGE: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ needs.build.outputs.image_tag }}
         run: docker-compose -f docker-compose.ci.yaml -p ci up -d
 
@@ -82,7 +80,6 @@ jobs:
 
       - name: Execute Database Test Script
         run: |
-          # The network name 'ci_default' is created by using '-p ci' with docker-compose
           docker run --rm --network=ci_default \
             -v $(pwd)/test_db.py:/test_db.py \
             -e POSTGRES_HOST=db \
@@ -94,17 +91,18 @@ jobs:
             sh -c "pip install psycopg2-binary requests && python -u /test_db.py"
 
       - name: Stop services after test
-        if: always() # This step runs even if the tests fail
+        if: always()
         run: docker-compose -f docker-compose.ci.yaml -p ci down
 
   # ===============================================
-  # Job 3: Push Image to ECR (runs in parallel with tests)
+  # Job 3: Push Image to ECR (contingent on tests passing)
   # ===============================================
   push-to-ecr:
     name: Push Image to ECR
     runs-on: ubuntu-latest
-    needs: build # Depends only on the build job
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/database'
+    # This job now depends on the success of integration-test
+    needs: [build, integration-test]
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/database') && success()
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -139,8 +137,9 @@ jobs:
   update-kubernetes-repo:
     name: Update Kubernetes Manifest
     runs-on: ubuntu-latest
-    needs: [integration-test, push-to-ecr]
-    if: github.ref == 'refs/heads/database'
+    # This job runs last, after successful testing and pushing.
+    needs: [push-to-ecr]
+    if: github.ref == 'refs/heads/database' && success()
     steps:
       - name: Checkout Kubernetes repo
         uses: actions/checkout@v4
@@ -155,7 +154,6 @@ jobs:
       - name: Update image tag in values.yaml
         run: |
           IMAGE_TAG="${{ needs.build.outputs.image_tag }}"
-          # Ensure you have a values.yaml file with this structure
           yq eval '.image.tag = "'"$IMAGE_TAG"'"' -i 'my-app-chart/values.yaml'
 
       - name: Commit and push changes
