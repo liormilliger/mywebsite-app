@@ -58,6 +58,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
       - name: Download image artifact
         uses: actions/download-artifact@v4
         with:
@@ -67,26 +72,30 @@ jobs:
         run: docker load --input ${{ env.IMAGE_FILE_NAME }}
 
       - name: Start services using Docker Compose
-        run: docker-compose up -d
+        env:
+          # This variable will be picked up by docker-compose.ci.yaml
+          WEB_IMAGE: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ needs.build.outputs.image_tag }}
+        run: docker-compose -f docker-compose.ci.yaml -p ci up -d
 
       - name: Wait for services to be fully up
         run: echo "Waiting for services to initialize..." && sleep 20
 
       - name: Execute Database Test Script
         run: |
-          # We run the test script inside a temporary container that has access to the test network
-          docker run --rm --network=${PWD##*/}_default \
+          # The network name 'ci_default' is created by using '-p ci' with docker-compose
+          docker run --rm --network=ci_default \
+            -v $(pwd)/test_db.py:/test_db.py \
             -e POSTGRES_HOST=db \
             -e POSTGRES_DB=mywebsite \
             -e POSTGRES_USER=admin \
             -e POSTGRES_PASSWORD=password \
             --entrypoint="" \
             python:3.9-slim \
-            sh -c "pip install psycopg2-binary requests && python -u $(pwd)/test_db.py"
+            sh -c "pip install psycopg2-binary requests && python -u /test_db.py"
 
       - name: Stop services after test
         if: always() # This step runs even if the tests fail
-        run: docker-compose down
+        run: docker-compose -f docker-compose.ci.yaml -p ci down
 
   # ===============================================
   # Job 3: Push Image to ECR (runs in parallel with tests)
@@ -95,7 +104,6 @@ jobs:
     name: Push Image to ECR
     runs-on: ubuntu-latest
     needs: build # Depends only on the build job
-    # This job only runs if the commit is on the 'main' or 'database' branch, not on other feature branches
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/database'
     steps:
       - name: Configure AWS credentials
@@ -131,9 +139,7 @@ jobs:
   update-kubernetes-repo:
     name: Update Kubernetes Manifest
     runs-on: ubuntu-latest
-    # This job requires both testing and pushing to be successful
     needs: [integration-test, push-to-ecr]
-    # Only run this step when pushing to the 'database' branch, as per your ArgoCD config
     if: github.ref == 'refs/heads/database'
     steps:
       - name: Checkout Kubernetes repo
@@ -141,7 +147,6 @@ jobs:
         with:
           repository: liormilliger/mywebsite-k8s
           token: ${{ secrets.GH_PAT }}
-          # Explicitly check out the branch that ArgoCD is watching
           ref: database
 
       - name: Install yq for YAML processing
@@ -159,3 +164,4 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git commit -am "Update image tag for mywebsite to ${{ needs.build.outputs.image_tag }}"
           git push
+
