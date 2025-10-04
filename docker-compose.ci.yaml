@@ -1,0 +1,36 @@
+# docker-compose.ci.yaml
+# A dedicated, lightweight configuration for running automated integration tests in the CI/CD pipeline.
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    container_name: test-db
+    environment:
+      # These credentials match what the application (db.py) and test script expect.
+      POSTGRES_DB: mywebsite
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    # This volume ensures the init script is run when the container starts.
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d mywebsite"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    # 'build: .' is not needed here as the CI workflow will use the pre-built image from the previous step.
+    # We specify the image name that the 'build' job creates.
+    image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }}
+    container_name: test-web
+    # No ports are exposed to the host, as communication is internal to the Docker network.
+    environment:
+      # The Flask app reads these individual variables to connect to the database.
+      POSTGRES_HOST: db
+      POSTGRES_DB: mywebsite
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    depends_on:
+      db:
+        condition: service_healthy

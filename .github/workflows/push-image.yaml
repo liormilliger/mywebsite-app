@@ -2,7 +2,8 @@ name: Build, Test, and Push Docker Image to ECR
 
 on:
   push:
-    branches: [ "main" ]
+    # This workflow will now run on both main and database branches
+    branches: [ "main", "database" ]
   workflow_dispatch:
 
 env:
@@ -13,10 +14,10 @@ env:
 
 jobs:
   # ===============================================
-  # Job 1: Build the Docker Image
+  # Job 1: Build Docker Image and Create Version Tag
   # ===============================================
   build:
-    name: Build Image
+    name: Build and Tag Image
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ignore')"
     outputs:
@@ -28,17 +29,17 @@ jobs:
       - name: Define Image Version Tag
         id: version
         run: |
-          VERSION="1.${{ github.run_number }}.0"
+          # Create a dynamic version tag based on the branch and run number
+          BRANCH_NAME=$(echo ${{ github.ref_name }} | sed 's/[^a-zA-Z0-9]/-/g')
+          VERSION="1.${{ github.run_number }}-${BRANCH_NAME}"
           echo "IMAGE_TAG=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
-        run: |
-          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} .
+        run: docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} .
 
-      - name: Save Docker image as an artifact
-        run: |
-          docker save ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} --output ${{ env.IMAGE_FILE_NAME }}
-          
+      - name: Save Docker image for subsequent jobs
+        run: docker save ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} --output ${{ env.IMAGE_FILE_NAME }}
+
       - name: Upload image artifact
         uses: actions/upload-artifact@v4
         with:
@@ -46,40 +47,56 @@ jobs:
           path: ${{ env.IMAGE_FILE_NAME }}
 
   # ===============================================
-  # Job 2: Test the Docker Image
+  # Job 2: Run Integration Tests with Docker Compose
+  # This job now includes all the database checks.
   # ===============================================
-  test:
-    name: Test Image
+  integration-test:
+    name: Run Integration Tests
     runs-on: ubuntu-latest
-    needs: build
+    needs: build # Depends only on the build job
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download image artifact
         uses: actions/download-artifact@v4
         with:
           name: docker-image
 
-      - name: Load Docker image
-        run: |
-          docker load --input ${{ env.IMAGE_FILE_NAME }}
+      - name: Load Docker image from artifact
+        run: docker load --input ${{ env.IMAGE_FILE_NAME }}
 
-      - name: Run container locally and perform healthcheck
+      - name: Start services using Docker Compose
+        run: docker-compose up -d
+
+      - name: Wait for services to be fully up
+        run: echo "Waiting for services to initialize..." && sleep 20
+
+      - name: Execute Database Test Script
         run: |
-          IMAGE_NAME=$(docker images --format '{{.Repository}}:{{.Tag}}' | head -n 1)
-          docker run -d --name my-app-test -p 8080:5000 $IMAGE_NAME
-          echo "Waiting for container to start..."
-          sleep 15
-          echo "Performing healthcheck..."
-          curl --fail http://localhost:8080/ || exit 1
-          echo "Healthcheck passed!"
-          docker stop my-app-test
+          # We run the test script inside a temporary container that has access to the test network
+          docker run --rm --network=${PWD##*/}_default \
+            -e POSTGRES_HOST=db \
+            -e POSTGRES_DB=mywebsite \
+            -e POSTGRES_USER=admin \
+            -e POSTGRES_PASSWORD=password \
+            --entrypoint="" \
+            python:3.9-slim \
+            sh -c "pip install psycopg2-binary requests && python -u $(pwd)/test_db.py"
+
+      - name: Stop services after test
+        if: always() # This step runs even if the tests fail
+        run: docker-compose down
 
   # ===============================================
-  # Job 3: Push the Image to ECR
+  # Job 3: Push Image to ECR (runs in parallel with tests)
   # ===============================================
-  push:
+  push-to-ecr:
     name: Push Image to ECR
     runs-on: ubuntu-latest
-    needs: [build, test]
+    needs: build # Depends only on the build job
+    # This job only runs if the commit is on the 'main' or 'database' branch, not on other feature branches
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/database'
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -89,7 +106,6 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Download image artifact
@@ -97,30 +113,36 @@ jobs:
         with:
           name: docker-image
 
-      - name: Load Docker image
-        run: |
-          docker load --input ${{ env.IMAGE_FILE_NAME }}
+      - name: Load Docker image from artifact
+        run: docker load --input ${{ env.IMAGE_FILE_NAME }}
 
       - name: Tag and Push image to Amazon ECR
         run: |
           IMAGE_TAG="${{ needs.build.outputs.image_tag }}"
-          docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          # Also tag with 'latest' if on the main branch for easy reference
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          fi
           docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags
 
   # ===============================================
-  # Job 4: Update Kubernetes Manifest Repo
+  # Job 4: Update K8s Repo (GitOps Trigger)
   # ===============================================
   update-kubernetes-repo:
     name: Update Kubernetes Manifest
     runs-on: ubuntu-latest
-    needs: [build, push] # Runs after build (to get the tag) and push (to ensure image exists)
-
+    # This job requires both testing and pushing to be successful
+    needs: [integration-test, push-to-ecr]
+    # Only run this step when pushing to the 'database' branch, as per your ArgoCD config
+    if: github.ref == 'refs/heads/database'
     steps:
       - name: Checkout Kubernetes repo
         uses: actions/checkout@v4
         with:
           repository: liormilliger/mywebsite-k8s
           token: ${{ secrets.GH_PAT }}
+          # Explicitly check out the branch that ArgoCD is watching
+          ref: database
 
       - name: Install yq for YAML processing
         run: sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
@@ -128,7 +150,7 @@ jobs:
       - name: Update image tag in values.yaml
         run: |
           IMAGE_TAG="${{ needs.build.outputs.image_tag }}"
-          # This command targets the .image.tag key in your specified values.yaml file
+          # Ensure you have a values.yaml file with this structure
           yq eval '.image.tag = "'"$IMAGE_TAG"'"' -i 'my-app-chart/values.yaml'
 
       - name: Commit and push changes
