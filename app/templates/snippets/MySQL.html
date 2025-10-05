@@ -1,15 +1,55 @@
-<h4>MySQL - Create Table Statement</h4>
-<p>An example of a `CREATE TABLE` statement with various column types and constraints.</p>
+<div class="snippet-intro">
+    <p>
+        For MySQL, I've replicated the same visitor-tracking logic that I implemented with PostgreSQL. This demonstrates how a similar goal can be achieved in a different database system by adapting the SQL schema to its specific syntax and data types.
+    </p>
+    <p style="margin-top: 10px;">
+        The application logic in the <code>db.py</code> file would also need to be adjusted to use a MySQL connector library (like <code>mysql-connector-python</code>) instead of <code>psycopg2</code>.
+    </p>
+</div>
+
+<h4>Database Initialization (MySQL)</h4>
+<p>This initialization script creates the necessary tables in a MySQL database to log website visitors and their page views.</p>
+
+<div class="code-accordion">
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>init-mysql.sql - Database Schema</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
 <pre><code class="language-sql">
--- Table structure for storing product information
-CREATE TABLE `products` (
-  `product_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `product_name` VARCHAR(255) NOT NULL,
-  `description` TEXT,
-  `price` DECIMAL(10, 2) NOT NULL,
-  `stock_quantity` INT NOT NULL DEFAULT 0,
-  `category` VARCHAR(100),
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+<span class="comment">-- init-mysql.sql</span>
+
+<span class="comment">-- This script creates a schema to log website traffic for a MySQL database.</span>
+
+<span class="comment">-- Table to store unique visitor information.</span>
+<span class="key">CREATE TABLE IF NOT EXISTS</span> `visitors` (
+    `ip_address` <span class="type">VARCHAR(45)</span> <span class="key">PRIMARY KEY</span>,
+    `first_visit_time` <span class="type">TIMESTAMP</span> <span class="key">NOT NULL DEFAULT</span> CURRENT_TIMESTAMP,
+    `last_visit_time` <span class="type">TIMESTAMP</span> <span class="key">NOT NULL DEFAULT</span> CURRENT_TIMESTAMP,
+    `user_agent` <span class="type">TEXT</span>
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+<span class="comment">-- Table to log each individual page view.</span>
+<span class="key">CREATE TABLE IF NOT EXISTS</span> `page_views` (
+    `view_id` <span class="type">INT</span> <span class="key">AUTO_INCREMENT PRIMARY KEY</span>,
+    `visitor_ip` <span class="type">VARCHAR(45)</span> <span class="key">NOT NULL</span>,
+    `page_route` <span class="type">TEXT NOT NULL</span>,
+    `view_timestamp` <span class="type">TIMESTAMP</span> <span class="key">NOT NULL DEFAULT</span> CURRENT_TIMESTAMP,
+    <span class="key">CONSTRAINT</span> `fk_visitor_ip`
+        <span class="key">FOREIGN KEY</span>(`visitor_ip`)
+        <span class="key">REFERENCES</span> `visitors`(`ip_address`)
+        <span class="key">ON DELETE CASCADE</span>
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 </code></pre>
+        </div>
+    </div>
+</div>
+
+<div class="explanation" style="margin-top: 1.5rem;">
+    <p>This SQL script sets up the same two core tables as the PostgreSQL version, but adapted for MySQL:</p>
+    <ul>
+        <li><code><strong>visitors</strong></code>: Stores unique visitors, using <code>VARCHAR(45)</code> for the IP address.</li>
+        <li><code><strong>page_views</strong></code>: Logs each page view, using <code>INT AUTO_INCREMENT</code> for the primary key.</li>
+    </ul>
+</div>

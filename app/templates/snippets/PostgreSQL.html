@@ -1,21 +1,168 @@
-<h4>PostgreSQL - Sample SQL Query</h4>
-<p>A standard SQL query to retrieve user data from multiple tables.</p>
+<div class="snippet-intro">
+    <p>
+        My experience with databases is being showcased here with PostgreSQL, as this is my favorite Relational DB.
+        I decided to enhance my portfolio application by creating a logic that writes all visitor traffic to a database to track their navigation. I created 2 tables for that and the results were surprising!
+    </p>
+    <p style="margin-top: 10px;">
+        This required changes to the app logic and the creation of a <code>db.py</code> file—both of which are presented in the <a href="#" onclick="document.querySelector('[data-target=\'python\']').click(); return false;">Python</a> and <a href="#" onclick="document.querySelector('[data-target=\'bash\']').click(); return false;">Bash</a> Scripting snippets on this page.
+    </p>
+</div>
+
+<h4>Database Initialization</h4>
+<p>The database itself needs an initialization script to create the necessary schema, user, password, and tables before the application can interact with it.</p>
+
+<div class="code-accordion">
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>init.sql - Database Schema</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
 <pre><code class="language-sql">
--- Select users and their most recent order
-SELECT
-    u.user_id,
-    u.username,
-    u.email,
-    o.order_id,
-    o.order_date,
-    o.total_amount
-FROM
-    users u
-LEFT JOIN
-    orders o ON u.user_id = o.user_id
-WHERE
-    u.signup_date >= '2025-01-01'
-ORDER BY
-    o.order_date DESC
-LIMIT 10;
+<span class="comment">-- init.sql</span>
+
+<span class="comment">-- This script creates a schema to log website traffic, tracking unique</span>
+<span class="comment">-- visitors and the specific pages they view over time.</span>
+
+<span class="comment">-- Table to store unique visitor information.</span>
+<span class="comment">-- The IP address is the primary key here, as it uniquely identifies a visitor.</span>
+<span class="key">CREATE TABLE IF NOT EXISTS</span> visitors (
+    ip_address <span class="type">INET</span> <span class="key">PRIMARY KEY</span>,
+    first_visit_time <span class="type">TIMESTAMPTZ</span> <span class="key">NOT NULL DEFAULT</span> NOW(),
+    last_visit_time <span class="type">TIMESTAMPTZ</span> <span class="key">NOT NULL DEFAULT</span> NOW(),
+    user_agent <span class="type">TEXT</span> <span class="comment">-- Optional: store browser/device info</span>
+);
+
+<span class="comment">-- Table to log each individual page view.</span>
+<span class="comment">-- This table has its own primary key (view_id) because a visitor can have many page views.</span>
+<span class="comment">-- It uses a foreign key to link back to the visitors table.</span>
+<span class="key">CREATE TABLE IF NOT EXISTS</span> page_views (
+    view_id <span class="type">SERIAL</span> <span class="key">PRIMARY KEY</span>,
+    visitor_ip <span class="type">INET</span> <span class="key">NOT NULL</span>,
+    page_route <span class="type">TEXT</span> <span class="key">NOT NULL</span>, <span class="comment">-- e.g., '/', '/about-me', '/tech-in-action'</span>
+    view_timestamp <span class="type">TIMESTAMPTZ</span> <span class="key">NOT NULL DEFAULT</span> NOW(),
+    <span class="key">CONSTRAINT</span> fk_visitor_ip
+        <span class="key">FOREIGN KEY</span>(visitor_ip)
+        <span class="key">REFERENCES</span> visitors(ip_address)
+        <span class="key">ON DELETE CASCADE</span> <span class="comment">-- If a visitor is deleted, their page views are also deleted.</span>
+);
 </code></pre>
+        </div>
+    </div>
+</div>
+
+<div class="explanation" style="margin-top: 1.5rem;">
+    <p>This SQL script sets up two core tables:</p>
+    <ul>
+        <li><code><strong>visitors</strong></code>: This table stores a unique record for each visitor based on their IP address. It tracks their first and most recent visit times.</li>
+        <li><code><strong>page_views</strong></code>: This table logs every single page a visitor accesses. Each entry is linked back to the visitor's IP in the <code>visitors</code> table, creating a complete history of user navigation.</li>
+    </ul>
+</div>
+
+<hr>
+
+<h4>Real-World Results</h4>
+<p>
+    When launching my app with the database using a dedicated docker-compose file on an EC2 instance and opening the HTTP port to all traffic, I asked some friends to try it out. Afterward, I queried the database to see the records.
+</p>
+<p>I was stunned to see the following traffic, which includes all 148 requests from the attacking IP address:</p>
+
+<div class="code-accordion">
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>mywebsite=# ֿSelect * from page_views;</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code class="language-text">
+ view_id |   visitor_ip    | page_route                                        | view_timestamp         
+---------+-----------------+---------------------------------------------------+-------------------------------
+...
+      23 | 40.113.19.56    | /wp-content/plugins/hellopress/wp_filemanager.php | 2025-10-03 15:08:44.890954+00
+      24 | 40.113.19.56    | /bp.php                                           | 2025-10-03 15:08:44.981685+00
+      25 | 40.113.19.56    | /file2.php                                        | 2025-10-03 15:08:45.069474+00
+      26 | 40.113.19.56    | /class.1.php                                      | 2025-10-03 15:08:45.155711+00
+      27 | 40.113.19.56    | /manager.php                                      | 2025-10-03 15:08:45.241398+00
+      28 | 40.113.19.56    | /file21.php                                       | 2025-10-03 15:08:45.326693+00
+      29 | 40.113.19.56    | /file6.php                                        | 2025-10-03 15:08:45.413621+00
+      30 | 40.113.19.56    | /file.php                                         | 2025-10-03 15:08:45.500576+00
+      31 | 40.113.19.56    | /lock360.php                                      | 2025-10-03 15:08:45.586863+00
+      32 | 40.113.19.56    | /default.php                                      | 2025-10-03 15:08:45.679053+00
+      33 | 40.113.19.56    | /file5.php                                        | 2025-10-03 15:08:45.794394+00
+      34 | 40.113.19.56    | /333.php                                          | 2025-10-03 15:08:45.881608+00
+      35 | 40.113.19.56    | /file15.php                                       | 2025-10-03 15:08:45.966794+00
+      36 | 40.113.19.56    | /atomlib.php                                      | 2025-10-03 15:08:46.052841+00
+      37 | 40.113.19.56    | /aa2.php                                          | 2025-10-03 15:08:46.138764+00
+      38 | 40.113.19.56    | /gfile.php                                        | 2025-10-03 15:08:46.224591+00
+      39 | 40.113.19.56    | /nfile.php                                        | 2025-10-03 15:08:46.311504+00
+      40 | 40.113.19.56    | /cabs.php                                         | 2025-10-03 15:08:46.396944+00
+      41 | 40.113.19.56    | /usep.php                                         | 2025-10-03 15:08:46.483186+00
+      42 | 40.113.19.56    | /abcd.php                                         | 2025-10-03 15:08:46.570358+00
+      43 | 40.113.19.56    | /ilex.php                                         | 2025-10-03 15:08:46.658465+00
+      44 | 40.113.19.56    | /hk.php                                           | 2025-10-03 15:08:46.746744+00
+      45 | 40.113.19.56    | /file1.php                                        | 2025-10-03 15:08:46.834331+00
+      46 | 40.113.19.56    | /rrr.php                                          | 2025-10-03 15:08:46.92382+00
+      47 | 40.113.19.56    | /vee.php                                          | 2025-10-03 15:08:47.00991+00
+      48 | 40.113.19.56    | /222.php                                          | 2025-10-03 15:08:47.095895+00
+      49 | 40.113.19.56    | /fffff.php                                        | 2025-10-03 15:08:47.185577+00
+      50 | 40.113.19.56    | /cool.php                                         | 2025-10-03 15:08:47.289561+00
+      51 | 40.113.19.56    | /cfile.php                                        | 2025-10-03 15:08:47.375429+00
+      52 | 40.113.19.56    | /new4.php                                         | 2025-10-03 15:08:47.462155+00
+      53 | 40.113.19.56    | /031.php                                          | 2025-10-03 15:08:47.54776+00
+      54 | 40.113.19.56    | /goat.php                                         | 2025-10-03 15:08:47.636889+00
+      55 | 40.113.19.56    | /we.php                                           | 2025-10-03 15:08:47.724788+00
+      56 | 40.113.19.56    | /aa.php                                           | 2025-10-03 15:08:47.80998+00
+      57 | 40.113.19.56    | /gmo.php                                          | 2025-10-03 15:08:47.895707+00
+      58 | 40.113.19.56    | /gm.php                                           | 2025-10-03 15:08:47.982633+00
+      59 | 40.113.19.56    | /eauu.php                                         | 2025-10-03 15:08:48.069536+00
+      60 | 40.113.19.56    | /2.php                                            | 2025-10-03 15:08:48.155682+00
+      61 | 40.113.19.56    | /CLA.php                                          | 2025-10-03 15:08:48.242789+00
+      62 | 40.113.19.56    | /wpc.php                                          | 2025-10-03 15:08:48.336367+00
+      63 | 40.113.19.56    | /lala.php                                         | 2025-10-03 15:08:48.423806+00
+      64 | 40.113.19.56    | /dfre.php                                         | 2025-10-03 15:08:48.512749+00
+      65 | 40.113.19.56    | /file3.php                                        | 2025-10-03 15:08:48.598727+00
+      66 | 40.113.19.56    | /as.php                                           | 2025-10-03 15:08:48.684506+00
+      67 | 40.113.19.56    | /444.php                                          | 2025-10-03 15:08:48.769966+00
+      68 | 40.113.19.56    | /file9.php                                        | 2025-10-03 15:08:48.856609+00
+      69 | 40.113.19.56    | /yanz.php                                         | 2025-10-03 15:08:48.944013+00
+      70 | 40.113.19.56    | /system_log.php                                   | 2025-10-03 15:08:49.030504+00
+      71 | 40.113.19.56    | /admin/upload/css.php                             | 2025-10-03 15:08:49.116629+00
+      72 | 40.113.19.56    | /wp.php                                           | 2025-10-03 15:08:49.202528+00
+      73 | 40.113.19.56    | /admin.php                                        | 2025-10-03 15:08:49.289782+00
+      74 | 40.113.19.56    | /f35.php                                          | 2025-10-03 15:08:49.376755+00
+      75 | 40.113.19.56    | /info.php                                         | 2025-10-03 15:08:49.462196+00
+      76 | 40.113.19.56    | /css.php                                          | 2025-10-03 15:08:49.547774+00
+      77 | 40.113.19.56    | /radio.php                                        | 2025-10-03 15:08:49.633898+00
+      78 | 40.113.19.56    | /wp-admin/user/about.php                          | 2025-10-03 15:08:49.718909+00
+      79 | 40.113.19.56    | /index/function.php                               | 2025-10-03 15:08:49.806662+00
+      80 | 40.113.19.56    | /simple.php                                       | 2025-10-03 15:08:49.893433+00
+      81 | 40.113.19.56    | /v.php                                            | 2025-10-03 15:08:49.982912+00
+      82 | 40.113.19.56    | /fe5.php                                          | 2025-10-03 15:08:50.06874+00
+      83 | 40.113.19.56    | /ee.php                                           | 2025-10-03 15:08:50.154924+00
+      84 | 40.113.19.56    | /get.php                                          | 2025-10-03 15:08:50.241466+00
+      85 | 40.113.19.56    | /file18.php                                       | 2025-10-03 15:08:50.328438+00
+      86 | 40.113.19.56    | /c.php                                            | 2025-10-03 15:08:50.415157+00
+      87 | 40.113.19.56    | /about.php                                        | 2025-10-03 15:08:50.50094+00
+      88 | 40.113.19.56    | /file17.php                                       | 2025-10-03 15:08:50.585732+00
+      89 | 40.113.19.56    | /wp-includes/IXR/admin.php                        | 2025-10-03 15:08:50.67756+00
+      90 | 40.113.19.56    | /efile.php                                        | 2025-10-03 15:08:50.763741+00
+      91 | 40.113.19.56    | /r.php                                            | 2025-10-03 15:08:50.851319+00
+      92 | 40.113.19.56    | /t.php                                            | 2025-10-03 15:08:50.952744+00
+      93 | 40.113.19.56    | /file88.php                                       | 2025-10-03 15:08:51.037884+00
+      94 | 40.113.19.56    | /NewFile.php                                      | 2025-10-03 15:08:51.124456+00
+      95 | 40.113.19.56    | /makeasmtp.php                                    | 2025-10-03 15:08:51.22758+00
+      96 | 40.113.19.56    | /tiny.php                                         | 2025-10-03 15:08:51.314992+00
+      97 | 40.113.19.56    | /marijuana.php                                    | 2025-10-03 15:08:51.401166+00
+      98 | 40.113.19.56    | /config.php                                       | 2025-10-03 15:08:51.489659+00
+      99 | 40.113.19.56    | /wp-2019.php                                      | 2025-10-03 15:08:51.577475+00
+     100 | 40.113.19.56    | /1.php                                            | 2025-10-03 15:08:51.662816+00
+...
+(183 rows)
+</code></pre>
+        </div>
+    </div>
+</div>
+
+<p style="margin-top: 1.5rem;">
+    Alongside the traffic from my friends, the logs were flooded with hundreds of rapid requests from a single IP address (<code>40.113.19.56</code>) trying to access common vulnerability endpoints and non-existent PHP files. This is a classic example of a vulnerability scan, often preceding or forming part of a DDoS attack. This demonstrates how quickly a publicly accessible server can become a target. 🎯
+</p>
