@@ -3,3 +3,4 @@ prometheus-flask-exporter
 gunicorn
 psycopg2-binary
 click
+prometheus-client
