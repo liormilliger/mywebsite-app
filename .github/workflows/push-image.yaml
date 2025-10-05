@@ -134,8 +134,7 @@ jobs:
   push-to-ecr:
     name: Push Image to ECR
     runs-on: ubuntu-latest
-    # This job depends on BOTH test jobs. Since only one will run, we use `always()` to check their results.
-    needs: [build, integration-test-db, integration-test-app]
+    needs: [build, integration-test-app]
     # Run if:
     # 1. The preceding jobs didn't fail (they were either successful or skipped).
     # 2. A commit message does NOT contain the word "skip".
