@@ -987,7 +987,7 @@ footer {
         display: flex; /* Always use flexbox */
         flex-direction: column;
         align-items: center;
-        padding-top: 5rem;
+        padding-top: 0.5rem;
         gap: 1.5rem;
         transform: translateX(100%); /* Start off-screen to the right */
         transition: transform 0.3s ease-in-out; /* Animate the transform property */
