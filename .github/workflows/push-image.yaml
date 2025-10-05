@@ -137,7 +137,7 @@ jobs:
           fetch-depth: 0
 
       - name: Scan repository for secrets with Gitleaks
-        uses: gitleaks/gitleaks-action@v3
+        uses: gitleaks/gitleaks-action@v2
         env:
           # By default, this action will fail the job if it finds leaks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
