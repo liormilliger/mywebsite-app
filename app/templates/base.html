@@ -10,35 +10,38 @@
 </head>
 <body>
 
-<nav>
-    <div class="nav-brand">
-        <a href="/">Lior Milliger - DevOps</a>
-    </div>
-
-    <button class="hamburger-menu" aria-label="Toggle navigation menu">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <div class="nav-links-container">
-        <div class="nav-menu-links">
-            <a href="/">Home</a>
-            <a href="/about-me">About Me</a>
-            <a href="/tech-in-action">Tech Stack</a>
-            <a href="/my-projects">My Projects</a>
-            <a href="/education">Education</a>
-            <a href="/contact">Contact</a>
+    <nav>
+        <div class="nav-brand">
+            <a href="/">Lior Milliger - DevOps</a>
         </div>
-        <div class="nav-icon-links">
-            <a href="{{ url_for('static', filename='files/LiorMilligerCV.pdf') }}" download class="nav-button">CV</a>
-            <a href="https://github.com/liormilliger" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
-                <i class="fab fa-github"></i>
-            </a>
-            <a href="https://www.linkedin.com/in/lior-milliger/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
-                <i class="fab fa-linkedin"></i>
-            </a>
+
+        <button class="hamburger-menu" aria-label="Toggle navigation menu">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="nav-links-container">
+            <button class="close-menu-btn" aria-label="Close navigation menu">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="nav-menu-links">
+                <a href="/">Home</a>
+                <a href="/about-me">About Me</a>
+                <a href="/tech-in-action">Tech Stack</a>
+                <a href="/my-projects">My Projects</a>
+                <a href="/education">Education</a>
+                <a href="/contact">Contact</a>
+            </div>
+            <div class="nav-icon-links">
+                <a href="{{ url_for('static', filename='files/LiorMilligerCV.pdf') }}" download class="nav-button">CV</a>
+                <a href="https://github.com/liormilliger" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/lior-milliger/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
     <main>
         {% block content %}{% endblock %}

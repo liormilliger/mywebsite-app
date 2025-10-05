@@ -2,8 +2,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Hamburger Menu Logic ---
     const hamburger = document.querySelector('.hamburger-menu');
     const navLinksContainer = document.querySelector('.nav-links-container');
-    if (hamburger) {
-        hamburger.addEventListener('click', () => navLinksContainer.classList.toggle('active'));
+    const closeButton = document.querySelector('.close-menu-btn');
+    const navLinks = document.querySelectorAll('.nav-links-container a');
+
+    // Open the menu when hamburger is clicked
+    if (hamburger && navLinksContainer) {
+        hamburger.addEventListener('click', () => {
+            navLinksContainer.classList.add('active');
+        });
+    }
+
+    // Close the menu when the new 'X' button is clicked
+    if (closeButton && navLinksContainer) {
+        closeButton.addEventListener('click', () => {
+            navLinksContainer.classList.remove('active');
+        });
+    }
+    
+    // Close the menu when any link inside it is clicked
+    if (navLinks.length > 0 && navLinksContainer) {
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navLinksContainer.classList.remove('active');
+            });
+        });
     }
 
     // --- Simple Accordion Logic ---
@@ -15,11 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const content = this.nextElementSibling;
             
             if (content.style.maxHeight) {
-                // If it's open, close it
                 content.style.maxHeight = null;
                 if(icon) icon.textContent = '+';
             } else {
-                // If it's closed, open it
                 if(content) content.style.maxHeight = content.scrollHeight + 'px';
                 if(icon) icon.textContent = '−';
             }

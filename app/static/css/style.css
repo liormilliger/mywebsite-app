@@ -19,6 +19,7 @@ nav {
     background-color: #0c1a2e;
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
     position: relative;
+    z-index: 1001; /* Ensure nav is above other content but below the slide-in menu */
 }
 
 nav a {
@@ -71,10 +72,10 @@ nav a {
     font-size: 1.6rem;
 }
 
-.hamburger-menu {
-    display: none; /* Hamburger menu is no longer used */
+/* Mobile-only elements are hidden on desktop */
+.hamburger-menu, .close-menu-btn, .back-to-list-btn {
+    display: none;
 }
-
 
 /* --- Main Content Area --- */
 main {
@@ -812,87 +813,100 @@ footer {
 }
 
 
-/* ========================================= */
-/* ===== RESPONSIVE STYLES FOR MOBILE ====== */
-/* ========================================= */
+/* ===================================================================== */
+/* =================== RESPONSIVE STYLES (CONSOLIDATED) ================ */
+/* ===================================================================== */
 
-/* --- Tablet and Larger Phones (up to 992px) --- */
+/* --- Primary Mobile & Tablet Breakpoint (up to 992px) --- */
 @media (max-width: 992px) {
-    .grid-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .tech-list {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-/* --- Main Mobile Breakpoint (up to 768px) --- */
-@media (max-width: 768px) {
-    
     /* --- General Adjustments --- */
-    main {
-        padding: 1.5rem 1rem;
-    }
-
-    /* --- Typography --- */
+    main { padding: 1.5rem 1rem; }
     .welcome-heading { font-size: 2.2rem; }
     .page-content h1, #contact h2 { font-size: 2rem; }
     .about-text p, #contact p { font-size: 1.1rem; }
-    
-    /* --- NEW COMPACT MOBILE NAVIGATION --- */
-    nav {
-        flex-direction: column; /* Stack brand and links vertically */
-        align-items: center; /* Center-align the items */
-        padding: 0.75rem 1rem;
-        gap: 0.75rem; /* Space between brand and the links container */
-    }
-    
-    .hamburger-menu {
-        display: none; /* Ensure hamburger is hidden */
-    }
 
+    /* --- SLIDE-IN HAMBURGER NAVIGATION --- */
+    nav { flex-direction: row; justify-content: space-between; }
+    .hamburger-menu {
+        display: block;
+        background: none;
+        border: none;
+        color: #ECDFCC;
+        font-size: 1.6rem;
+        cursor: pointer;
+    }
     .nav-links-container {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 280px;
+        height: 100vh;
+        background-color: #1a2b3c;
+        z-index: 1002; /* Must be higher than nav's z-index */
         display: flex;
-        flex-wrap: wrap; /* Allow links to wrap to a new line */
-        justify-content: center; /* Center the links horizontally */
-        gap: 10px 20px; /* Vertical and horizontal gap between items */
+        flex-direction: column;
+        align-items: center;
+        padding-top: 3rem;
+        gap: 1.5rem;
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+    }
+    .nav-links-container.active { transform: translateX(0); }
+    .nav-links-container .nav-menu-links,
+    .nav-links-container .nav-icon-links {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.2rem;
         width: 100%;
     }
-
-    .nav-menu-links {
-        gap: 20px; /* Spacing between menu text links */
-        padding: 0;
-        margin: 0;
+    .close-menu-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        background: none;
         border: none;
+        color: #ECDFCC;
+        font-size: 2rem;
+        cursor: pointer;
     }
-
-    .nav-menu-links a {
-        font-size: 0.9rem; /* Reduce font size to fit more links */
-    }
-
-    .nav-icon-links {
-        gap: 20px; /* Spacing between icons and button */
-        padding: 0;
-        margin: 0;
-    }
-
-    .nav-icon-links .nav-button {
-        font-size: 0.85rem;
-        padding: 5px 10px; /* Reduce button padding */
-    }
-
-    .nav-icon-links i {
-        font-size: 1.4rem; /* Slightly reduce icon size */
-    }
+    .nav-links-container.active .close-menu-btn { display: block; }
     
-    /* --- Homepage --- */
+    /* --- TECH STACK MOBILE SLIDING PANE --- */
+    .tech-list { grid-template-columns: repeat(3, 1fr); }
+    .tech-container { position: relative; overflow: hidden; display: block; }
+    .tech-list, .tech-display { width: 100%; transition: transform 0.3s ease-in-out; }
+    .tech-display {
+        position: fixed;
+        top: 65px;
+        left: 0;
+        transform: translateX(100%);
+        width: 100%;
+        height: calc(100vh - 65px);
+        background-color: #0B192C;
+        padding: 1rem;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .tech-container.snippet-visible .tech-list { transform: translateX(-100%); }
+    .tech-container.snippet-visible .tech-display { transform: translateX(0); }
+    .back-to-list-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: none;
+        border: 1px solid #ECDFCC;
+        color: #ECDFCC;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+    }
+
+    /* --- Other Component Adjustments --- */
     .profile-photo { width: 150px; height: 150px; }
-
-    /* --- Tech Stack Page --- */
-    .tech-list { grid-template-columns: repeat(2, 1fr); }
-    
-    /* --- About Me Page --- */
     .about-me-container { flex-direction: column; }
     .about-me-menu {
         position: static;
@@ -900,43 +914,25 @@ footer {
         margin-bottom: 2rem;
         align-self: stretch;
     }
-    .about-me-menu ul {
-        display: flex;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-    }
-     .about-me-menu ul::-webkit-scrollbar { display: none; }
-    .about-me-menu a {
-        border-left: none;
-        border-bottom: 3px solid transparent;
-        white-space: nowrap;
-        padding: 12px;
-    }
-    .about-me-menu a:hover {
-        border-left: none;
-        border-bottom-color: #ECDFCC;
-    }
-    
-    /* --- Education Page --- */
-    .grid-container { grid-template-columns: 1fr; }
-
-    /* --- Pipeline Simulation --- */
+    .about-me-menu ul { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .about-me-menu ul::-webkit-scrollbar { display: none; }
+    .about-me-menu a { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; padding: 12px; }
+    .about-me-menu a:hover { border-left: none; border-bottom-color: #ECDFCC; }
+    .grid-container { grid-template-columns: repeat(2, 1fr); }
     .pipeline-visualizer-container { flex-direction: column; align-items: stretch; }
     .pipeline-visualizer { flex-direction: column; }
     .pipeline-stage { border-right: none; border-bottom: 1px solid rgba(236, 223, 204, 0.2); }
     .pipeline-stage:last-child { border-bottom: none; }
     #reset-pipeline-btn { margin-top: 1rem; }
-
-    /* --- Tables (like Vulnerability Table) --- */
-    .accordion-content {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
+    .accordion-content { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .vulnerability-table { min-width: 600px; }
-    
-    /* --- Projects Page --- */
     .projects-grid { grid-template-columns: 1fr; }
+}
+
+/* --- Main Mobile Breakpoint (up to 768px) --- */
+@media (max-width: 768px) {
+    .grid-container { grid-template-columns: 1fr; }
+    .tech-list { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* --- Smaller Mobile Breakpoint (up to 480px) --- */
@@ -945,71 +941,6 @@ footer {
     .welcome-heading { font-size: 1.8rem; }
     .page-content h1, #contact h2 { font-size: 1.7rem; }
     .tech-list { grid-template-columns: 1fr; }
-    .contact-item {
-        padding: 1rem;
-        flex-direction: column;
-        text-align: center;
-        gap: 0.5rem;
-    }
-    .contact-item .icon {
-        margin-right: 0;
-        margin-bottom: 0.5rem;
-    }
-}
-
-/* ========================================= */
-/* ===== NEW RESPONSIVE NAV STYLES ====== */
-/* ========================================= */
-
-@media (max-width: 768px) {
-    
-    /* Show the hamburger icon */
-    .hamburger-menu {
-        display: block;
-    }
-
-    /* The container for the mobile menu links */
-    .nav-links-container {
-        /* --- 1. Open Menu on the Right Side --- */
-        position: fixed; /* Use fixed positioning to detach from the nav bar */
-        top: 0;
-        right: 0;
-        width: 280px; /* Give it a fixed width instead of 100% */
-        height: 100vh; /* Make it take the full height of the screen */
-        
-        /* --- 3. Lighter Menu Background --- */
-        background-color: #1a2b3c; /* A slightly lighter, distinct background */
-        
-        /* --- 2. Bring the Menu to the Front (Z-Index) --- */
-        z-index: 1000; /* High z-index to ensure it's on top of ALL other content */
-
-        /* --- BONUS: Smooth Slide-in Animation --- */
-        display: flex; /* Always use flexbox */
-        flex-direction: column;
-        align-items: center;
-        padding-top: 0.5rem;
-        gap: 1.5rem;
-        transform: translateX(100%); /* Start off-screen to the right */
-        transition: transform 0.3s ease-in-out; /* Animate the transform property */
-    }
-
-    /* This class is toggled by JS to show the menu */
-    .nav-links-container.active {
-        transform: translateX(0); /* Move it on-screen */
-        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2); /* Optional: nice shadow effect */
-    }
-
-    /* Adjust the inner containers for vertical layout */
-    .nav-menu-links, .nav-icon-links {
-        flex-direction: column;
-        align-items: center;
-        gap: 1.2rem;
-        width: 100%;
-    }
-    
-    /* Ensure the nav itself aligns brand and hamburger */
-    nav {
-        flex-direction: row;
-        justify-content: space-between;
-    }
+    .contact-item { padding: 1rem; flex-direction: column; text-align: center; gap: 0.5rem; }
+    .contact-item .icon { margin-right: 0; margin-bottom: 0.5rem; }
 }
