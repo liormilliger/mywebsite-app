@@ -1,59 +1,124 @@
 <!--
-This block adds styling to the code. The colors are chosen for good contrast and readability.
-- 'pre' and 'code' tags are used to display preformatted text, preserving spaces and line breaks.
-- Different colors are assigned to Python keywords, comments, strings, and other elements.
+This block now contains all necessary styles for both the code syntax and the accordion,
+making the component fully self-contained and resolving any style conflicts.
 -->
 <style>
+    /* --- Preserved Code Syntax Highlighting Styles --- */
     .code-container {
-        background-color: #2d2d2d; /* Dark background for the code block */
-        color: #f8f8f2; /* Light text color for contrast */
+        background-color: #2d2d2d;
+        color: #f8f8f2;
         border-radius: 8px;
-        padding: 20px;
         font-family: 'Courier New', Courier, monospace;
         font-size: 14px;
-        overflow-x: auto; /* Allows horizontal scrolling if code is too wide */
+        overflow-x: auto;
         border: 1px solid #444;
     }
     .code-container pre {
         margin: 0;
+        padding: 20px;
     }
-    .code-keyword { color: #ff79c6; } /* Pink for keywords like 'from', 'import', 'def' */
-    .code-string { color: #f1fa8c; } /* Yellow for strings */
-    .code-comment { color: #6272a4; font-style: italic; } /* Bluish-grey for comments */
-    .code-function { color: #50fa7b; } /* Green for function names */
-    .code-decorator { color: #ffb86c; } /* Orange for decorators like @app.route */
-    .code-number { color: #bd93f9; } /* Purple for numbers */
-    .code-class { color: #8be9fd; } /* Cyan for class names */
+    .code-keyword { color: #ff79c6; }
+    .code-string { color: #f1fa8c; }
+    .code-comment { color: #6272a4; font-style: italic; }
+    .code-function { color: #50fa7b; }
+    .code-decorator { color: #ffb86c; }
+    .code-number { color: #bd93f9; }
+    .code-class { color: #8be9fd; }
+
+    /* --- Self-Contained Accordion Styles --- */
+    .accordion {
+        border: 1px solid rgba(236, 223, 204, 0.2);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 1.5rem;
+    }
+    .accordion-item:not(:last-child) {
+        border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+    }
+    .accordion-header {
+        background-color: #0c1a2e;
+        color: #ECDFCC;
+        cursor: pointer;
+        padding: 15px 20px;
+        width: 100%;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 1.1rem;
+        transition: background-color 0.3s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .accordion-header:hover, .accordion-header.active {
+        background-color: #1a2b3c;
+    }
+    .accordion-header-text .filename {
+        font-weight: bold;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    .accordion-header-text .description {
+        display: block;
+        font-size: 0.9rem;
+        color: rgba(236, 223, 204, 0.7);
+        margin-top: 5px;
+        font-weight: normal;
+    }
+    .accordion-icon {
+        font-size: 1.5rem;
+        transition: transform 0.3s ease-in-out;
+    }
+    .accordion-header.active .accordion-icon {
+        transform: rotate(45deg);
+    }
+    .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out;
+        background-color: #2d2d2d;
+    }
+    .accordion-content .code-container {
+        border: none;
+        border-radius: 0;
+    }
 </style>
 
-<h4>Python: Flask Web Application</h4>
+<h4>Python: From a Simple App to a Database-Driven Service</h4>
 <p>
-    This is the main application file (`app.py`) for my website. It's a Python web application built using the <strong>Flask</strong> framework.
-    <br>Key features demonstrated in this script include:
+    I started with a simple Flask application, `app.py`, designed to serve the pages of this website. As the project grew, I wanted to keep a record of visits, which led me to integrate a PostgreSQL database. This seemingly small addition had a significant impact on the architecture. It required separating the database logic into `db.py` and adjusting how the application was configured for different environments. This evolution turned a single-file app into a multi-service architecture, affecting local development, containerization with Docker, and deployment on Kubernetes, as each layer needed specific adjustments to handle the new database dependency.<br>
+    <br><br>
+    Below you can see the full code I am using for this application, both in PROD and DEV environments.
 </p>
-<ul>
-    <li><strong>Routing:</strong> Each `@app.route` decorator defines a URL endpoint (like `/` for the home page) and links it to a Python function.</li>
-    <li><strong>Templating:</strong> The `render_template()` function renders HTML templates, allowing dynamic content to be displayed.</li>
-    <li><strong>Logging:</strong> It includes a custom logging setup to record application events, such as page visits and errors, in a structured format.</li>
-    <li><strong>Metrics for Prometheus:</strong> It uses the `prometheus-flask-exporter` library to expose a `/metrics` endpoint, making it easy to monitor the application's performance with Prometheus.</li>
-    <li><strong>File Downloads:</strong> The `/Jenkinsfile-demo` route shows how to securely send a file from the server for the user to download.</li>
-</ul>
 
-<div class="code-container">
+<div class="accordion">
+    <!-- Accordion Item 1: app.py -->
+    <div class="accordion-item">
+        <div class="accordion-header">
+            <div class="accordion-header-text">
+                <span class="filename">app.py</span>
+                <span class="description">The main Flask application. It defines all the web routes and integrates with the database to log every visit.</span>
+            </div>
+            <span class="accordion-icon">+</span>
+        </div>
+        <div class="accordion-content">
+            <div class="code-container">
 <pre><code><span class="code-keyword">from</span> flask <span class="code-keyword">import</span> Flask, render_template, send_from_directory, request
 <span class="code-keyword">from</span> prometheus_flask_exporter <span class="code-keyword">import</span> PrometheusMetrics
 <span class="code-keyword">import</span> os
 <span class="code-keyword">import</span> logging
 <span class="code-keyword">import</span> time
+<span class="code-keyword">from</span> db <span class="code-keyword">import</span> init_db_command, log_visitor, get_db
 
 app = <span class="code-class">Flask</span>(__name__)
 
-<span class="code-comment"># --- Prometheus Metrics Configuration ---</span>
-<span class="code-comment"># This line creates a /metrics endpoint for Prometheus to scrape</span>
-metrics = <span class="code-class">PrometheusMetrics</span>(app)
+<span class="code-comment"># --- Database Setup ---</span>
+<span class="code-comment"># Close the database connection after each request and add a CLI command.</span>
+app.teardown_appcontext(<span class="code-keyword">lambda</span> e: get_db().close())
+app.cli.add_command(init_db_command)
 
-<span class="code-comment"># You can also create custom metrics</span>
-<span class="code-comment"># This creates a static metric with info about the application</span>
+
+<span class="code-comment"># --- Prometheus Metrics Configuration ---</span>
+metrics = <span class="code-class">PrometheusMetrics</span>(app)
 metrics.info(<span class="code-string">'app_info'</span>, <span class="code-string">'Application info'</span>, version=<span class="code-string">'1.0.3'</span>)
 
 
@@ -67,11 +132,163 @@ handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.INFO)
 
+<span class="code-comment"># --- Middleware to Log Every Visit ---</span>
+<span class="code-decorator">@app.before_request</span>
+<span class="code-keyword">def</span> <span class="code-function">log_request_info</span>():
+    <span class="code-string">"""
+    This function runs before every request to log the visitor's information.
+    """</span>
+    <span class="code-comment"># We don't want to log requests for static files (css, js, images)</span>
+    <span class="code-keyword">if</span> <span class="code-keyword">not</span> request.path.startswith(<span class="code-string">'/static'</span>):
+        log_visitor()
+
+
+<span class="code-comment"># --- Application Routes ---</span>
+
 <span class="code-decorator">@app.route</span>(<span class="code-string">'/'</span>)
 <span class="code-keyword">def</span> <span class="code-function">home</span>():
     app.logger.info(<span class="code-string">f"[{request.path}] - Home page accessed."</span>)
-    <span class="code-comment"># Example of a warning log</span>
-    app.logger.warning(<span class="code-string">f"[{request.path}] - This is a sample warning message for demonstration."</span>)
+    <span class="code-keyword">return</span> render_template(<span class="code-string">'index.html'</span>)
+
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/tech-in-action'</span>)
+<span class="code-keyword">def</span> <span class="code-function">tech</span>():
+    app.logger.info(<span class="code-string">f"[{request.path}] - Tech in Action page accessed."</span>)
+    <span class="code-keyword">return</span> render_template(<span class="code-string">'tech.html'</span>)
+
+<span class="code-comment"># ... other routes ...</span>
+    
+<span class="code-keyword">if</span> __name__ == <span class="code-string">'__main__'</span>:
+    app.run(host=<span class="code-string">'0.0.0.0'</span>, port=<span class="code-number">5000</span>)
+</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accordion Item 2: db.py -->
+    <div class="accordion-item">
+        <div class="accordion-header">
+            <div class="accordion-header-text">
+                <span class="filename">db.py</span>
+                <span class="description">Handles all database connections and transactions, keeping this logic separate from the main application file.</span>
+            </div>
+            <span class="accordion-icon">+</span>
+        </div>
+        <div class="accordion-content">
+            <div class="code-container">
+<pre><code><span class="code-keyword">import</span> os
+<span class="code-keyword">import</span> psycopg2
+<span class="code-keyword">from</span> flask <span class="code-keyword">import</span> g, request, current_app
+<span class="code-keyword">import</span> click
+
+<span class="code-keyword">def</span> <span class="code-function">get_db</span>():
+    <span class="code-string">"""
+    Opens a new database connection if there is none yet for the
+    current application context.
+    """</span>
+    <span class="code-keyword">if</span> <span class="code-string">'db'</span> <span class="code-keyword">not</span> <span class="code-keyword">in</span> g:
+        <span class="code-keyword">try</span>:
+            g.db = psycopg2.connect(
+                <span class="code-comment"># Use environment variables for connection details</span>
+                host=os.environ.get(<span class="code-string">'POSTGRES_HOST'</span>, <span class="code-string">'db'</span>),
+                dbname=os.environ.get(<span class="code-string">'POSTGRES_DB'</span>, <span class="code-string">'mywebsite'</span>),
+                user=os.environ.get(<span class="code-string">'POSTGRES_USER'</span>, <span class="code-string">'admin'</span>),
+                password=os.environ.get(<span class="code-string">'POSTGRES_PASSWORD'</span>, <span class="code-string">'password'</span>),
+                port=os.environ.get(<span class="code-string">'POSTGRES_PORT'</span>, <span class="code-number">5432</span>)
+            )
+            current_app.logger.info(<span class="code-string">"Database connection established."</span>)
+        <span class="code-keyword">except</span> psycopg2.OperationalError <span class="code-keyword">as</span> e:
+            current_app.logger.error(<span class="code-string">f"Could not connect to database: {e}"</span>)
+            <span class="code-keyword">return</span> <span class="code-keyword">None</span>
+    <span class="code-keyword">return</span> g.db
+
+<span class="code-keyword">def</span> <span class="code-function">log_visitor</span>():
+    <span class="code-string">"""
+    Logs the current visitor's IP, user agent, and the page they visited.
+    """</span>
+    db = get_db()
+    <span class="code-keyword">if</span> db <span class="code-keyword">is</span> <span class="code-keyword">None</span>:
+        current_app.logger.error(<span class="code-string">"No database connection available, skipping visitor log."</span>)
+        <span class="code-keyword">return</span>
+
+    cursor = db.cursor()
+    visitor_ip = request.headers.get(<span class="code-string">'X-Forwarded-For'</span>, request.remote_addr)
+    user_agent = request.headers.get(<span class="code-string">'User-Agent'</span>)
+    page_route = request.path
+
+    <span class="code-keyword">try</span>:
+        cursor.execute(
+            <span class="code-string">"""
+            INSERT INTO visitors (ip_address, user_agent) VALUES (%s, %s)
+            ON CONFLICT (ip_address) DO UPDATE
+            SET last_visit_time = NOW(), user_agent = EXCLUDED.user_agent;
+            """</span>,
+            (visitor_ip, user_agent)
+        )
+        cursor.execute(
+            <span class="code-string">"""
+            INSERT INTO page_views (visitor_ip, page_route) VALUES (%s, %s);
+            """</span>,
+            (visitor_ip, page_route)
+        )
+        db.commit()
+    <span class="code-keyword">except</span> <span class="code-class">Exception</span> <span class="code-keyword">as</span> e:
+        db.rollback()
+        current_app.logger.error(<span class="code-string">f"Database error: {e}"</span>)
+    <span class="code-keyword">finally</span>:
+        cursor.close()
+
+<span class="code-decorator">@click.command</span>(<span class="code-string">'init-db'</span>)
+<span class="code-keyword">def</span> <span class="code-function">init_db_command</span>():
+    <span class="code-string">"""Clear existing data and create new tables."""</span>
+    db = get_db()
+    <span class="code-keyword">with</span> current_app.open_resource(<span class="code-string">'../init/init.sql'</span>) <span class="code-keyword">as</span> f:
+        db.cursor().execute(f.read().decode(<span class="code-string">'utf8'</span>))
+    db.commit()
+    click.echo(<span class="code-string">'Initialized the database.'</span>)
+</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accordion Item 3: app-local.py -->
+    <div class="accordion-item">
+        <div class="accordion-header">
+            <div class="accordion-header-text">
+                <span class="filename">app-local.py</span>
+                <span class="description">A database-free version of the app for local development, allowing work on the UI without needing a database service running.</span>
+            </div>
+            <span class="accordion-icon">+</span>
+        </div>
+        <div class="accordion-content">
+            <div class="code-container">
+<pre><code><span class="code-keyword">from</span> flask <span class="code-keyword">import</span> Flask, render_template, send_from_directory, request
+<span class="code-keyword">from</span> prometheus_flask_exporter <span class="code-keyword">import</span> PrometheusMetrics
+<span class="code-keyword">import</span> os
+<span class="code-keyword">import</span> logging
+<span class="code-keyword">import</span> time
+
+app = <span class="code-class">Flask</span>(__name__)
+
+<span class="code-comment"># --- Prometheus Metrics and Logging are kept for consistency ---</span>
+metrics = <span class="code-class">PrometheusMetrics</span>(app)
+metrics.info(<span class="code-string">'app_info'</span>, <span class="code-string">'Application info'</span>, version=<span class="code-string">'1.0.3'</span>)
+
+handler = logging.<span class="code-class">StreamHandler</span>()
+formatter = logging.<span class="code-class">Formatter</span>(
+    <span class="code-string">'%(asctime)s UTC [%(levelname)s] - %(message)s'</span>
+)
+formatter.converter = time.gmtime
+handler.setFormatter(formatter)
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.INFO)
+
+
+<span class="code-comment"># --- Application Routes ---</span>
+<span class="code-comment"># All database-related calls are removed from this version.</span>
+
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/'</span>)
+<span class="code-keyword">def</span> <span class="code-function">home</span>():
+    app.logger.info(<span class="code-string">f"[{request.path}] - Home page accessed."</span>)
     <span class="code-keyword">return</span> render_template(<span class="code-string">'index.html'</span>)
 
 <span class="code-decorator">@app.route</span>(<span class="code-string">'/about-me'</span>)
@@ -79,58 +296,76 @@ app.logger.setLevel(logging.INFO)
     app.logger.info(<span class="code-string">f"[{request.path}] - About Me page accessed."</span>)
     <span class="code-keyword">return</span> render_template(<span class="code-string">'about.html'</span>)
 
-<span class="code-decorator">@app.route</span>(<span class="code-string">'/tech-in-action'</span>)
-<span class="code-keyword">def</span> <span class="code-function">tech</span>():
-    app.logger.info(<span class="code-string">f"[{request.path}] - Tech in Action page accessed."</span>)
-    <span class="code-keyword">return</span> render_template(<span class="code-string">'tech.html'</span>)
+<span class="code-comment"># ... other routes are identical to app.py ...</span>
 
-<span class="code-decorator">@app.route</span>(<span class="code-string">'/my-projects'</span>)
-<span class="code-keyword">def</span> <span class="code-function">projects</span>():
-    app.logger.info(<span class="code-string">f"[{request.path}] - My Projects page accessed."</span>)
-    <span class="code-keyword">return</span> render_template(<span class="code-string">'projects.html'</span>)
-
-<span class="code-decorator">@app.route</span>(<span class="code-string">'/education'</span>)
-<span class="code-keyword">def</span> <span class="code-function">education</span>():
-    app.logger.info(<span class="code-string">f"[{request.path}] - Education page accessed."</span>)
-    <span class="code-keyword">return</span> render_template(<span class="code-string">'education.html'</span>)
-
-<span class="code-decorator">@app.route</span>(<span class="code-string">'/contact'</span>)
-<span class="code-keyword">def</span> <span class="code-function">contact</span>():
-    app.logger.info(<span class="code-string">f"[{request.path}] - Contact page accessed."</span>)
-    <span class="code-keyword">return</span> render_template(<span class="code-string">'contact.html'</span>)
-
-<span class="code-decorator">@app.route</span>(<span class="code-string">'/Jenkinsfile-demo'</span>)
-<span class="code-keyword">def</span> <span class="code-function">download_jenkinsfile</span>():
-    <span class="code-comment"># Construct the path to the 'static/files' directory</span>
-    directory = os.path.join(app.root_path, <span class="code-string">'static'</span>, <span class="code-string">'files'</span>)
-    <span class="code-keyword">try</span>:
-        app.logger.info(<span class="code-string">f"[{request.path}] - Attempting to send file 'Jenkinsfile-demo'."</span>)
-        <span class="code-keyword">return</span> send_from_directory(
-            directory=directory,
-            path=<span class="code-string">'Jenkinsfile-demo'</span>,
-            as_attachment=<span class="code-keyword">True</span>  <span class="code-comment"># This is the crucial part</span>
-        )
-    <span class="code-keyword">except</span> <span class="code-class">FileNotFoundError</span>:
-        <span class="code-comment"># Example of an error log</span>
-        app.logger.error(<span class="code-string">f"[{request.path}] - File not found at path: {os.path.join(directory, 'Jenkinsfile-demo')}"</span>)
-        <span class="code-keyword">return</span> <span class="code-string">"File not found."</span>, <span class="code-number">404</span>
-
-<span class="code-decorator">@app.route</span>(<span class="code-string">'/github-actions-demo'</span>)
-<span class="code-keyword">def</span> <span class="code-function">download_github_actions</span>():
-    <span class="code-string">"""Provides the GitHub Actions YAML file for download."""</span>
-    <span class="code-comment"># The path to the 'static/files' directory</span>
-    directory = os.path.join(app.root_path, <span class="code-string">'static'</span>, <span class="code-string">'files'</span>)
-    <span class="code-keyword">try</span>:
-        <span class="code-keyword">return</span> send_from_directory(
-            directory, 
-            <span class="code-string">'githubactions-demo.yaml'</span>, 
-            as_attachment=<span class="code-keyword">True</span>,
-            download_name=<span class="code-string">'push-image.yaml'</span> <span class="code-comment"># Optional: suggest a different filename to the user</span>
-        )
-    <span class="code-keyword">except</span> <span class="code-class">FileNotFoundError</span>:
-        <span class="code-keyword">return</span> <span class="code-string">"File not found."</span>, <span class="code-number">404</span>
-    
 <span class="code-keyword">if</span> __name__ == <span class="code-string">'__main__'</span>:
     app.run(host=<span class="code-string">'0.0.0.0'</span>, port=<span class="code-number">5000</span>)
 </code></pre>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    function initializePythonAccordion() {
+        const pythonContainer = document.querySelector('#python');
+        if (!pythonContainer) return;
+
+        const headers = pythonContainer.querySelectorAll('.accordion-header');
+        if (headers.length === 0) return;
+
+        // Remove old listeners before re-adding to avoid duplicates
+        headers.forEach(header => {
+            header.replaceWith(header.cloneNode(true));
+        });
+
+        pythonContainer.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.closest('.accordion-item');
+                const content = item.querySelector('.accordion-content');
+                const icon = header.querySelector('.accordion-icon');
+                const allItems = pythonContainer.querySelectorAll('.accordion-item');
+                const isActive = header.classList.contains('active');
+
+                // Close all others
+                allItems.forEach(other => {
+                    const h = other.querySelector('.accordion-header');
+                    const c = other.querySelector('.accordion-content');
+                    const i = other.querySelector('.accordion-icon');
+                    h.classList.remove('active');
+                    c.style.maxHeight = null;
+                    i.textContent = '+';
+                });
+
+                // Toggle this one
+                if (!isActive) {
+                    header.classList.add('active');
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    icon.textContent = '−';
+                } else {
+                    header.classList.remove('active');
+                    content.style.maxHeight = null;
+                    icon.textContent = '+';
+                }
+            });
+        });
+    }
+
+    // Use IntersectionObserver to initialize once the Python panel becomes visible
+    const pythonPanel = document.querySelector('#python');
+    if (pythonPanel) {
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    initializePythonAccordion();
+                    obs.disconnect(); // only initialize once
+                }
+            });
+        }, { threshold: 0.1 });
+
+        observer.observe(pythonPanel);
+    }
+});
+</script>
+
