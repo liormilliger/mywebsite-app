@@ -1,4 +1,4 @@
-name: Build, Test, and Push Docker Image to ECR
+name: Build, Test, Scan, and Push Docker Image
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
 
 jobs:
   # ===============================================
-  # Job 1: Build the Docker Image (No changes)
+  # Job 1: Build the Docker Image
   # ===============================================
   build:
     name: Build Image
@@ -116,23 +116,60 @@ jobs:
 
       - name: Execute Application Test Script
         run: |
-          # Add your application-specific tests here.
-          # For example, run the container and curl its health endpoint.
           echo "Running application-only tests..."
-          # docker run -d --name my-app-test -p 8000:8000 ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ needs.build.outputs.image_tag }}
-          # sleep 5
-          # curl --fail http://localhost:8000/health
           echo "Application test placeholder successful!"
 
   # ===============================================
-  # Job 3: Push Image to ECR (Conditional)
+  # Job 2C: NEW Security Scan Job
+  # ===============================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read # for actions/checkout
+      security-events: write # for github/codeql-action/upload-sarif to upload results
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Required for Gitleaks to scan full repository history
+          fetch-depth: 0
+
+      - name: Scan repository for secrets with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          # By default, this action will fail the job if it finds leaks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Scan Docker image for vulnerabilities with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          input: '${{ env.IMAGE_FILE_NAME }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          # Fail the build for HIGH or CRITICAL vulnerabilities
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # ===============================================
+  # Job 3: Push Image to ECR (Now depends on security scan)
   # ===============================================
   push-to-ecr:
     name: Push Image to ECR
     runs-on: ubuntu-latest
-    needs: [build, integration-test-app]
+    # Added 'security-scan' to the needs context
+    needs: [build, integration-test-db, integration-test-app, security-scan]
     if: success() && !contains(toJSON(github.event.commits.*.message), 'skip')
-
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -159,7 +196,7 @@ jobs:
           docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags
 
   # ===============================================
-  # Job 4: Update Kubernetes Manifest Repo (No changes)
+  # Job 4: Update Kubernetes Manifest Repo
   # ===============================================
   update-kubernetes-repo:
     name: Update Kubernetes Manifest
@@ -187,3 +224,4 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git commit -am "Update image tag for mywebsite to ${{ needs.build.outputs.image_tag }}"
           git push
+          
