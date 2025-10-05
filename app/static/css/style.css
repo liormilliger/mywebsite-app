@@ -889,6 +889,12 @@ footer {
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
+    .tech-display {
+        box-sizing: border-box; /* 👈 FIX for right side cutoff */
+    }
+    .tech-content-panel code {
+        font-size: 0.85rem; /* 👈 Smaller font size for code on mobile */
+    }
     .tech-container.snippet-visible .tech-list { transform: translateX(-100%); }
     .tech-container.snippet-visible .tech-display { transform: translateX(0); }
     .back-to-list-btn {
