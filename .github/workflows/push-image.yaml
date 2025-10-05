@@ -137,7 +137,7 @@ jobs:
           fetch-depth: 0
 
       - name: Scan repository for secrets with Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           # By default, this action will fail the job if it finds leaks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -157,7 +157,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
 
@@ -224,4 +224,3 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git commit -am "Update image tag for mywebsite to ${{ needs.build.outputs.image_tag }}"
           git push
-          
