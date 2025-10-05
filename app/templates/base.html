@@ -10,10 +10,16 @@
 </head>
 <body>
 
-    <nav>
-        <div class="nav-brand">
-            <a href="/">Lior Milliger - DevOps</a>
-        </div>
+<nav>
+    <div class="nav-brand">
+        <a href="/">Lior Milliger - DevOps</a>
+    </div>
+
+    <button class="hamburger-menu" aria-label="Toggle navigation menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="nav-links-container">
         <div class="nav-menu-links">
             <a href="/">Home</a>
             <a href="/about-me">About Me</a>
@@ -31,7 +37,8 @@
                 <i class="fab fa-linkedin"></i>
             </a>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <main>
         {% block content %}{% endblock %}
