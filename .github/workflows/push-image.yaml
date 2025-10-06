@@ -120,7 +120,7 @@ jobs:
           echo "Application test placeholder successful!"
 
   # ===============================================
-  # Job 2C: NEW Security Scan Job
+  # Job 2C: Security Scan Job
   # ===============================================
   security-scan:
     name: Security Scan
@@ -189,11 +189,10 @@ jobs:
       - name: Load Docker image
         run: docker load --input ${{ env.IMAGE_FILE_NAME }}
 
-      - name: Tag and Push image to Amazon ECR
+      - name: Push image to Amazon ECR
         run: |
           IMAGE_TAG="${{ needs.build.outputs.image_tag }}"
-          docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${IMAGE_TAG}
 
   # ===============================================
   # Job 4: Update Kubernetes Manifest Repo
@@ -224,3 +223,4 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git commit -am "Update image tag for mywebsite to ${{ needs.build.outputs.image_tag }}"
           git push
+          
