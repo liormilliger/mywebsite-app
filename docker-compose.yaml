@@ -4,6 +4,7 @@ services:
   app:
     build: .
     container_name: mywebsite-app
+    restart: unless-stopped
     expose:
       - "5000"
     volumes:
@@ -12,11 +13,12 @@ services:
       db:
         condition: service_healthy
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/mywebsite
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
 
   nginx:
     image: nginx:latest
     container_name: mywebsite-nginx
+    restart: always
     ports:
       - "80:80"
       - "443:443"
@@ -26,7 +28,7 @@ services:
       - ./data/certbot/www:/var/www/certbot
     depends_on:
       - app
-  
+
   certbot:
     image: certbot/certbot
     container_name: mywebsite-certbot
@@ -42,14 +44,14 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=mywebsite
+      - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d mywebsite"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
