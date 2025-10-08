@@ -204,6 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentPanels = document.querySelectorAll('.tech-content-panel');
     const categoryFrames = document.querySelectorAll('.tech-category-frame');
     const backButton = document.querySelector('.back-to-list-btn');
+    const body = document.body; // <-- ADDED: Select the body element
 
     // --- Logic for Dropdown Menus ---
     categoryFrames.forEach(frame => {
@@ -254,6 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (techContainer) {
                 techContainer.classList.add('snippet-visible');
+                body.style.overflow = 'hidden'; // <-- MODIFIED: Prevent body from scrolling
             }
         });
     });
@@ -262,6 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (backButton && techContainer) {
         backButton.addEventListener('click', () => {
             techContainer.classList.remove('snippet-visible');
+            body.style.overflow = ''; // <-- MODIFIED: Re-enable body scrolling
         });
     }
 
