@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentPanels = document.querySelectorAll('.tech-content-panel');
     const categoryFrames = document.querySelectorAll('.tech-category-frame');
     const backButton = document.querySelector('.back-to-list-btn');
-    const body = document.body; // <-- ADDED: Select the body element
+    const body = document.body;
 
     // --- Logic for Dropdown Menus ---
     categoryFrames.forEach(frame => {
@@ -255,7 +255,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (techContainer) {
                 techContainer.classList.add('snippet-visible');
-                body.style.overflow = 'hidden'; // <-- MODIFIED: Prevent body from scrolling
+                // *** FIX: Only lock body scroll on mobile viewports ***
+                if (window.innerWidth <= 992) {
+                    body.style.overflow = 'hidden'; 
+                }
             }
         });
     });
@@ -264,7 +267,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (backButton && techContainer) {
         backButton.addEventListener('click', () => {
             techContainer.classList.remove('snippet-visible');
-            body.style.overflow = ''; // <-- MODIFIED: Re-enable body scrolling
+            // *** FIX: This correctly re-enables scrolling on all viewports ***
+            body.style.overflow = ''; 
         });
     }
 

@@ -16,45 +16,25 @@
         </button>
         <div class="accordion-content">
 <pre><code>    environment {
-        AWS_REGION     = 'us-east-1'
-        ECR_REGISTRY   = 'ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com'
-        ECR_REPOSITORY = 'my-app'
-        IMAGE_NAME     = "${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}"
+        AWS_REGION      = "us-east-1"
+        ECR_REGISTRY    = "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com"
+        ECR_REPOSITORY  = "mywebsite"
+        IMAGE_FILE_NAME = "my-app-image.tar"
+        BRANCH_NAME     = "${env.GIT_BRANCH?.replaceAll(/[^a-zA-Z0-9]/, '-')}"
+        IMAGE_TAG       = "1.${env.BUILD_NUMBER}-${BRANCH_NAME}"
     }
 </code></pre>
         </div>
     </div>
-</div>
-
-<div class="code-accordion">
     <div class="accordion-item">
         <button class="accordion-header">
-            <span class="header-title">stage('Poll SCM') { ... }</span>
+            <span class="header-title">stage('Checkout') { ... }</span>
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>        stage('Poll SCM') {
+<pre><code>        stage('Checkout') {
             steps {
-                echo "Polling for changes in the source repository..."
                 checkout scm
-                echo "Code fetched successfully."
-            }
-        }
-</code></pre>
-        </div>
-    </div>
-    <div class="accordion-item">
-        <button class="accordion-header">
-            <span class="header-title">stage('Unit Test & Lint') { ... }</span>
-            <span class="accordion-icon">+</span>
-        </button>
-        <div class="accordion-content">
-<pre><code>        stage('Unit Test & Lint') {
-            steps {
-                echo "Running unit tests and linting for Python..."
-                sh 'pip install -r requirements.txt'
-                sh 'pytest'
-                echo "All Python tests passed."
             }
         }
 </code></pre>
@@ -69,8 +49,12 @@
 <pre><code>        stage('Build Image') {
             steps {
                 script {
-                    echo "Building Docker image..."
-                    sh "docker build -t ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} ."
+                    sh """
+                        echo "Building Docker image..."
+                        docker build -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} .
+                        docker save ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} -o ${IMAGE_FILE_NAME}
+                    """
+                    archiveArtifacts artifacts: "${IMAGE_FILE_NAME}", fingerprint: true
                 }
             }
         }
@@ -79,61 +63,88 @@
     </div>
     <div class="accordion-item">
         <button class="accordion-header">
-            <span class="header-title">stage('Scan Image Layers') { ... }</span>
+            <span class="header-title">stage('Integration Test - Database') { ... }</span>
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>        stage('Scan Image Layers') {
-            steps {
-                echo "Scanning image for vulnerabilities..."
-                sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER}"
-                echo "Vulnerability scan completed. No critical issues found."
-            }
-            post {
-                always {
-                    echo "Generating and archiving scan report."
-                    // archiveArtifacts artifacts: 'scan-report.json'
+<pre><code>        stage('Integration Test - Database') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == "database" || (env.GIT_COMMIT && sh(script: "git log -1 --pretty=%B | grep -E 'db|database' || true", returnStatus: true) == 0)
                 }
             }
-        }
-</code></pre>
-        </div>
-    </div>
-    <div class="accordion-item">
-        <button class="accordion-header">
-            <span class="header-title">stage('Test Image') { ... }</span>
-            <span class="accordion-icon">+</span>
-        </button>
-        <div class="accordion-content">
-<pre><code>        stage('Test Image') {
-            steps {
-                echo "Running integration tests on the built image..."
-                sh "docker run --name my-app-test ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} &"
-                sh "sleep 10 && curl --fail http://localhost:8080/"
-            }
-            post {
-                always {
-                    echo "Cleaning up integration test container."
-                    sh "docker stop my-app-test || true && docker rm my-app-test || true"
-                }
-            }
-        }
-</code></pre>
-        </div>
-    </div>
-    <div class="accordion-item">
-        <button class="accordion-header">
-            <span class="header-title">stage('Tag & Version') { ... }</span>
-            <span class="accordion-icon">+</span>
-        </button>
-        <div class="accordion-content">
-<pre><code>        stage('Tag & Version') {
             steps {
                 script {
-                    def versionTag = "1.${env.BUILD_NUMBER}.0"
-                    echo "Tagging image with version: ${versionTag}"
-                    sh "docker tag ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} ${env.IMAGE_NAME}:${versionTag}"
-                    sh "docker tag ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} ${env.IMAGE_NAME}:latest"
+                    sh """
+                        echo "Running Database Integration Tests..."
+                        curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                        chmod +x /usr/local/bin/docker-compose
+                        docker load -i ${IMAGE_FILE_NAME}
+                        docker-compose -f docker-compose.ci.yaml -p ci up -d
+                        echo "Waiting for services..."
+                        sleep 15
+                        docker run --rm --network=ci_default \
+                            -v $(pwd)/test_db.py:/test_db.py \
+                            -e POSTGRES_HOST=db \
+                            -e POSTGRES_DB=mywebsite \
+                            -e POSTGRES_USER=admin \
+                            -e POSTGRES_PASSWORD=password \
+                            --entrypoint="" python:3.9-slim \
+                            sh -c "pip install psycopg2-binary requests && python -u /test_db.py"
+                    """
+                }
+            }
+            post {
+                always {
+                    sh "docker-compose -f docker-compose.ci.yaml -p ci down || true"
+                }
+            }
+        }
+</code></pre>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">stage('Integration Test - App Only') { ... }</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code>        stage('Integration Test - App Only') {
+            when {
+                expression {
+                    return !(env.BRANCH_NAME == "database" || (env.GIT_COMMIT && sh(script: "git log -1 --pretty=%B | grep -E 'db|database' || true", returnStatus: true) == 0))
+                }
+            }
+            steps {
+                script {
+                    sh """
+                        echo "Running application-only tests..."
+                        echo "Application test placeholder successful!"
+                    """
+                }
+            }
+        }
+</code></pre>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">stage('Security Scan') { ... }</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code>        stage('Security Scan') {
+            steps {
+                script {
+                    sh """
+                        echo "Running Gitleaks scan..."
+                        docker run --rm -v $(pwd):/repo zricethezav/gitleaks:latest detect --source=/repo --no-git -v || true
+
+                        echo "Running Trivy scan..."
+                        docker run --rm -v $(pwd):/work -v /var/run/docker.sock:/var/run/docker.sock \
+                            aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL \
+                            ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} || true
+                    """
                 }
             }
         }
@@ -147,22 +158,56 @@
         </button>
         <div class="accordion-content">
 <pre><code>        stage('Push to ECR') {
+            when {
+                expression { return !sh(script: "git log -1 --pretty=%B | grep 'skip' || true", returnStatus: true) == 0 }
+            }
             steps {
-                withCredentials([aws(credentials: 'aws-credentials')]) {
-                    echo "Logging into AWS ECR..."
-                    sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
-                    echo "Pushing image to ECR..."
-                    sh "docker push ${env.IMAGE_NAME} --all-tags"
+                script {
+                    withCredentials([
+                        [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-jenkins-creds']
+                    ]) {
+                        sh """
+                            echo "Logging into Amazon ECR..."
+                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                            docker load -i ${IMAGE_FILE_NAME}
+                            docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+                        """
+                    }
                 }
             }
         }
-    }
 </code></pre>
         </div>
     </div>
-</div>
-
-<div class="code-accordion">
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">stage('Update Kubernetes Manifest Repo') { ... }</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code>        stage('Update Kubernetes Manifest Repo') {
+            steps {
+                script {
+                    sshagent(['github-pat']) {
+                        sh """
+                            echo "Cloning Kubernetes manifest repo..."
+                            git clone --branch ${BRANCH_NAME} https://github.com/liormilliger/mywebsite-k8s.git
+                            cd mywebsite-k8s
+                            wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+                            chmod +x /usr/bin/yq
+                            yq eval '.image.tag = "${IMAGE_TAG}"' -i my-app-chart/values.yaml
+                            git config user.name "Jenkins"
+                            git config user.email "jenkins@local"
+                            git commit -am "Update image tag for mywebsite to ${IMAGE_TAG}" || echo "No changes"
+                            git push
+                        """
+                    }
+                }
+            }
+        }
+</code></pre>
+        </div>
+    </div>
     <div class="accordion-item">
         <button class="accordion-header">
             <span class="header-title">post { ... }</span>
@@ -171,12 +216,7 @@
         <div class="accordion-content">
 <pre><code>    post {
         always {
-            stage('Clean Up') {
-                steps {
-                    echo "Cleaning up workspace and local Docker images..."
-                    sh "docker rmi ${env.IMAGE_NAME}:build-${env.BUILD_NUMBER} || true"
-                }
-            }
+            echo "Pipeline completed for branch: ${BRANCH_NAME}"
         }
     }
 }
