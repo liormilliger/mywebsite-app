@@ -1,82 +1,23 @@
-<style>
-    .info-box {
-        background-color: #2c3e50; /* A dark blue-gray */
-        color: #ecf0f1; /* A light, soft white */
-        padding: 18px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        border-left: 5px solid #3498db; /* A bright blue accent */
-    }
-    .info-box h4 {
-        margin-top: 0;
-        color: #ffffff;
-    }
-    .info-box p {
-        margin-bottom: 10px;
-        line-height: 1.6;
-    }
-    .info-box p:last-child {
-        margin-bottom: 0;
-    }
-    .accordion-button {
-        background-color: #34495e; /* A slightly lighter dark blue */
-        color: #ecf0f1;
-        cursor: pointer;
-        padding: 15px;
-        width: 100%;
-        text-align: left;
-        border: none;
-        outline: none;
-        transition: background-color 0.3s ease;
-        border-radius: 5px;
-        margin-top: 5px;
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 1em;
-        font-weight: bold;
-    }
-    .accordion-button:hover, .accordion-button.active {
-        background-color: #4a627a;
-    }
-    .accordion-button::after {
-        content: '+';
-        font-size: 1.2em;
-        float: right;
-    }
-    .accordion-button.active::after {
-        content: '−';
-    }
-    .accordion-panel {
-        padding: 0 18px;
-        background-color: #1e2b37; /* Darker background for code */
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease-out;
-        border-bottom-left-radius: 5px;
-        border-bottom-right-radius: 5px;
-        margin-bottom: 5px;
-    }
-    .accordion-panel pre {
-        margin: 15px 0;
-    }
-</style>
+<div class="docker-snippet-container">
 
-<div class="info-box">
-    <h4>Containerization & Orchestration Files</h4>
-    <p>
-        <strong>Dockerfile:</strong> A blueprint for building the Python applications container image. It defines the base image, sets up the working directory, installs dependencies, and specifies the command to run the application.
-    </p>
-    <p>
-        <strong>docker-compose.yaml:</strong> The main orchestration file for development and production. It defines and connects all the necessary services: the Python app, an Nginx reverse proxy, a Certbot container for SSL certificates, and a PostgreSQL database.
-    </p>
-    <p>
-        <strong>docker-compose.ci.yaml:</strong> A streamlined version used for automated testing in a CI/CD pipeline. It sets up only the essential services (the web app and database) needed to run integration tests efficiently.
-    </p>
-</div>
+    <div class="snippet-intro">
+        <h4>Containerization Strategy</h4>
+        <p>
+            The <strong>Dockerfile</strong> encapsulates the entire Python application, creating a self-contained image with a defined entry point. For deployment, <strong>docker-compose.yaml</strong> orchestrates the launch of the app as a set of interconnected microservices, including the database, a reverse proxy, and certificate services (CA) to expose the application securely. The streamlined <strong>docker-compose.ci.yaml</strong> is specifically for CI build and testing environments, where services like the proxy and certificate management are unnecessary.
+        </p>
+    </div>
 
-<div class="accordion-container">
-    <button class="accordion-button">Dockerfile</button>
-    <div class="accordion-panel">
-        <pre><code class="language-dockerfile">
+    <div class="code-accordion">
+        <div class="accordion-item">
+            <button class="accordion-header">
+                <div class="header-text-wrapper">
+                    <span class="header-title">Dockerfile</span>
+                    <span class="header-description">A blueprint for building the Python application container image.</span>
+                </div>
+                <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-content">
+                <pre><code class="language-dockerfile">
 FROM python:3.9-slim
 WORKDIR /app
 COPY ./app/requirements.txt .
@@ -84,12 +25,20 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./app /app
 EXPOSE 5000
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
-        </code></pre>
-    </div>
+                </code></pre>
+            </div>
+        </div>
 
-    <button class="accordion-button">docker-compose.yaml</button>
-    <div class="accordion-panel">
-        <pre><code class="language-yaml">
+        <div class="accordion-item">
+            <button class="accordion-header">
+                <div class="header-text-wrapper">
+                    <span class="header-title">docker-compose.yaml</span>
+                    <span class="header-description">The main orchestration file for development and production environments.</span>
+                </div>
+                <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-content">
+                <pre><code class="language-yaml">
 version: '3.8'
 
 services:
@@ -150,12 +99,20 @@ services:
 
 volumes:
   postgres_data:
-        </code></pre>
-    </div>
+                </code></pre>
+            </div>
+        </div>
 
-    <button class="accordion-button">docker-compose.ci.yaml</button>
-    <div class="accordion-panel">
-        <pre><code class="language-yaml">
+        <div class="accordion-item">
+            <button class="accordion-header">
+                <div class="header-text-wrapper">
+                    <span class="header-title">docker-compose.ci.yaml</span>
+                    <span class="header-description">A streamlined version used for automated testing in a CI/CD pipeline.</span>
+                </div>
+                <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-content">
+                <pre><code class="language-yaml">
 version: '3.8'
 services:
   db:
@@ -184,26 +141,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-        </code></pre>
+                </code></pre>
+            </div>
+        </div>
     </div>
 </div>
-
-<script>
-    // Self-contained script for this accordion component
-    document.addEventListener('DOMContentLoaded', function() {
-        // Use a more specific selector if this script is on a page with other accordions
-        const accordions = document.querySelectorAll('.accordion-container .accordion-button');
-
-        accordions.forEach(accordion => {
-            accordion.addEventListener('click', function() {
-                this.classList.toggle('active');
-                const panel = this.nextElementSibling;
-                if (panel.style.maxHeight) {
-                    panel.style.maxHeight = null;
-                } else {
-                    panel.style.maxHeight = panel.scrollHeight + "px";
-                }
-            });
-        });
-    });
-</script>
