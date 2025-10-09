@@ -967,3 +967,85 @@ footer {
     margin-top: 5px;
     padding-right: 1rem; /* Prevents text from overlapping the '+' icon */
 }
+
+/* ADD THIS TO YOUR style.css FILE */
+
+.accordion-header .header-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.accordion-header .header-description {
+    font-size: 0.9rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: normal;
+    color: rgba(236, 223, 204, 0.8);
+    margin-top: 5px;
+    padding-right: 1rem; /* Prevents text from overlapping the '+' icon */
+}
+
+/* Blinking cursor effect for simulation */
+.blinking-cursor {
+    font-weight: bold;
+    color: #ECDFCC;
+    animation: 1s blink step-end infinite;
+}
+
+@keyframes blink {
+    from, to { color: transparent; }
+    50% { color: #ECDFCC; }
+}
+
+/* --- ACCORDION STYLES FOR CODE SNIPPETS --- */
+
+.code-accordion {
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #020c1b;
+}
+
+.accordion-item:not(:last-child) {
+    border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+}
+
+.accordion-header {
+    background-color: #0c1a2e;
+    color: #ECDFCC;
+    cursor: pointer;
+    padding: 12px 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.accordion-header:hover, .accordion-header.active {
+    background-color: #1a2b3c;
+}
+
+.accordion-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* THIS IS THE CRITICAL PART FOR OPENING/CLOSING */
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.accordion-content pre {
+    margin-top: 0;
+    border: none;
+    border-radius: 0;
+}
+

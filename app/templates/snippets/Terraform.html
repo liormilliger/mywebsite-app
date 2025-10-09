@@ -12,201 +12,47 @@
     </p>
 </div>
 
-<pre><code>Terraform used the selected providers to generate the following execution plan. 
-Resource actions are indicated with the following symbols:
-  <span style="color: #28a745; font-weight: bold;">+</span> create
-  <span style="color: #0dcaf0; font-weight: bold;">&lt;=</span> read (data resources)
-</code></pre>
-
 <div class="code-accordion">
 
     <div class="accordion-item">
-        <button class="accordion-header">
-            <span class="header-title">Module: ArgoCD Resources (5)</span>
+        <button class="accordion-header" id="vpc-header" data-output-id="vpc-output" data-simulated="false">
+            <div class="header-text-wrapper">
+                <span class="header-title">Module: VPC Resources (8)</span>
+                <span class="header-description">Click to run 'terraform apply' simulation</span>
+            </div>
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>  # module.argocd.data.aws_secretsmanager_secret_version.argocd_secret will be read during apply
-  &lt;= data "aws_secretsmanager_secret_version" "argocd_secret" {
-      + secret_id      = "&lt;YOUR_SECRET_NAME&gt;"
-      # ... other attributes will be known after apply
-    }
-
-  # module.argocd.helm_release.argocd will be created
-  + resource "helm_release" "argocd" {
-      + name           = "argocd"
-      + chart          = "argo-cd"
-      + repository     = "https://argoproj.github.io/argo-helm"
-      + namespace      = "argocd"
-      # ... other attributes will be known after apply
-    }
-
-  # module.argocd.kubernetes_namespace.argocd will be created
-  + resource "kubernetes_namespace" "argocd" {
-      + metadata {
-          + name = "argocd"
-        }
-    }
-
-  # module.argocd.kubernetes_secret.config_repo_ssh will be created
-  + resource "kubernetes_secret" "config_repo_ssh" {
-      + metadata {
-          + name      = "&lt;YOUR_SECRET_NAME&gt;"
-          + namespace = "argocd"
-          + labels    = {
-              + "argocd.argoproj.io/secret-type" = "repository"
-            }
-        }
-    }
-
-  # module.argocd.time_sleep.wait_for_crd_registration will be created
-  + resource "time_sleep" "wait_for_crd_registration" {
-      + create_duration = "30s"
-    }
-</code></pre>
+            <pre id="vpc-output"></pre>
         </div>
     </div>
 
     <div class="accordion-item">
-        <button class="accordion-header">
-            <span class="header-title">Module: EKS Resources (15)</span>
+        <button class="accordion-header" id="eks-header" data-output-id="eks-output" data-simulated="false">
+            <div class="header-text-wrapper">
+                <span class="header-title">Module: EKS Resources (15)</span>
+                <span class="header-description">Click to run 'terraform apply' simulation</span>
+            </div>
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>  # module.eks.data.aws_vpc.cluster_vpc will be read during apply
-  &lt;= data "aws_vpc" "cluster_vpc" {
-      # ... attributes will be known after apply
-    }
-
-  # module.eks.data.tls_certificate.eks_cluster_cert will be read during apply
-  &lt;= data "tls_certificate" "eks_cluster_cert" {
-      # ... attributes will be known after apply
-    }
-
-  # module.eks.aws_eks_cluster.eks-cluster will be created
-  + resource "aws_eks_cluster" "eks-cluster" {
-      + name    = "&lt;YOUR_CLUSTER_NAME&gt;"
-      + version = "1.28"
-      # ... other attributes will be known after apply
-    }
-
-  # module.eks.aws_eks_node_group.node-group will be created
-  + resource "aws_eks_node_group" "node-group" {
-      + cluster_name   = "&lt;YOUR_CLUSTER_NAME&gt;"
-      + instance_types = [ "t3.medium" ]
-      + node_group_name  = "&lt;YOUR_NODE_GROUP_NAME&gt;"
-      # ... other attributes will be known after apply
-    }
-
-  # module.eks.aws_iam_openid_connect_provider.eks_oidc_provider will be created
-  + resource "aws_iam_openid_connect_provider" "eks_oidc_provider" {
-      # ... attributes will be known after apply
-    }
-
-  # module.eks.aws_iam_role.eks-cluster-iam-role will be created
-  + resource "aws_iam_role" "eks-cluster-iam-role" {
-      + name = "&lt;YOUR_CLUSTER_NAME&gt;-iam-role"
-    }
-
-  # module.eks.aws_iam_role.node-group-role will be created
-  + resource "aws_iam_role" "node-group-role" {
-      + name = "&lt;YOUR_NODE_GROUP_NAME&gt;-role"
-    }
-
-  # module.eks.aws_iam_role_policy_attachment.eks-cluster-policy will be created
-  + resource "aws_iam_role_policy_attachment" "eks-cluster-policy" {
-      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-      + role       = "&lt;YOUR_CLUSTER_NAME&gt;-iam-role"
-    }
-
-  # module.eks.aws_iam_role_policy_attachment.ec2-container-registry-read-only will be created
-  + resource "aws_iam_role_policy_attachment" "ec2-container-registry-read-only" {
-      + policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-      + role       = "&lt;YOUR_NODE_GROUP_NAME&gt;-role"
-    }
-
-  # module.eks.aws_iam_role_policy_attachment.eks-cni-policy will be created
-  + resource "aws_iam_role_policy_attachment" "eks-cni-policy" {
-      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-      + role       = "&lt;YOUR_NODE_GROUP_NAME&gt;-role"
-    }
-
-  # module.eks.aws_iam_role_policy_attachment.eks-csi-ebs-node-policy will be created
-  + resource "aws_iam_role_policy_attachment" "eks-csi-ebs-node-policy" {
-      + policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-      + role       = "&lt;YOUR_NODE_GROUP_NAME&gt;-role"
-    }
-
-  # module.eks.aws_iam_role_policy_attachment.eks-worker-node-policy will be created
-  + resource "aws_iam_role_policy_attachment" "eks-worker-node-policy" {
-      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-      + role       = "&lt;YOUR_NODE_GROUP_NAME&gt;-role"
-    }
-
-  # module.eks.aws_launch_template.naming-nodes will be created
-  + resource "aws_launch_template" "naming-nodes" {
-      + name = "&lt;YOUR_APP_NAME&gt;"
-    }
-
-  # module.eks.aws_security_group.eks_node_sg will be created
-  + resource "aws_security_group" "eks_node_sg" {
-      + name = "&lt;YOUR_CLUSTER_NAME&gt;-node-sg"
-    }
-
-  # null_resource.update_kubeconfig will be created
-  + resource "null_resource" "update_kubeconfig" {
-      + id = (known after apply)
-    }
-</code></pre>
+            <pre id="eks-output"></pre>
         </div>
     </div>
 
     <div class="accordion-item">
-        <button class="accordion-header">
-            <span class="header-title">Module: VPC Resources (8)</span>
+        <button class="accordion-header" id="argocd-header" data-output-id="argocd-output" data-simulated="false">
+            <div class="header-text-wrapper">
+                <span class="header-title">Module: ArgoCD Resources (5)</span>
+                <span class="header-description">Click to run 'terraform apply' simulation</span>
+            </div>
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>  # module.vpc.aws_internet_gateway.main_igw will be created
-  + resource "aws_internet_gateway" "main_igw" {
-      + tags   = { "Name" = "&lt;YOUR_IGW_NAME&gt;" }
-    }
-
-  # module.vpc.aws_route_table.main_route_table will be created
-  + resource "aws_route_table" "main_route_table" {
-      + tags   = { "Name" = "&lt;YOUR_RT_NAME&gt;" }
-    }
-
-  # module.vpc.aws_route_table_association.private_subnet_association[*] will be created
-  + resource "aws_route_table_association" "private_subnet_association" {
-      # ... 2 instances to be created ...
-    }
-
-  # module.vpc.aws_route_table_association.public_subnet_association[*] will be created
-  + resource "aws_route_table_association" "public_subnet_association" {
-      # ... 2 instances to be created ...
-    }
-
-  # module.vpc.aws_subnet.private_subnets[*] will be created
-  + resource "aws_subnet" "private_subnets" {
-      # ... 2 instances to be created ...
-    }
-
-  # module.vpc.aws_subnet.public_subnets[*] will be created
-  + resource "aws_subnet" "public_subnets" {
-      # ... 2 instances to be created ...
-    }
-
-  # module.vpc.aws_vpc.main_vpc will be created
-  + resource "aws_vpc" "main_vpc" {
-      + cidr_block = "10.0.0.0/16"
-      + tags       = { "Name" = "&lt;YOUR_APP_NAME&gt;" }
-    }
-</code></pre>
+            <pre id="argocd-output"></pre>
         </div>
     </div>
+
 </div>
 
-<pre><code>
-Plan: 28 to add, 0 to change, 0 to destroy.
-</code></pre>
+<script src="{{ url_for('static', filename='js/simulation-tf.js') }}"></script>

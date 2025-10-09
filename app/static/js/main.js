@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Simple Accordion Logic ---
-    const accordions = document.querySelectorAll('.accordion-header');
+    const accordions = document.querySelectorAll('.accordion-header:not(.code-accordion .accordion-header)');
     accordions.forEach(acc => {
         acc.addEventListener('click', function() {
             this.classList.toggle('active');
