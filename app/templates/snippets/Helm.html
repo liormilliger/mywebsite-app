@@ -1,19 +1,324 @@
-<h3>Helm - The Package Manager for Kubernetes</h3>
-<p>
-    Helm helps you manage Kubernetes applications. Helm Charts are packages of pre-configured Kubernetes resources that can be deployed as a single unit. This example shows the metadata file, <code>Chart.yaml</code>, which defines the chart's properties.
-</p>
-<pre><code>apiVersion: v2
-name: my-website
-description: A Helm chart for deploying my personal website on Kubernetes
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My DevOps Portfolio | Helm</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="path/to/prism.css">
+    <style>
+        /* Basic Accordion Styling - You can customize this in your style.css */
+        .accordion {
+            background-color: #eee;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+            margin-top: 5px;
+            border-radius: 5px;
+        }
 
-# A chart can be either an 'application' or a 'library' chart.
-# Application charts are installable, and library charts provide useful functions.
-type: application
+        .active, .accordion:hover {
+            background-color: #ccc;
+        }
 
-# This is the chart version. This version number should be incremented each time you make changes
-# to the chart and its templates, especially when you package it for distribution.
-version: 0.1.0
+        .accordion-title {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .accordion-explanation {
+            margin-top: 8px;
+            font-style: italic;
+        }
 
-# This is the version number of the application being deployed. This version number should be
-# incremented each time you make changes to the application.
-appVersion: "1.0.0"</code></pre>
+        .panel {
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <h1>Helm ☸️ - Packing k8s Manifests</h1>
+        <p>
+            Helm streamlines Kubernetes application management by packaging all necessary manifest files into a single unit called a Chart. It uses a powerful templating engine to make these charts reusable across different environments, managing complex deployments with a simple, centralized configuration file.
+        </p>
+
+        <hr>
+
+        <button class="accordion">
+            <div class="accordion-title">app-deployment.yaml</div>
+            <div class="accordion-explanation">
+                A <strong>Deployment</strong> manages a set of identical pods for a stateless application. This file defines our web server's container image, replica count, and the environment variables needed to connect to the database.
+            </div>
+        </button>
+        <div class="panel">
+            <pre><code class="language-yaml">{% raw %}apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mywebsite-deployment
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  selector:
+    matchLabels:
+      app: mywebsite
+  template:
+    metadata:
+      labels:
+        app: mywebsite
+    spec:
+      containers:
+      - name: mywebsite-app
+        image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+        imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.app.containerPort }}
+        env:
+        - name: POSTGRES_HOST
+          value: {{ .Values.database.host | quote }}
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.objectNames.configMap }}
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.objectNames.configMap }}
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.objectNames.secret }}
+              key: postgres-password
+{% endraw %}</code></pre>
+        </div>
+
+        <button class="accordion">
+            <div class="accordion-title">app-service.yaml</div>
+            <div class="accordion-explanation">
+                A <strong>Service</strong> provides a stable network endpoint (IP address and DNS name) for a set of pods. We need this Service to expose our web server pods internally so other parts of the cluster can reliably access them.
+            </div>
+        </button>
+        <div class="panel">
+            <pre><code class="language-yaml">{% raw %}apiVersion: v1
+kind: Service
+metadata:
+  name: mywebsite-service
+spec:
+  type: {{ .Values.app.service.type }}
+  selector:
+    app: mywebsite
+  ports:
+    - name: web
+      protocol: TCP
+      port: {{ .Values.app.service.port }}
+      targetPort: {{ .Values.app.service.targetPort }}
+{% endraw %}</code></pre>
+        </div>
+        
+        <button class="accordion">
+            <div class="accordion-title">db-configmap.yaml</div>
+            <div class="accordion-explanation">
+                A <strong>ConfigMap</strong> stores non-sensitive configuration data. This one is crucial as it holds the database name and user, decoupling these settings from the application's code and bridging the connection between the app and the DB.
+            </div>
+        </button>
+        <div class="panel">
+            <pre><code class="language-yaml">{% raw %}apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.objectNames.configMap }}
+data:
+  POSTGRES_DB: {{ .Values.database.db | quote }}
+  POSTGRES_USER: {{ .Values.database.user | quote }}
+{% endraw %}</code></pre>
+        </div>
+
+        <button class="accordion">
+            <div class="accordion-title">init-db-configmap.yaml</div>
+            <div class="accordion-explanation">
+                This <strong>ConfigMap</strong> holds an initial SQL script that runs when the database is first created. Its purpose is to automatically define the database schema, creating the `visitors` and `page_views` tables required by the application.
+            </div>
+        </button>
+        <div class="panel">
+            <pre><code class="language-sql">apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-script
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS visitors (
+        ip_address INET PRIMARY KEY,
+        first_visit_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        last_visit_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        user_agent TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS page_views (
+        view_id SERIAL PRIMARY KEY,
+        visitor_ip INET NOT NULL,
+        page_route TEXT NOT NULL,
+        view_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        CONSTRAINT fk_visitor_ip
+            FOREIGN KEY(visitor_ip)
+            REFERENCES visitors(ip_address)
+            ON DELETE CASCADE
+    );</code></pre>
+        </div>
+
+        <button class="accordion">
+            <div class="accordion-title">db-statefulset.yaml</div>
+            <div class="accordion-explanation">
+                A <strong>StatefulSet</strong> is used for stateful applications like databases because it provides stable network names and persistent storage tied to each pod. This ensures data integrity and consistency, which is vital for a database.
+            </div>
+        </button>
+        <div class="panel">
+            <pre><code class="language-yaml">{% raw %}apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-db
+spec:
+  serviceName: {{ .Values.database.host }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-db
+  template:
+    metadata:
+      labels:
+        app: postgres-db
+    spec:
+      containers:
+      - name: postgres
+        image: "{{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}"
+        ports:
+        - containerPort: 5432
+          name: postgres
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.objectNames.configMap }}
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.objectNames.secret }}
+              key: postgres-password
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        - name: init-db-script
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: init-db-script
+        configMap:
+          name: postgres-init-script
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: {{ .Values.database.storage.storageClassName }}
+      resources:
+        requests:
+          storage: {{ .Values.database.storage.size }}
+{% endraw %}</code></pre>
+        </div>
+
+        <button class="accordion">
+            <div class="accordion-title">db-service.yaml</div>
+            <div class="accordion-explanation">
+                This <strong>Service</strong> gives the database pods a stable internal DNS name (`postgres-db-service`) for the application to connect to. It includes a mapping for the standard PostgreSQL port, ensuring the connection always works.
+            </div>
+        </button>
+        <div class="panel">
+            <pre><code class="language-yaml">{% raw %}apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.database.host }}
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres-db
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+    - name: metrics
+      protocol: TCP
+      port: 9187
+      targetPort: 9187
+{% endraw %}</code></pre>
+        </div>
+
+        <button class="accordion">
+            <div class="accordion-title">values.yaml</div>
+            <div class="accordion-explanation">
+                The <strong>`values.yaml`</strong> file centralizes all configurable parameters for the Helm chart. It acts as a single source of truth, allowing us to easily customize deployments for different environments without changing the core templates.
+            </div>
+        </button>
+        <div class="panel">
+            <pre><code class="language-yaml">
+app:
+  replicaCount: 2
+  image:
+    repository: your-docker-id/mywebsite
+    tag: "v1.2.0"
+    pullPolicy: Always
+  containerPort: 5000
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 5000
+
+database:
+  image:
+    repository: postgres
+    tag: "15"
+  user: admin
+  db: mywebsite
+  host: postgres-db-service
+  storage:
+    storageClassName: gp3
+    size: 8Gi
+
+objectNames:
+  configMap: postgres-config
+  secret: postgres-secret
+            </code></pre>
+        </div>
+
+    </main>
+
+    <script src="path/to/prism.js"></script>
+
+    <script>
+        var acc = document.getElementsByClassName("accordion");
+        for (var i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
