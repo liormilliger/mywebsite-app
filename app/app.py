@@ -3,15 +3,13 @@ from prometheus_flask_exporter import PrometheusMetrics
 import os
 import logging
 import time
-from db import init_db_command, log_visitor, get_db
+from db import log_visitor, get_db
 
 app = Flask(__name__)
 
 # --- Database Setup ---
 # Initialize the database and register a command to run it from the command line if needed.
 app.teardown_appcontext(lambda e: get_db().close())
-app.cli.add_command(init_db_command)
-
 
 # --- Prometheus Metrics Configuration ---
 metrics = PrometheusMetrics(app)

@@ -1,7 +1,7 @@
 import os
 import psycopg2
 from flask import g, request, current_app
-import click
+# import click
 
 def get_db():
     """
@@ -75,18 +75,18 @@ def log_visitor():
     finally:
         cursor.close()
 
-# --- Optional: Command to initialize DB from terminal ---
-# This isn't strictly necessary with the Docker init script,
-# but it's good practice for Flask apps.
-def init_db():
-    db = get_db()
-    # Read the init.sql file and execute it
-    with current_app.open_resource('../init/init.sql') as f:
-        db.cursor().execute(f.read().decode('utf8'))
-    db.commit()
+# # --- Optional: Command to initialize DB from terminal ---
+# # This isn't strictly necessary with the Docker init script,
+# # but it's good practice for Flask apps.
+# def init_db():
+#     db = get_db()
+#     # Read the init.sql file and execute it
+#     with current_app.open_resource('../init/init.sql') as f:
+#         db.cursor().execute(f.read().decode('utf8'))
+#     db.commit()
 
-@click.command('init-db')
-def init_db_command():
-    """Clear the existing data and create new tables."""
-    init_db()
-    click.echo('Initialized the database.')
+# @click.command('init-db')
+# def init_db_command():
+#     """Clear the existing data and create new tables."""
+#     init_db()
+#     click.echo('Initialized the database.')
