@@ -5,8 +5,9 @@ domains=(liormilliger.com)
 email="liormilliger@gmail.com"
 rsa_key_size=4096
 data_path="./data/certbot"
-# Use the Buypass ACME server
-acme_server="https://api.buypass.com/acme/directory"
+# Set to 1 to use the Let's Encrypt staging server (for testing, avoids rate limits)
+# Set to 0 to use the production server (for a real, trusted certificate)
+staging=1
 
 # --- Script Logic ---
 if [ -d "$data_path" ]; then
@@ -27,7 +28,7 @@ fi
 echo "### Creating dummy certificate for $domains ..."
 path="/etc/letsencrypt/live/$domains"
 mkdir -p "$data_path/conf/live/$domains"
-docker-compose run --rm --entrypoint "\
+docker-compose --env-file .env run --rm --entrypoint "\
   openssl req -x509 -nodes -newkey rsa:$rsa_key_size -days 1\
     -keyout '$path/privkey.pem' \
     -out '$path/fullchain.pem' \
@@ -35,17 +36,17 @@ docker-compose run --rm --entrypoint "\
 echo
 
 echo "### Starting nginx ..."
-docker-compose up --force-recreate -d nginx
+docker-compose --env-file .env up --force-recreate -d nginx
 echo
 
 echo "### Deleting dummy certificate for $domains ..."
-docker-compose run --rm --entrypoint "\
+docker-compose --env-file .env run --rm --entrypoint "\
   rm -Rf /etc/letsencrypt/live/$domains && \
   rm -Rf /etc/letsencrypt/archive/$domains && \
   rm -Rf /etc/letsencrypt/renewal/$domains.conf" certbot
 echo
 
-echo "### Requesting certificate from Buypass for $domains ..."
+echo "### Requesting certificate from Let's Encrypt staging server ..."
 domain_args=""
 for domain in "${domains[@]}"; do
   domain_args="$domain_args -d $domain"
@@ -56,9 +57,12 @@ case "$email" in
   "") email_arg="--register-unsafely-without-email" ;;
 esac
 
-docker-compose run --rm --entrypoint "\
+staging_arg=""
+if [ $staging != "0" ]; then staging_arg="--staging"; fi
+
+docker-compose --env-file .env run --rm --entrypoint "\
   certbot certonly --webroot -w /var/www/certbot \
-    --server $acme_server \
+    $staging_arg \
     $email_arg \
     $domain_args \
     --rsa-key-size $rsa_key_size \
@@ -67,12 +71,12 @@ docker-compose run --rm --entrypoint "\
 echo
 
 echo "### Reloading nginx ..."
-docker-compose exec nginx nginx -s reload
+docker-compose --env-file .env exec nginx nginx -s reload
 echo
 
 echo "### Starting all application services ..."
-docker-compose up -d
+docker-compose --env-file .env up -d
 echo
 
-echo "### SSL setup complete! Your application is now running. ###"
+echo "### SSL staging setup complete! Your application is running with a test certificate. ###"
 
