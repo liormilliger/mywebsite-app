@@ -1,7 +1,209 @@
-<h3>Dockerfile</h3>
-<pre><code>FROM python:3.8-slim-buster
+<style>
+    .info-box {
+        background-color: #2c3e50; /* A dark blue-gray */
+        color: #ecf0f1; /* A light, soft white */
+        padding: 18px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 5px solid #3498db; /* A bright blue accent */
+    }
+    .info-box h4 {
+        margin-top: 0;
+        color: #ffffff;
+    }
+    .info-box p {
+        margin-bottom: 10px;
+        line-height: 1.6;
+    }
+    .info-box p:last-child {
+        margin-bottom: 0;
+    }
+    .accordion-button {
+        background-color: #34495e; /* A slightly lighter dark blue */
+        color: #ecf0f1;
+        cursor: pointer;
+        padding: 15px;
+        width: 100%;
+        text-align: left;
+        border: none;
+        outline: none;
+        transition: background-color 0.3s ease;
+        border-radius: 5px;
+        margin-top: 5px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 1em;
+        font-weight: bold;
+    }
+    .accordion-button:hover, .accordion-button.active {
+        background-color: #4a627a;
+    }
+    .accordion-button::after {
+        content: '+';
+        font-size: 1.2em;
+        float: right;
+    }
+    .accordion-button.active::after {
+        content: '−';
+    }
+    .accordion-panel {
+        padding: 0 18px;
+        background-color: #1e2b37; /* Darker background for code */
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        margin-bottom: 5px;
+    }
+    .accordion-panel pre {
+        margin: 15px 0;
+    }
+</style>
+
+<div class="info-box">
+    <h4>Containerization & Orchestration Files</h4>
+    <p>
+        <strong>Dockerfile:</strong> A blueprint for building the Python applications container image. It defines the base image, sets up the working directory, installs dependencies, and specifies the command to run the application.
+    </p>
+    <p>
+        <strong>docker-compose.yaml:</strong> The main orchestration file for development and production. It defines and connects all the necessary services: the Python app, an Nginx reverse proxy, a Certbot container for SSL certificates, and a PostgreSQL database.
+    </p>
+    <p>
+        <strong>docker-compose.ci.yaml:</strong> A streamlined version used for automated testing in a CI/CD pipeline. It sets up only the essential services (the web app and database) needed to run integration tests efficiently.
+    </p>
+</div>
+
+<div class="accordion-container">
+    <button class="accordion-button">Dockerfile</button>
+    <div class="accordion-panel">
+        <pre><code class="language-dockerfile">
+FROM python:3.9-slim
 WORKDIR /app
-COPY . /app
-RUN pip install -r requirements.txt
-EXPOSE 80
-CMD ["python", "app.py"]</code></pre>
+COPY ./app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY ./app /app
+EXPOSE 5000
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+        </code></pre>
+    </div>
+
+    <button class="accordion-button">docker-compose.yaml</button>
+    <div class="accordion-panel">
+        <pre><code class="language-yaml">
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: mywebsite-app
+    restart: unless-stopped
+    expose:
+      - "5000"
+    volumes:
+      - ./app:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+
+  nginx:
+    image: nginx:latest
+    container_name: mywebsite-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    depends_on:
+      - app
+
+  certbot:
+    image: certbot/certbot
+    container_name: mywebsite-certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    command: sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;"
+
+  db:
+    image: postgres:15-alpine
+    container_name: mywebsite-db
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+        </code></pre>
+    </div>
+
+    <button class="accordion-button">docker-compose.ci.yaml</button>
+    <div class="accordion-panel">
+        <pre><code class="language-yaml">
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: test-db
+    environment:
+      POSTGRES_DB: mywebsite
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d mywebsite"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    image: ${WEB_IMAGE}
+    container_name: test-web
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: mywebsite
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    depends_on:
+      db:
+        condition: service_healthy
+        </code></pre>
+    </div>
+</div>
+
+<script>
+    // Self-contained script for this accordion component
+    document.addEventListener('DOMContentLoaded', function() {
+        // Use a more specific selector if this script is on a page with other accordions
+        const accordions = document.querySelectorAll('.accordion-container .accordion-button');
+
+        accordions.forEach(accordion => {
+            accordion.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        });
+    });
+</script>

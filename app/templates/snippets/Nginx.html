@@ -1,41 +1,39 @@
-<h4>Nginx - Reverse Proxy Configuration</h4>
+<h4>Nginx - Reverse Proxy & SSL Configuration</h4>
 <p>
-    An Artifactory-style generated configuration for Nginx. It redirects HTTP (80) traffic to HTTPS (443),
-    handles SSL termination, and proxies requests to the upstream server.
+    This Nginx configuration is set up to serve a web application securely.<br>
+    It redirects all HTTP traffic to HTTPS, handles SSL termination using Let's Encrypt certificates,<br>
+    and reverse proxies requests to a backend application container named 'app' running on port 5000.
 </p>
 <pre><code class="language-nginx">
-## add to nginx.conf http block:
-
 server {
     listen 80;
     server_name liormilliger.com;
 
-    ## Redirect all HTTP requests to HTTPS
-    return 301 https://$host$request_uri;
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
 }
 
 server {
     listen 443 ssl;
     server_name liormilliger.com;
-    
-    ## SSL Certificate Configuration
-    ssl_certificate      /etc/nginx/ssl/liormilliger.com.crt;
-    ssl_certificate_key  /etc/nginx/ssl/liormilliger.com.key;
-    
-    ## SSL Protocol and Cipher Configuration
-    ssl_protocols          TLSv1.2 TLSv1.3;
-    ssl_ciphers            HIGH:!aNULL:!MD5;
-    ssl_prefer_server_ciphers on;
 
-    ## Proxy Configuration
+    ssl_certificate /etc/letsencrypt/live/liormilliger.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/liormilliger.com/privkey.pem;
+    
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
     location / {
-        proxy_set_header    Host $host;
-        proxy_set_header    X-Real-IP $remote_addr;
-        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header    X-Forwarded-Proto $scheme;
-        
-        proxy_pass          http://liormilliger.com;
-        proxy_read_timeout  900;
+        proxy_pass http://app:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 </code></pre>
