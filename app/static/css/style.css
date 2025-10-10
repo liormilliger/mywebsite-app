@@ -172,7 +172,7 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background-color 0.3s ease;
+    transition: background-color: 0.3s ease;
 }
 
 .tech-category-title:hover, .tech-category-title.active-title {
@@ -903,9 +903,10 @@ footer {
         /* This is hidden by default on mobile and shown with JS */
         display: none; 
     }
-    .tech-content-panel code {
-        /* Keep the smaller font size for code on mobile */
-        font-size: 0.85rem; 
+    .tech-content-panel code,
+    .tech-content-panel pre {
+        /* Further reduce font size for long code lines on mobile */
+        font-size: 0.78rem; 
     }
     .back-to-list-btn {
         /* This will be visible when its parent (.tech-display) is shown */
@@ -961,3 +962,4 @@ footer {
     .contact-item { padding: 1rem; flex-direction: column; text-align: center; gap: 0.5rem; }
     .contact-item .icon { margin-right: 0; margin-bottom: 0.5rem; }
 }
+
