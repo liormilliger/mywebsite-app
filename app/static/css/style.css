@@ -172,7 +172,7 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background-color: 0.3s ease;
+    transition: background-color 0.3s ease;
 }
 
 .tech-category-title:hover, .tech-category-title.active-title {
