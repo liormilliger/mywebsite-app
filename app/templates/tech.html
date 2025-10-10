@@ -198,21 +198,23 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Select all the key elements
-    const techContainer = document.querySelector('.tech-container');
+    // --- Select all key elements ---
+    const techList = document.querySelector('.tech-list');
+    const techDisplay = document.querySelector('.tech-display');
     const techLinks = document.querySelectorAll('.tech-link');
     const contentPanels = document.querySelectorAll('.tech-content-panel');
     const categoryFrames = document.querySelectorAll('.tech-category-frame');
     const backButton = document.querySelector('.back-to-list-btn');
-    const body = document.body;
+    const homePanel = document.getElementById('tech-home');
 
-    // --- Logic for Dropdown Menus ---
+    // --- Logic for Dropdown Menus (remains the same) ---
     categoryFrames.forEach(frame => {
         const title = frame.querySelector('.tech-category-title');
         const content = frame.querySelector('.tech-category-content');
         title.addEventListener('click', (event) => {
             event.stopPropagation();
             const isAlreadyOpen = content.classList.contains('open');
+            // Close all other open dropdowns
             document.querySelectorAll('.tech-category-content.open').forEach(openContent => {
                 openContent.classList.remove('open');
                 openContent.previousElementSibling.classList.remove('active-title');
@@ -232,53 +234,53 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- Logic for showing content when a tech link is clicked ---
+    // --- NEW LOGIC: Show content and hide the list ---
     techLinks.forEach(link => {
         link.addEventListener('click', function(event) {
             event.preventDefault();
             event.stopPropagation();
             const targetId = this.getAttribute('data-target');
             
+            // Set the active link style
             techLinks.forEach(l => l.classList.remove('active'));
             this.classList.add('active');
             
+            // Hide all content panels first
             contentPanels.forEach(panel => panel.style.display = 'none');
+            // Show the target panel
             const targetPanel = document.getElementById(targetId);
             if (targetPanel) {
                 targetPanel.style.display = 'block';
             }
+            
+            // Hide the list and show the content display area
+            if (techList) techList.style.display = 'none';
+            if (techDisplay) techDisplay.style.display = 'block';
 
+            // Close any open dropdowns
             document.querySelectorAll('.tech-category-content.open').forEach(openContent => {
                 openContent.classList.remove('open');
                 openContent.previousElementSibling.classList.remove('active-title');
             });
-            
-            if (techContainer) {
-                techContainer.classList.add('snippet-visible');
-                // *** FIX: Only lock body scroll on mobile viewports ***
-                if (window.innerWidth <= 992) {
-                    body.style.overflow = 'hidden'; 
-                }
-            }
         });
     });
 
-    // --- Logic for the "Back" button ---
-    if (backButton && techContainer) {
+    // --- NEW LOGIC: Go back to the list view ---
+    if (backButton) {
         backButton.addEventListener('click', () => {
-            techContainer.classList.remove('snippet-visible');
-            // *** FIX: This correctly re-enables scrolling on all viewports ***
-            body.style.overflow = ''; 
+            if (techDisplay) techDisplay.style.display = 'none';
+            if (techList) techList.style.display = 'grid'; // Use grid to restore original layout
         });
     }
 
-    // --- Set the initial state of the page on load ---
+    // --- Initialize the page state ---
     function initializePage() {
         contentPanels.forEach(panel => panel.style.display = 'none');
-        const homePanel = document.getElementById('tech-home');
         if (homePanel) {
             homePanel.style.display = 'block';
         }
+        // On page load, the tech-display should be hidden by default (handled by CSS)
+        // and the list should be visible.
     }
     initializePage();
 });
