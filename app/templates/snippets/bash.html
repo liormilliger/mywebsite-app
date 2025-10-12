@@ -1,76 +1,113 @@
-<h4>Bash: AWS EC2 Shutdown Automation</h4>
+<h2>Bash: Automating SSL Certificates with Docker Compose and Certbot</h2>
 <p>
-    This Bash script automates the process of shutting down running EC2 instances in an AWS account. It's a practical example of using the AWS CLI for cost management, especially in development or testing environments where resources don't need to run 24/7.
+    This Bash script automates the entire process of obtaining and installing a free SSL/TLS certificate from Let's Encrypt for a web server running inside Docker. It is designed to work with a Docker Compose setup that includes an Nginx web server and a Certbot container.
 </p>
 <ul>
-    <li><strong>AWS CLI:</strong> The script leverages the `aws ec2` command-line tool to interact with the AWS API.</li>
-    <li><strong>JSON Parsing:</strong> It uses `jq`, a lightweight and flexible command-line JSON processor, to parse the output from the AWS CLI.</li>
-    <li><strong>Automation:</strong> The script is designed to be run automatically by a scheduler like cron, ensuring resources are consistently managed without manual intervention.</li>
+    <li><strong>Automation:</strong> The script handles everything from creating temporary certificates to allow Nginx to start, to requesting the real certificate from Let's Encrypt, and finally reloading Nginx to apply it.</li>
+    <li><strong>Docker Integration:</strong> It seamlessly manages the Docker containers, starting, stopping, and executing commands within them as needed for the certification process.</li>
+    <li><strong>Best Practices:</strong> The script downloads recommended TLS security parameters and automates the certificate renewal process setup, ensuring a secure and up-to-date configuration.</li>
 </ul>
 
-<h4>ec2_shutdown.sh</h4>
+<h4>init-letsencrypt.sh</h4>
 <div class="code-container-bash">
 <pre><code><span class="bash-comment">#!/bin/bash</span>
 
-<span class="bash-comment"># --- AWS Credentials ---</span>
-<span class="bash-comment"># Best practice is to configure these as environment variables or use an IAM role.</span>
-<span class="bash-comment"># Avoid hardcoding credentials in scripts.</span>
-<span class="bash-keyword">export</span> <span class="bash-variable">AWS_ACCESS_KEY_ID</span>=<span class="bash-string">"YOUR_AWS_ACCESS_KEY_ID"</span>
-<span class="bash-keyword">export</span> <span class="bash-variable">AWS_SECRET_ACCESS_KEY</span>=<span class="bash-string">"YOUR_AWS_SECRET_ACCESS_KEY"</span>
-<span class="bash-keyword">export</span> <span class="bash-variable">AWS_DEFAULT_REGION</span>=<span class="bash-string">"us-east-1"</span> <span class="bash-comment"># Change to your default region</span>
+<span class="bash-comment"># Make sure to replace these with your domain and email</span>
+<span class="bash-variable">domains</span>=(<span class="bash-string">your-domain.com</span>)
+<span class="bash-variable">email</span>=<span class="bash-string">"your-email@example.com"</span> <span class="bash-comment"># Add a valid email address</span>
 
-<span class="bash-keyword">echo</span> <span class="bash-string">"Fetching list of running EC2 instances..."</span>
+<span class="bash-comment"># --- Do not edit below this line ---</span>
+<span class="bash-variable">data_path</span>=<span class="bash-string">"./data/certbot"</span>
+<span class="bash-variable">rsa_key_size</span>=4096
+<span class="bash-variable">staging</span>=0 <span class="bash-comment"># Set to 1 for testing with staging servers</span>
 
-<span class="bash-comment"># Get a list of all running EC2 instance IDs</span>
-<span class="bash-comment"># --filters "Name=instance-state-name,Values=running" -> Filters for instances that are currently running.</span>
-<span class="bash-comment"># --query "Reservations[].Instances[].InstanceId" -> Narrows down the JSON output to just the instance IDs.</span>
-<span class="bash-comment"># --output json -> Specifies the output format.</span>
-<span class="bash-comment"># | jq -r '.[]' -> Pipes the JSON output to jq, which formats it as a raw string list.</span>
-INSTANCE_IDS=$(<span class="bash-command">aws</span> ec2 describe-instances --filters <span class="bash-string">"Name=instance-state-name,Values=running"</span> --query <span class="bash-string">"Reservations[].Instances[].InstanceId"</span> --output json | <span class="bash-command">jq</span> -r <span class="bash-string">'.[]'</span>)
-
-<span class="bash-comment"># Check if there are any running instances</span>
-<span class="bash-keyword">if</span> [ -z <span class="bash-string">"<span class="bash-variable">${INSTANCE_IDS}</span>"</span> ]; <span class="bash-keyword">then</span>
-    <span class="bash-keyword">echo</span> <span class="bash-string">"No running EC2 instances found."</span>
-    <span class="bash-keyword">exit</span> 0
+<span class="bash-keyword">if</span> [ -d <span class="bash-string">"<span class="bash-variable">$data_path</span>"</span> ]; <span class="bash-keyword">then</span>
+  <span class="bash-command">read</span> -p <span class="bash-string">"Existing data found for <span class="bash-variable">$domains</span>. Continue and replace existing certificate? (y/N) "</span> decision
+  <span class="bash-keyword">if</span> [ <span class="bash-string">"<span class="bash-variable">$decision</span>"</span> != <span class="bash-string">"Y"</span> ] && [ <span class="bash-string">"<span class="bash-variable">$decision</span>"</span> != <span class="bash-string">"y"</span> ]; <span class="bash-keyword">then</span>
+    <span class="bash-keyword">exit</span>
+  <span class="bash-keyword">fi</span>
 <span class="bash-keyword">fi</span>
 
-<span class="bash-keyword">echo</span> <span class="bash-string">"Found running instances: <span class="bash-variable">${INSTANCE_IDS}</span>"</span>
-<span class="bash-keyword">echo</span> <span class="bash-string">"Initiating shutdown..."</span>
+<span class="bash-keyword">if</span> [ ! -e <span class="bash-string">"<span class="bash-variable">$data_path</span>/conf/options-ssl-nginx.conf"</span> ] || [ ! -e <span class="bash-string">"<span class="bash-variable">$data_path</span>/conf/ssl-dhparams.pem"</span> ]; <span class="bash-keyword">then</span>
+  <span class="bash-command">echo</span> <span class="bash-string">"### Downloading recommended TLS parameters ..."</span>
+  <span class="bash-command">mkdir</span> -p <span class="bash-string">"<span class="bash-variable">$data_path</span>/conf"</span>
+  <span class="bash-command">curl</span> -s https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf > <span class="bash-string">"<span class="bash-variable">$data_path</span>/conf/options-ssl-nginx.conf"</span>
+  <span class="bash-command">curl</span> -s https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem > <span class="bash-string">"<span class="bash-variable">$data_path</span>/conf/ssl-dhparams.pem"</span>
+  <span class="bash-command">echo</span>
+<span class="bash-keyword">fi</span>
 
-<span class="bash-comment"># Shutdown the instances</span>
-<span class="bash-comment"># Note: This command just initiates the shutdown. It doesn't wait for them to stop.</span>
-<span class="bash-command">aws</span> ec2 stop-instances --instance-ids <span class="bash-variable">${INSTANCE_IDS}</span>
+<span class="bash-command">echo</span> <span class="bash-string">"### Creating dummy certificate for <span class="bash-variable">$domains</span> ..."</span>
+<span class="bash-variable">path</span>=<span class="bash-string">"/etc/letsencrypt/live/<span class="bash-variable">$domains</span>"</span>
+<span class="bash-command">mkdir</span> -p <span class="bash-string">"<span class="bash-variable">$data_path</span>/conf/live/<span class="bash-variable">$domains</span>"</span>
+<span class="bash-command">docker-compose</span> run --rm --entrypoint "\
+  openssl req -x509 -nodes -newkey rsa:<span class="bash-variable">$rsa_key_size</span> -days 1\
+    -keyout '<span class="bash-variable">$path</span>/privkey.pem' \
+    -out '<span class="bash-variable">$path</span>/fullchain.pem' \
+    -subj '/CN=localhost'" certbot
+<span class="bash-command">echo</span>
 
-<span class="bash-keyword">echo</span> <span class="bash-string">"Shutdown command issued for all running instances."</span>
+<span class="bash-command">echo</span> <span class="bash-string">"### Starting nginx ..."</span>
+<span class="bash-command">docker-compose</span> up --force-recreate -d nginx
+<span class="bash-command">echo</span>
+
+<span class="bash-command">echo</span> <span class="bash-string">"### Deleting dummy certificate for <span class="bash-variable">$domains</span> ..."</span>
+<span class="bash-command">docker-compose</span> run --rm --entrypoint "\
+  rm -Rf /etc/letsencrypt/live/<span class="bash-variable">$domains</span> && \
+  rm -Rf /etc/letsencrypt/archive/<span class="bash-variable">$domains</span> && \
+  rm -Rf /etc/letsencrypt/renewal/<span class="bash-variable">$domains</span>.conf" certbot
+<span class="bash-command">echo</span>
+
+<span class="bash-command">echo</span> <span class="bash-string">"### Requesting Let's Encrypt certificate for <span class="bash-variable">$domains</span> ..."</span>
+<span class="bash-variable">domain_args</span>=<span class="bash-string">""</span>
+<span class="bash-keyword">for</span> domain <span class="bash-keyword">in</span> <span class="bash-string">"<span class="bash-variable">${domains[@]}</span>"</span>; <span class="bash-keyword">do</span>
+  <span class="bash-variable">domain_args</span>=<span class="bash-string">"<span class="bash-variable">$domain_args</span> -d <span class="bash-variable">$domain</span>"</span>
+<span class="bash-keyword">done</span>
+
+<span class="bash-variable">email_arg</span>=<span class="bash-string">"--email <span class="bash-variable">$email</span>"</span>
+<span class="bash-keyword">case</span> <span class="bash-string">"<span class="bash-variable">$email</span>"</span> <span class="bash-keyword">in</span>
+  <span class="bash-string">""</span>) <span class="bash-variable">email_arg</span>=<span class="bash-string">"--register-unsafely-without-email"</span> ;;
+<span class="bash-keyword">esac</span>
+
+<span class="bash-keyword">if</span> [ <span class="bash-variable">$staging</span> != <span class="bash-string">"0"</span> ]; <span class="bash-keyword">then</span> <span class="bash-variable">staging_arg</span>=<span class="bash-string">"--staging"</span>; <span class="bash-keyword">fi</span>
+
+<span class="bash-command">docker-compose</span> run --rm --entrypoint "\
+  certbot certonly --webroot -w /var/www/certbot \
+    <span class="bash-variable">$staging_arg</span> \
+    <span class="bash-variable">$email_arg</span> \
+    <span class="bash-variable">$domain_args</span> \
+    --rsa-key-size <span class="bash-variable">$rsa_key_size</span> \
+    --agree-tos \
+    --force-renewal" certbot
+<span class="bash-command">echo</span>
+
+<span class="bash-command">echo</span> <span class="bash-string">"### Reloading nginx ..."</span>
+<span class="bash-command">docker-compose</span> exec nginx nginx -s reload
+
+<span class="bash-command">echo</span> <span class="bash-string">"### Your site is now running with HTTPS! ###"</span>
 </code></pre>
 </div>
 
-<h4>Scheduling with Cron</h4>
+<h4>Script Breakdown</h4>
 <p>
-    To run this script automatically every day, you can use a <strong>cronjob</strong>, a time-based job scheduler in Unix-like operating systems.
+    This script is executed in several distinct stages to ensure a smooth and automated setup:
 </p>
 <ol>
     <li>
-        <strong>Make the script executable:</strong> First, you need to give the script permission to be executed.
-        <div class="code-container-bash"><pre><code>chmod +x /path/to/your/ec2_shutdown.sh</code></pre></div>
+        <strong>Configuration:</strong> At the top, you define the domain(s) you want to secure and a contact email address. This makes the script easy to adapt for different projects.
     </li>
     <li>
-        <strong>Edit the crontab:</strong> Open the crontab file for editing by running the command below. This file contains the schedule of cron entries to be run.
-        <div class="code-container-bash"><pre><code>crontab -e</code></pre></div>
+        <strong>Download TLS Parameters:</strong> The script checks if secure TLS parameters from Certbot's official repository exist. If not, it downloads them. These files provide strong, up-to-date SSL/TLS settings for Nginx.
     </li>
     <li>
-        <strong>Add the cron entry:</strong> Add the following line to the file. This will schedule the script to run every morning at 1:00 AM.
-        <div class="code-container-bash">
-<pre><code><span class="bash-comment"># Minute (0-59)  Hour (0-23)  Day of month (1-31)  Month (1-12)  Day of week (0-6)  Command to run</span>
-   <span class="bash-string">0               1              * * * /path/to/your/ec2_shutdown.sh >> /path/to/your/cron.log 2>&1</span></code></pre>
-        </div>
-        <p>
-            <strong>Explanation of the line:</strong>
-            <ul>
-                <li><code>0 1 * * *</code>: This means "at minute 0 of hour 1 on every day of every month of every day of the week."</li>
-                <li><code>/path/to/your/ec2_shutdown.sh</code>: The absolute path to your script.</li>
-                <li><code>>> /path/to/your/cron.log 2>&1</code>: This is important for logging. It appends the script's output (stdout) and any errors (stderr) to a log file, which helps in debugging if the script fails to run.</li>
-            </ul>
-        </p>
+        <strong>Create a Dummy Certificate:</strong> Nginx won't start if it's configured for HTTPS but can't find an SSL certificate. To solve this chicken-and-egg problem, the script generates a temporary, self-signed "dummy" certificate.
+    </li>
+    <li>
+        <strong>Start Nginx:</strong> With the dummy certificate in place, the script starts the Nginx container. Nginx can now run and is ready to serve the validation files that Let's Encrypt needs to see.
+    </li>
+    <li>
+        <strong>Request the Real Certificate:</strong> The script then deletes the dummy certificate and runs the Certbot container. Certbot communicates with Let's Encrypt's servers, which perform an HTTP-01 challenge to verify that you control the domain. Once verified, Let's Encrypt issues a real certificate.
+    </li>
+    <li>
+        <strong>Reload Nginx:</strong> Finally, the script sends a reload command to the running Nginx container. This causes Nginx to gracefully pick up the new, official Let's Encrypt certificate without any downtime, completing the switch to HTTPS.
     </li>
 </ol>
