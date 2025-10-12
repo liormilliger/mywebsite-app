@@ -39,7 +39,7 @@
 <span class="key">CREATE TABLE IF NOT EXISTS</span> page_views (
     view_id <span class="type">SERIAL</span> <span class="key">PRIMARY KEY</span>,
     visitor_ip <span class="type">INET</span> <span class="key">NOT NULL</span>,
-    page_route <span class="type">TEXT</span> <span class="key">NOT NULL</span>, <span class="comment">-- e.g., '/', '/about-me', '/tech-in-action'</span>
+    page_route <span class="type">TEXT</span> <span class="key">NOT NULL</span>, <span class="comment">-- e.g., '/', '/about-me', '/tech-stack'</span>
     view_timestamp <span class="type">TIMESTAMPTZ</span> <span class="key">NOT NULL DEFAULT</span> NOW(),
     <span class="key">CONSTRAINT</span> fk_visitor_ip
         <span class="key">FOREIGN KEY</span>(visitor_ip)

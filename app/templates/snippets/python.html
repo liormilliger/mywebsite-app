@@ -64,7 +64,7 @@ app.logger.setLevel(logging.INFO)
     app.logger.info(<span class="code-string">f"[{request.path}] - Home page accessed."</span>)
     <span class="code-keyword">return</span> render_template(<span class="code-string">'index.html'</span>)
 
-<span class="code-decorator">@app.route</span>(<span class="code-string">'/tech-in-action'</span>)
+<span class="code-decorator">@app.route</span>(<span class="code-string">'/tech-stack'</span>)
 <span class="code-keyword">def</span> <span class="code-function">tech</span>():
     app.logger.info(<span class="code-string">f"[{request.path}] - Tech in Action page accessed."</span>)
     <span class="code-keyword">return</span> render_template(<span class="code-string">'tech.html'</span>)

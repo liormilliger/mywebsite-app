@@ -1,7 +1,6 @@
 import os
 import psycopg2
 from flask import g, request, current_app
-# import click
 
 def get_db():
     """
@@ -11,7 +10,6 @@ def get_db():
     if 'db' not in g:
         try:
             g.db = psycopg2.connect(
-                # Use environment variables for connection details
                 host=os.environ.get('POSTGRES_HOST', 'db'),
                 dbname=os.environ.get('POSTGRES_DB', 'mywebsite'),
                 user=os.environ.get('POSTGRES_USER', 'admin'),
@@ -36,15 +34,11 @@ def log_visitor():
 
     cursor = db.cursor()
     
-    # Get visitor details from the request
-    # Use 'X-Forwarded-For' to get the real IP if behind a proxy like Nginx
     visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     user_agent = request.headers.get('User-Agent')
     page_route = request.path
 
     try:
-        # Use ON CONFLICT to handle new and existing visitors in one command (UPSERT)
-        # This is more efficient than doing a SELECT first.
         cursor.execute(
             """
             INSERT INTO visitors (ip_address, user_agent)
@@ -55,7 +49,6 @@ def log_visitor():
             (visitor_ip, user_agent)
         )
         
-        # Log the specific page view
         cursor.execute(
             """
             INSERT INTO page_views (visitor_ip, page_route)
@@ -64,12 +57,10 @@ def log_visitor():
             (visitor_ip, page_route)
         )
         
-        # Commit the changes to the database
         db.commit()
         current_app.logger.info(f"Logged visit from {visitor_ip} to {page_route}")
 
     except Exception as e:
-        # Roll back the transaction if any error occurs
         db.rollback()
         current_app.logger.error(f"Database error: {e}")
     finally:

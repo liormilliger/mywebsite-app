@@ -51,7 +51,7 @@ def about():
     app.logger.info(f"[{request.path}] - About Me page accessed.")
     return render_template('about.html')
 
-@app.route('/tech-in-action')
+@app.route('/tech-stack')
 def tech():
     app.logger.info(f"[{request.path}] - Tech in Action page accessed.")
     return render_template('tech.html')

@@ -6,14 +6,9 @@ import time
 
 app = Flask(__name__)
 
-# --- Prometheus Metrics Configuration ---
-# This part is kept as it's not dependent on the database.
 metrics = PrometheusMetrics(app)
 metrics.info('app_info', 'Application info', version='1.0.3')
 
-
-# --- Logging Configuration ---
-# Basic logging is useful for any version of the app.
 handler = logging.StreamHandler()
 formatter = logging.Formatter(
     '%(asctime)s UTC [%(levelname)s] - %(message)s'
@@ -22,10 +17,6 @@ formatter.converter = time.gmtime
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.INFO)
-
-
-# --- Application Routes ---
-# All the routes are independent of the database.
 
 @app.route('/')
 def home():
@@ -37,7 +28,7 @@ def about():
     app.logger.info(f"[{request.path}] - About Me page accessed.")
     return render_template('about.html')
 
-@app.route('/tech-in-action')
+@app.route('/tech-stack')
 def tech():
     app.logger.info(f"[{request.path}] - Tech in Action page accessed.")
     return render_template('tech.html')
