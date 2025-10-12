@@ -390,6 +390,16 @@ footer {
 }
 
 /* --- ABOUT ME PAGE STYLES --- */
+.about-me-intro {
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 3rem;
+}
+.about-me-intro p {
+    margin: 0;
+}
+
 .about-me-container {
     display: flex;
     gap: 3rem;
@@ -925,17 +935,35 @@ footer {
 
     /* --- Other Component Adjustments --- */
     .profile-photo { width: 150px; height: 150px; }
+    
+    /* --- ABOUT ME PAGE MOBILE STYLES --- */
+    .about-me-intro {
+        margin-bottom: 1.5rem; /* Reduced space between intro and menu */
+    }
+    .about-me-intro p {
+        font-size: 0.95rem; /* Slightly smaller font for the intro text */
+    }
     .about-me-container { flex-direction: column; }
     .about-me-menu {
         position: static;
-        border-bottom: 1px solid rgba(236, 223, 204, 0.2);
-        margin-bottom: 2rem;
         align-self: stretch;
+        margin-bottom: 1.5rem; /* Reduced space after the menu */
+        background-color: #0c1a2e; /* Added background for container effect */
+        border: 1px solid rgba(236, 223, 204, 0.2); /* Added border for container */
+        border-radius: 8px; /* Rounded corners for the container */
+        padding: 4px 0; /* Vertical padding inside the container */
     }
-    .about-me-menu ul { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .about-me-menu ul { 
+        display: flex; 
+        overflow-x: auto; 
+        -webkit-overflow-scrolling: touch; 
+        scrollbar-width: none; 
+        padding: 0 10px; /* Padding so links don't touch the container edges */
+    }
     .about-me-menu ul::-webkit-scrollbar { display: none; }
     .about-me-menu a { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; padding: 12px; }
     .about-me-menu a:hover { border-left: none; border-bottom-color: #ECDFCC; }
+
     .grid-container { grid-template-columns: repeat(2, 1fr); }
     .pipeline-visualizer-container { flex-direction: column; align-items: stretch; }
     .pipeline-visualizer { flex-direction: column; }
