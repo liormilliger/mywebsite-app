@@ -963,3 +963,152 @@ footer {
     .contact-item .icon { margin-right: 0; margin-bottom: 0.5rem; }
 }
 
+
+/* ===================================================================== */
+/* ============= UNIFIED SNIPPET & ACCORDION STYLES ==================== */
+/* ===================================================================== */
+
+/* --- General Code Container --- */
+.code-container {
+    background-color: #020c1b; /* Corrected lighter blue background */
+    color: #f8f8f2;
+    border-radius: 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    overflow-x: auto;
+    border: 1px solid #444;
+}
+.code-container pre {
+    margin: 0;
+    padding: 20px;
+}
+
+/* --- Python Accordion & Code Highlighting --- */
+.python-accordion {
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 1.5rem;
+}
+.python-accordion .accordion-item:not(:last-child) {
+    border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+}
+.python-accordion .accordion-header {
+    background-color: #0c1a2e;
+    color: #ECDFCC;
+    cursor: pointer;
+    padding: 15px 20px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.python-accordion .accordion-header:hover, .python-accordion .accordion-header.active {
+    background-color: #1a2b3c;
+}
+.python-accordion .accordion-header-text .filename {
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+}
+.python-accordion .accordion-header-text .description {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(236, 223, 204, 0.7);
+    margin-top: 5px;
+    font-weight: normal;
+}
+.python-accordion .accordion-icon {
+    font-size: 1.5rem;
+    transition: transform 0.3s ease-in-out;
+}
+.python-accordion .accordion-header.active .accordion-icon {
+    transform: rotate(45deg);
+}
+.python-accordion .accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    background-color: #020c1b; /* Corrected lighter blue background */
+}
+.python-accordion .accordion-content .code-container {
+    border: none;
+    border-radius: 0;
+}
+/* Syntax Highlighting */
+.code-keyword { color: #ff79c6; }
+.code-string { color: #f1fa8c; }
+.code-comment { color: #6272a4; font-style: italic; }
+.code-function { color: #50fa7b; }
+.code-decorator { color: #ffb86c; }
+.code-number { color: #bd93f9; }
+.code-class { color: #8be9fd; }
+
+/* --- Helm Snippet Accordion --- */
+.helm-accordion {
+    background-color: #0c1a2e;
+    color: #ECDFCC;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid rgba(236, 223, 204, 0.2);
+}
+.helm-accordion.active, .helm-accordion:hover {
+    background-color: #1a2b3c;
+}
+.helm-accordion-title {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #ECDFCC;
+}
+.helm-accordion-explanation {
+    margin-top: 8px;
+    font-style: italic;
+    color: rgba(236, 223, 204, 0.8);
+}
+.helm-panel {
+    padding: 0 18px;
+    background-color: #020c1b; /* Corrected lighter blue background */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    border: 1px solid rgba(236, 223, 204, 0.2);
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+}
+.helm-panel pre code {
+    color: #a7c5eb;
+}
+
+/* --- Bash Snippet --- */
+.code-container-bash {
+    background-color: #020c1b; /* Corrected lighter blue background */
+    color: #f8f8f2;
+    border-radius: 8px;
+    padding: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    overflow-x: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border: none; /* Removed the frame as requested */
+}
+.code-container-bash pre {
+    margin: 0;
+}
+/* Syntax Highlighting */
+.bash-comment { color: #6272a4; font-style: italic; }
+.bash-keyword { color: #ff79c6; }
+.bash-string { color: #f1fa8c; }
+.bash-command { color: #8be9fd; }
+.bash-variable { color: #bd93f9; }

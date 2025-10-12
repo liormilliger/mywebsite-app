@@ -6,47 +6,6 @@
     <title>My DevOps Portfolio | Helm</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="path/to/prism.css">
-    <style>
-        /* Basic Accordion Styling - You can customize this in your style.css */
-        .accordion {
-            background-color: #eee;
-            color: #444;
-            cursor: pointer;
-            padding: 18px;
-            width: 100%;
-            border: none;
-            text-align: left;
-            outline: none;
-            font-size: 15px;
-            transition: 0.4s;
-            margin-top: 5px;
-            border-radius: 5px;
-        }
-
-        .active, .accordion:hover {
-            background-color: #ccc;
-        }
-
-        .accordion-title {
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-        
-        .accordion-explanation {
-            margin-top: 8px;
-            font-style: italic;
-        }
-
-        .panel {
-            padding: 0 18px;
-            background-color: white;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.2s ease-out;
-            border: 1px solid #ddd;
-            border-top: none;
-        }
-    </style>
 </head>
 <body>
 
@@ -58,13 +17,13 @@
 
         <hr>
 
-        <button class="accordion">
-            <div class="accordion-title">app-deployment.yaml</div>
-            <div class="accordion-explanation">
+        <button class="helm-accordion">
+            <div class="helm-accordion-title">app-deployment.yaml</div>
+            <div class="helm-accordion-explanation">
                 A <strong>Deployment</strong> manages a set of identical pods for a stateless application. This file defines our web server's container image, replica count, and the environment variables needed to connect to the database.
             </div>
         </button>
-        <div class="panel">
+        <div class="helm-panel">
             <pre><code class="language-yaml">{% raw %}apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -106,13 +65,13 @@ spec:
 {% endraw %}</code></pre>
         </div>
 
-        <button class="accordion">
-            <div class="accordion-title">app-service.yaml</div>
-            <div class="accordion-explanation">
+        <button class="helm-accordion">
+            <div class="helm-accordion-title">app-service.yaml</div>
+            <div class="helm-accordion-explanation">
                 A <strong>Service</strong> provides a stable network endpoint (IP address and DNS name) for a set of pods. We need this Service to expose our web server pods internally so other parts of the cluster can reliably access them.
             </div>
         </button>
-        <div class="panel">
+        <div class="helm-panel">
             <pre><code class="language-yaml">{% raw %}apiVersion: v1
 kind: Service
 metadata:
@@ -129,13 +88,13 @@ spec:
 {% endraw %}</code></pre>
         </div>
         
-        <button class="accordion">
-            <div class="accordion-title">db-configmap.yaml</div>
-            <div class="accordion-explanation">
+        <button class="helm-accordion">
+            <div class="helm-accordion-title">db-configmap.yaml</div>
+            <div class="helm-accordion-explanation">
                 A <strong>ConfigMap</strong> stores non-sensitive configuration data. This one is crucial as it holds the database name and user, decoupling these settings from the application's code and bridging the connection between the app and the DB.
             </div>
         </button>
-        <div class="panel">
+        <div class="helm-panel">
             <pre><code class="language-yaml">{% raw %}apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -146,13 +105,13 @@ data:
 {% endraw %}</code></pre>
         </div>
 
-        <button class="accordion">
-            <div class="accordion-title">init-db-configmap.yaml</div>
-            <div class="accordion-explanation">
+        <button class="helm-accordion">
+            <div class="helm-accordion-title">init-db-configmap.yaml</div>
+            <div class="helm-accordion-explanation">
                 This <strong>ConfigMap</strong> holds an initial SQL script that runs when the database is first created. Its purpose is to automatically define the database schema, creating the `visitors` and `page_views` tables required by the application.
             </div>
         </button>
-        <div class="panel">
+        <div class="helm-panel">
             <pre><code class="language-sql">apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -178,13 +137,13 @@ data:
     );</code></pre>
         </div>
 
-        <button class="accordion">
-            <div class="accordion-title">db-statefulset.yaml</div>
-            <div class="accordion-explanation">
+        <button class="helm-accordion">
+            <div class="helm-accordion-title">db-statefulset.yaml</div>
+            <div class="helm-accordion-explanation">
                 A <strong>StatefulSet</strong> is used for stateful applications like databases because it provides stable network names and persistent storage tied to each pod. This ensures data integrity and consistency, which is vital for a database.
             </div>
         </button>
-        <div class="panel">
+        <div class="helm-panel">
             <pre><code class="language-yaml">{% raw %}apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -238,13 +197,13 @@ spec:
 {% endraw %}</code></pre>
         </div>
 
-        <button class="accordion">
-            <div class="accordion-title">db-service.yaml</div>
-            <div class="accordion-explanation">
+        <button class="helm-accordion">
+            <div class="helm-accordion-title">db-service.yaml</div>
+            <div class="helm-accordion-explanation">
                 This <strong>Service</strong> gives the database pods a stable internal DNS name (`postgres-db-service`) for the application to connect to. It includes a mapping for the standard PostgreSQL port, ensuring the connection always works.
             </div>
         </button>
-        <div class="panel">
+        <div class="helm-panel">
             <pre><code class="language-yaml">{% raw %}apiVersion: v1
 kind: Service
 metadata:
@@ -265,13 +224,13 @@ spec:
 {% endraw %}</code></pre>
         </div>
 
-        <button class="accordion">
-            <div class="accordion-title">values.yaml</div>
-            <div class="accordion-explanation">
+        <button class="helm-accordion">
+            <div class="helm-accordion-title">values.yaml</div>
+            <div class="helm-accordion-explanation">
                 The <strong>`values.yaml`</strong> file centralizes all configurable parameters for the Helm chart. It acts as a single source of truth, allowing us to easily customize deployments for different environments without changing the core templates.
             </div>
         </button>
-        <div class="panel">
+        <div class="helm-panel">
             <pre><code class="language-yaml">
 app:
   replicaCount: 2
@@ -307,7 +266,7 @@ objectNames:
     <script src="path/to/prism.js"></script>
 
     <script>
-        var acc = document.getElementsByClassName("accordion");
+        var acc = document.getElementsByClassName("helm-accordion");
         for (var i = 0; i < acc.length; i++) {
             acc[i].addEventListener("click", function() {
                 this.classList.toggle("active");
