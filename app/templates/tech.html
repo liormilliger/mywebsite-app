@@ -100,6 +100,10 @@
                         <img src="{{ url_for('static', filename='images/tech/Grafana.svg.png') }}" alt="Grafana Logo" class="tech-icon">
                         <span class="tech-link-text">Grafana</span>
                     </a>
+                    <a href="#" class="tech-link" data-target="elk-stack" title="ELK Stack for logging">
+                        <img src="{{ url_for('static', filename='images/tech/elk-logo.png') }}" alt="ELK Stack Logo" class="tech-icon">
+                        <span class="tech-link-text">ELK Stack</span>
+                    </a>
                 </div>
             </div>
 
@@ -183,6 +187,7 @@
             <div id="aws" class="tech-content-panel" style="display: none;">{% include 'snippets/AWS.html' %}</div>
             <div id="prometheus" class="tech-content-panel" style="display: none;">{% include 'snippets/Prometheus.html' %}</div>
             <div id="grafana" class="tech-content-panel" style="display: none;">{% include 'snippets/Grafana.html' %}</div>
+            <div id="elk-stack" class="tech-content-panel" style="display: none;">{% include 'snippets/ELK-Stack.html' %}</div>
             {# <div id="fluentbit" class="tech-content-panel" style="display: none;">{% include 'snippets/FluentBit.html' %}</div>
             <div id="elasticsearch" class="tech-content-panel" style="display: none;">{% include 'snippets/ElasticSearch.html' %}</div>
             <div id="kibana" class="tech-content-panel" style="display: none;">{% include 'snippets/Kibana.html' %}</div> #}

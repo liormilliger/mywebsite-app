@@ -1,0 +1,19 @@
+<h3>The ELK Stack: Centralized Logging</h3>
+<p>
+    The <strong>ELK Stack</strong> is a powerful combination of three open-source tools for centralized logging, log analysis, and visualization.
+</p>
+<ul>
+    <li><strong>Elasticsearch:</strong> A distributed search and analytics engine. It stores all the logs.</li>
+    <li><strong>Logstash:</strong> A server-side data processing pipeline that ingests data from multiple sources, transforms it, and sends it to a "stash" like Elasticsearch.</li>
+    <li><strong>Kibana:</strong> A data visualization dashboard that works on top of Elasticsearch, allowing you to create charts, graphs, and dashboards to view your log data.</li>
+</ul>
+
+<div class="snippet-intro">
+    <p>
+        <strong>Note on Log Shippers:</strong> In many of my projects, I use <strong>Filebeat</strong> instead of the full Logstash agent on the client-side. Filebeat is a lightweight, resource-friendly log shipper ("Beat") designed to send logs to either Logstash for further processing or directly to Elasticsearch. This is often more efficient for simple log forwarding from many servers.
+    </p>
+</div>
+
+<p>Below is an example of a Kibana dashboard, which is used to visualize the log data stored in Elasticsearch.</p>
+
+<img src="{{ url_for('static', filename='images/tech/kibana-view.png') }}" alt="Kibana Dashboard Example" style="width: 100%; border-radius: 8px; margin-top: 1rem; border: 1px solid rgba(236, 223, 204, 0.2);">
