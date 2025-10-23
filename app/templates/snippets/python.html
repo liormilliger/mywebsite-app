@@ -103,9 +103,9 @@ app.logger.setLevel(logging.INFO)
             g.db = psycopg2.connect(
                 <span class="code-comment"># Use environment variables for connection details</span>
                 host=os.environ.get(<span class="code-string">'POSTGRES_HOST'</span>, <span class="code-string">'db'</span>),
-                dbname=os.environ.get(<span class="code-string">'POSTGRES_DB'</span>, <span class="code-string">'mywebsite'</span>),
-                user=os.environ.get(<span class="code-string">'POSTGRES_USER'</span>, <span class="code-string">'admin'</span>),
-                password=os.environ.get(<span class="code-string">'POSTGRES_PASSWORD'</span>, <span class="code-string">'password'</span>),
+                dbname=os.environ.get(<span class="code-string">'POSTGRES_DB'</span>, <span class="code-string">'website-db'</span>),
+                user=os.environ.get(<span class="code-string">'POSTGRES_USER'</span>, <span class="code-string">'anyuser'</span>),
+                password=os.environ.get(<span class="code-string">'POSTGRES_PASSWORD'</span>, <span class="code-string">'some-password'</span>),
                 port=os.environ.get(<span class="code-string">'POSTGRES_PORT'</span>, <span class="code-number">5432</span>)
             )
             current_app.logger.info(<span class="code-string">"Database connection established."</span>)

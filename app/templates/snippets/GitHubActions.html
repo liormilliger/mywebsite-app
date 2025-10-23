@@ -1,5 +1,5 @@
-<a href="/github-actions-demo" class="download-link" download="push-image.yaml" title="Click to download the file">
-    <h3 class="downloadable-title">push-image.yaml<i class="fas fa-download"></i></h3>
+<a href="/github-actions-demo" class="download-link" download="githubactions-demo.yaml" title="Click to download the file">
+    <h3 class="downloadable-title">githubactions-demo.yaml<i class="fas fa-download"></i></h3>
 </a>
 
 <div class="snippet-intro">
@@ -8,6 +8,9 @@
     </p>
 </div>
 
+<img src="static/files/GHA-workflow.png" alt="GitHub Actions Workflow Diagram" style="width: 100%; max-width: 800px; display: block; margin: 2rem auto; border-radius: 8px;">
+
+
 <div class="code-accordion">
     <div class="accordion-item">
         <button class="accordion-header">
@@ -15,16 +18,17 @@
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>{% raw %}name: Build, Test, and Push Docker Image to ECR
+<pre><code>{% raw %}name: Build, Test, Scan, and Push Docker Image
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "database" ]
   workflow_dispatch:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REGISTRY: ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+  # BEST PRACTICE: Switched from 'vars' to 'secrets' to protect your AWS Account ID
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
   ECR_REPOSITORY: mywebsite
   IMAGE_FILE_NAME: my-app-image.tar{% endraw %}
 </code></pre>
@@ -37,9 +41,6 @@ env:
         </button>
         <div class="accordion-content">
 <pre><code>{% raw %}jobs:
-  # ===============================================
-  # Job 1: Build the Docker Image
-  # ===============================================
   build:
     name: Build Image
     runs-on: ubuntu-latest
@@ -52,17 +53,16 @@ env:
       - name: Define Image Version Tag
         id: version
         run: |
-          VERSION="1.${{ github.run_number }}.0"
+          BRANCH_NAME=$(echo ${{ github.ref_name }} | sed 's/[^a-zA-Z0-9]/-/g')
+          VERSION="1.${{ github.run_number }}-${BRANCH_NAME}"
           echo "IMAGE_TAG=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
-        run: |
-          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} .
+        run: docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} .
 
       - name: Save Docker image as an artifact
-        run: |
-          docker save ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} --output ${{ env.IMAGE_FILE_NAME }}
-          
+        run: docker save ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.IMAGE_TAG }} --output ${{ env.IMAGE_FILE_NAME }}
+
       - name: Upload image artifact
         uses: actions/upload-artifact@v4
         with:
@@ -73,63 +73,160 @@ env:
     </div>
     <div class="accordion-item">
         <button class="accordion-header">
-            <span class="header-title">Job 2: Test Image</span>
+            <span class="header-title">Job 2: Run Database Integration Tests</span>
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>{% raw %}  # ===============================================
-  # Job 2: Test the Docker Image
-  # ===============================================
-  test:
-    name: Test Image
+<pre><code>{% raw %}
+  integration-test-db:
+    name: Run Database Integration Tests
     runs-on: ubuntu-latest
     needs: build
+    if: github.ref_name == 'database' || contains(toJSON(github.event.commits.*.message), 'db') || contains(toJSON(github.event.commits.*.message), 'database')
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Docker Compose (Optimized)
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+
       - name: Download image artifact
         uses: actions/download-artifact@v4
         with:
           name: docker-image
 
       - name: Load Docker image
-        run: |
-          docker load --input ${{ env.IMAGE_FILE_NAME }}
+        run: docker load --input ${{ env.IMAGE_FILE_NAME }}
 
-      - name: Run container locally and perform healthcheck
+      - name: Start services using Docker Compose
+        env:
+          WEB_IMAGE: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ needs.build.outputs.image_tag }}
+        run: docker-compose -f docker-compose.ci.yaml -p ci up -d
+
+      - name: Wait for services to be healthy
         run: |
-          IMAGE_NAME=$(docker images --format '{{.Repository}}:{{.Tag}}' | head -n 1)
-          docker run -d --name my-app-test -p 8080:5000 $IMAGE_NAME
-          echo "Waiting for container to start..."
+          echo "Waiting for containers to become healthy..."
           sleep 15
-          echo "Performing healthcheck..."
-          curl --fail http://localhost:8080/ || exit 1
-          echo "Healthcheck passed!"
-          docker stop my-app-test{% endraw %}
+
+      - name: Execute Database Test Script
+        run: |
+          docker run --rm --network=ci_default \
+            -v $(pwd)/test_db.py:/test_db.py \
+            -e POSTGRES_HOST=${{ secrets.TEST_DB_HOST }} \
+            -e POSTGRES_DB=${{ secrets.TEST_DB_NAME }} \
+            -e POSTGRES_USER=${{ secrets.TEST_DB_USER }} \
+            -e POSTGRES_PASSWORD=${{ secrets.TEST_DB_PASSWORD }} \
+            --entrypoint="" \
+            python:3.9-slim \
+            sh -c "pip install psycopg2-binary requests && python -u /test_db.py"
+
+      - name: Stop services
+        if: always()
+        run: docker-compose -f docker-compose.ci.yaml -p ci down{% endraw %}
 </code></pre>
         </div>
     </div>
     <div class="accordion-item">
         <button class="accordion-header">
-            <span class="header-title">Job 3: Push Image to ECR</span>
+            <span class="header-title">Job 3: Run Application Tests</span>
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>{% raw %}  # ===============================================
-  # Job 3: Push the Image to ECR
-  # ===============================================
-  push:
+<pre><code>{% raw %}
+  integration-test-app:
+    name: Run Application Tests
+    runs-on: ubuntu-latest
+    needs: build
+    if: "!(github.ref_name == 'database' || contains(toJSON(github.event.commits.*.message), 'db') || contains(toJSON(github.event.commits.*.message), 'database'))"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker image
+        run: docker load --input ${{ env.IMAGE_FILE_NAME }}
+
+      - name: Execute Application Test Script
+        run: |
+          echo "Running application-only tests..."
+          echo "Application test placeholder successful!"{% endraw %}
+</code></pre>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">Job 4: Security Scan</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code>{% raw %}
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      security-events: write 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan repository for secrets with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Scan Docker image for vulnerabilities with Trivy
+        uses: aquasecurity/trivy-action@v0.50.1
+        with:
+          input: '${{ env.IMAGE_FILE_NAME }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'{% endraw %}
+</code></pre>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">Job 5: Push Image to ECR</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code>{% raw %}
+  push-to-ecr:
     name: Push Image to ECR
     runs-on: ubuntu-latest
-    needs: [build, test]
+    needs: [build, integration-test-app, security-scan]
+    permissions:
+      id-token: write
+      contents: read
+    if: success() && !contains(toJSON(github.event.commits.*.message), 'skip')
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Download image artifact
@@ -138,45 +235,40 @@ env:
           name: docker-image
 
       - name: Load Docker image
-        run: |
-          docker load --input ${{ env.IMAGE_FILE_NAME }}
+        run: docker load --input ${{ env.IMAGE_FILE_NAME }}
 
-      - name: Tag and Push image to Amazon ECR
+      - name: Push image to Amazon ECR
         run: |
           IMAGE_TAG="${{ needs.build.outputs.image_tag }}"
-          docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }} --all-tags{% endraw %}
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${IMAGE_TAG}{% endraw %}
 </code></pre>
         </div>
     </div>
     <div class="accordion-item">
         <button class="accordion-header">
-            <span class="header-title">Job 4: Update Kubernetes Repo</span>
+            <span class="header-title">Job 6: Update Kubernetes Repo</span>
             <span class="accordion-icon">+</span>
         </button>
         <div class="accordion-content">
-<pre><code>{% raw %}  # ===============================================
-  # Job 4: Update Kubernetes Manifest Repo
-  # ===============================================
+<pre><code>{% raw %}
   update-kubernetes-repo:
     name: Update Kubernetes Manifest
     runs-on: ubuntu-latest
-    needs: [build, push] # Runs after build (to get the tag) and push (to ensure image exists)
-
+    needs: [build, push-to-ecr]
     steps:
       - name: Checkout Kubernetes repo
         uses: actions/checkout@v4
         with:
           repository: liormilliger/mywebsite-k8s
-          token: ${{ secrets.GH_PAT }}
+          ssh-key: ${{ secrets.DEPLOY_KEY }} 
+          ref: ${{ github.ref_name }}
 
-      - name: Install yq for YAML processing
+      - name: Install yq
         run: sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
 
       - name: Update image tag in values.yaml
         run: |
           IMAGE_TAG="${{ needs.build.outputs.image_tag }}"
-          # This command targets the .image.tag key in your specified values.yaml file
           yq eval '.image.tag = "'"$IMAGE_TAG"'"' -i 'my-app-chart/values.yaml'
 
       - name: Commit and push changes
