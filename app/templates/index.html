@@ -5,17 +5,31 @@
 {% block content %}
 <div class="homepage-content">
     
-    <h1 class="welcome-heading">Lior Milliger - DevOps Engineer</h1>
-    
-    <img src="{{ url_for('static', filename='files/LiorPhoto.jpg') }}" alt="A photo of Lior Milliger" class="profile-photo">
+    <div class="intro-container">
+        <img src="{{ url_for('static', filename='files/LiorPhoto.jpg') }}" alt="A photo of Lior Milliger" class="profile-photo">
+        <h1 class="welcome-heading">Lior Milliger - DevOps Engineer</h1>
+    </div>
+
         
     <div class="about-text">
         <p>
-            As a DevOps Engineer looking for a job, I was thinking of ways to step up my game,<br>
-            showing the entire range of my skills, knowledge and abilities, rather than<br>
-            compromising on a one-pager CV, just to meet the job requirements -<br>
-            I decided to build a website that will present… me.
-        </p>
+            My journey into DevOps started with a simple realization: computers never forget what you tell them to do,<br>
+            they just do it exactly as you said (which, as it turns out, isn’t always what you meant).<br>
+            That curiosity for how systems behave, and occasionally misbehave, led me to what I do today:<br>
+            building scalable, reliable, and secure infrastructure that behaves exactly as intended.<br>
+            <br><br>
+            Over the years, I’ve worked across cloud platforms, CI/CD pipelines, Kubernetes clusters, and monitoring stacks,<br>
+            designing systems that make both developers and operations teams sleep better at night (most nights, anyway).<br>
+            I believe great DevOps isn’t just about automation, it’s about understanding how people and systems interact,<br>
+            and removing friction between the two.
+            <!-- <br><br>
+            This website is more than a digital résumé.<br>
+            It’s a living example of how I approach infrastructure - modular, observable, and a little bit fun.<br>
+            If you visit the Tech Stack page, you’ll find a breakdown of the tools and platforms running behind the scenes here.<br>
+            <br><br>
+            When I’m not tuning deployments or chasing down elusive latency spikes, you’ll usually find me<br>
+            experimenting with new technologies or automating something that probably didn’t need automating<br>
+            (but now runs perfectly every time). -->
     </div>
 </div>
 {% endblock %}

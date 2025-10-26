@@ -19,7 +19,7 @@ nav {
     background-color: #0c1a2e;
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
     position: relative;
-    z-index: 1001; /* Ensure nav is above other content but below the slide-in menu */
+    z-index: 1001;
 }
 
 nav a {
@@ -89,9 +89,47 @@ main {
 }
 
 .homepage-content {
-    text-align: center;
+    text-align: left;
+    max-width: 850px;
+    margin: 0 auto;
 }
 
+/* --- New Intro Container for Homepage --- */
+.intro-container {
+    display: flex;
+    align-items: center;         /* vertically center image and text */
+    justify-content: center;     /* center both horizontally */
+    gap: 2rem;                   /* space between image and text */
+    flex-wrap: wrap;             /* responsive stacking */
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.intro-container .profile-photo {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 3px solid #ECDFCC;
+    object-fit: cover;
+    margin-top: 0; /* remove old top margin */
+}
+
+.intro-container .welcome-heading {
+    font-size: 2.2rem;
+    font-weight: 300;
+    margin: 0;
+    text-align: left;
+}
+
+/* --- Responsive layout for smaller screens --- */
+@media (max-width: 768px) {
+    .intro-container {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* --- Existing Page Content --- */
 .page-content {
     text-align: left;
 }
@@ -112,8 +150,8 @@ main {
 }
 
 .about-text p {
-    font-size: 1.2rem;
-    line-height: 1.7;
+    font-size: 1rem;
+    line-height: 1.6;
     max-width: 850px;
     margin: 1rem auto 0;
 }
@@ -303,17 +341,6 @@ footer {
     opacity: 0.7;
 }
 
-.snippet-intro a {
-    color: inherit;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s ease;
-}
-
-.snippet-intro a:hover {
-    color: #FFFFFF;
-}
-
 .snippet-intro {
     background-color: rgba(12, 26, 46, 0.7);
     border-left: 4px solid #ECDFCC;
@@ -328,6 +355,17 @@ footer {
     font-size: 1rem;
     color: rgba(236, 223, 204, 0.9);
     line-height: 1.6;
+}
+
+.snippet-intro a {
+    color: inherit;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.snippet-intro a:hover {
+    color: #FFFFFF;
 }
 
 /* --- CONTACT PAGE STYLES --- */
@@ -1140,3 +1178,25 @@ footer {
 .bash-string { color: #f1fa8c; }
 .bash-command { color: #8be9fd; }
 .bash-variable { color: #bd93f9; }
+
+
+/* ===================================================================== */
+/* =================== ACCORDION MAX-HEIGHT FIX ======================== */
+/* ===================================================================== */
+
+/* Fix for the main code accordion (e.g., Jenkinsfile) */
+.accordion-header.active + .accordion-content {
+    /* Set a large value to allow the container to grow. */
+    /* 2000px should be enough; adjust if you have longer files. */
+    max-height: 3000px; 
+}
+
+/* Fix for the Python accordion */
+.python-accordion .accordion-header.active + .accordion-content {
+    max-height: 3000px; 
+}
+
+/* Fix for the Helm accordion */
+.helm-accordion.active + .helm-panel {
+    max-height: 3000px; 
+}

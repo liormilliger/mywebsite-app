@@ -35,39 +35,46 @@ pipeline {
 
     // ===========================================================
     stage('Integration Test - Database') {
-      when {
-        expression {
-          return env.BRANCH_NAME == "database" || 
-                 (env.GIT_COMMIT && sh(script: "git log -1 --pretty=%B | grep -E 'db|database' || true", returnStatus: true) == 0)
+            when {
+                expression {
+                    return env.BRANCH_NAME == "database" || (env.GIT_COMMIT && sh(script: "git log -1 --pretty=%B | grep -E 'db|database' || true", returnStatus: true) == 0)
+                }
+            }
+            steps {
+                script {
+                    withCredentials([
+                        [$class: 'UsernamePasswordMultiBinding', 
+                         credentialsId: 'my-db-creds',
+                         usernameVariable: 'DB_USER',
+                         dbnameVariable: 'DB_NAME',
+                         passwordVariable: 'DB_PASS']
+                    ]) {
+                        sh """
+                            echo "Running Database Integration Tests..."
+                            curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                            chmod +x /usr/local/bin/docker-compose
+                            docker load -i ${IMAGE_FILE_NAME}
+                            docker-compose -f docker-compose.ci.yaml -p ci up -d
+                            echo "Waiting for services..."
+                            sleep 15
+                            docker run --rm --network=ci_default \
+                                -v $(pwd)/test_db.py:/test_db.py \
+                                -e POSTGRES_HOST=db \
+                                -e POSTGRES_DB=${DB_NAME} \
+                                -e POSTGRES_USER=${DB_USER} \
+                                -e POSTGRES_PASSWORD=${DB_PASS} \
+                                --entrypoint="" python:3.9-slim \
+                                sh -c "pip install psycopg2-binary requests && python -u /test_db.py"
+                        """
+                    }
+                }
+            }
+            post {
+                always {
+                    sh "docker-compose -f docker-compose.ci.yaml -p ci down || true"
+                }
+            }
         }
-      }
-      steps {
-        script {
-          sh """
-            echo "Running Database Integration Tests..."
-            curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-\$(uname -s)-\$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
-            docker load -i ${IMAGE_FILE_NAME}
-            docker-compose -f docker-compose.ci.yaml -p ci up -d
-            echo "Waiting for services..."
-            sleep 15
-            docker run --rm --network=ci_default \
-              -v \$(pwd)/test_db.py:/test_db.py \
-              -e POSTGRES_HOST=db \
-              -e POSTGRES_DB=mywebsite \
-              -e POSTGRES_USER=admin \
-              -e POSTGRES_PASSWORD=password \
-              --entrypoint="" python:3.9-slim \
-              sh -c "pip install psycopg2-binary requests && python -u /test_db.py"
-          """
-        }
-      }
-      post {
-        always {
-          sh "docker-compose -f docker-compose.ci.yaml -p ci down || true"
-        }
-      }
-    }
 
     // ===========================================================
     stage('Integration Test - App Only') {
