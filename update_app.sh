@@ -8,6 +8,9 @@ echo "Stopping and removing existing container..."
 docker-compose stop $SERVICE_NAME || true
 docker-compose rm -f $SERVICE_NAME || true
 
+echo "Pulling new code..."
+git pull
+
 echo "Building new image for service '$SERVICE_NAME'..."
 docker-compose build --no-cache $SERVICE_NAME
 

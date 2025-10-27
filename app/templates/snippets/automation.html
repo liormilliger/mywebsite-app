@@ -1,0 +1,198 @@
+<a href="/scripts-collection" class="download-link" title="Click to explore my automation scripts">
+    <h3 class="downloadable-title">Automation Scripts<i class="fas fa-terminal"></i></h3>
+</a>
+
+<div class="snippet-intro">
+    <p>
+        Automation is at the core of how I work — from deploying Docker services, scanning AWS accounts, or cleaning up unused volumes, these scripts make repetitive tasks simple and reliable.
+        Below are a few of my most-used Bash scripts, formatted for easy reading.
+    </p>
+</div>
+
+<div class="code-accordion">
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">update_app.sh</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code class="language-bash">{% raw %}
+#!/bin/bash
+# Stops, pulls, rebuilds, and restarts a Docker Compose service
+
+set -e
+
+SERVICE_NAME="app"
+CONTAINER_NAME="mywebsite-app"
+
+echo "Stopping and removing existing container..."
+docker-compose stop $SERVICE_NAME || true
+docker-compose rm -f $SERVICE_NAME || true
+
+echo "Pulling new code..."
+git pull
+
+echo "Building new image for service '$SERVICE_NAME'..."
+docker-compose build --no-cache $SERVICE_NAME
+
+echo "Starting new container with latest image..."
+docker-compose up -d --no-deps $SERVICE_NAME
+
+echo "Pruning unused images..."
+docker image prune -f
+
+echo "✅ Update complete for '$CONTAINER_NAME'."
+{% endraw %}</code></pre>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">rm_unused_AWS-vols.sh</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code class="language-bash">{% raw %}
+#!/bin/bash
+# Delete all AWS EBS volumes not in use
+# Requires: AWS CLI configured with appropriate permissions
+
+set -e
+
+echo "🔍 Fetching EBS volumes not in 'in-use' state..."
+VOLUMES=$(aws ec2 describe-volumes \
+  --query "Volumes[?State!='in-use'].VolumeId" \
+  --output text)
+
+if [ -z "$VOLUMES" ]; then
+  echo "✅ No unused volumes found."
+  exit 0
+fi
+
+echo "⚠️ The following volumes are NOT in use:"
+echo "$VOLUMES" | tr '\t' '\n'
+echo
+read -p "Delete ALL these volumes? (yes/no): " CONFIRM
+
+if [[ "$CONFIRM" != "yes" ]]; then
+  echo "❌ Aborted. No volumes deleted."
+  exit 0
+fi
+
+for VOL in $VOLUMES; do
+  echo "Deleting $VOL..."
+  aws ec2 delete-volume --volume-id "$VOL"
+done
+
+echo "✅ Cleanup complete."
+{% endraw %}</code></pre>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">aws_inventory_list_v2.sh</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code class="language-bash">{% raw %}
+#!/bin/bash
+# Scans all AWS regions for EC2, EBS, EKS, and S3 resources
+
+set -euo pipefail
+
+ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+echo "AWS Account: $ACCOUNT_ID"
+echo
+
+REGIONS=$(aws ec2 describe-regions --query "Regions[].RegionName" --output text)
+
+for region in $REGIONS; do
+  echo "🔍 Scanning region: $region ..."
+  ec2_found=false
+  volume_found=false
+  eks_found=false
+  s3_found=false
+
+  EC2S=$(aws ec2 describe-instances --region "$region" \
+    --query "Reservations[].Instances[?State.Name=='running'].{ID:InstanceId, Name:Tags[?Key=='Name']|[0].Value, Creator:Tags[?Key=='CreatedBy']|[0].Value}" \
+    --output text 2>/dev/null || true)
+
+  if [[ -n "$EC2S" ]]; then
+    ec2_found=true
+    echo "⚙️ EC2 INSTANCES:"
+    echo "$EC2S" | while read -r ID NAME CREATOR; do
+      [[ -z "$NAME" ]] && NAME="(no name)"
+      [[ -z "$CREATOR" || "$CREATOR" == "None" ]] && CREATOR="(unknown creator)"
+      echo "   • Name: $NAME | ID: $ID | Creator: $CREATOR"
+    done
+  fi
+
+  VOLUMES=$(aws ec2 describe-volumes --region "$region" \
+    --query "Volumes[].{ID:VolumeId, Attachments:Attachments}" --output json 2>/dev/null || true)
+
+  ATTACHED=$(echo "$VOLUMES" | jq -r '.[] | select(.Attachments | length > 0) | "   • Volume: \(.ID) attached to \(.Attachments[0].InstanceId)"')
+  UNATTACHED=$(echo "$VOLUMES" | jq -r '.[] | select(.Attachments | length == 0) | "   • Unattached volume: \(.ID)"')
+
+  if [[ -n "$ATTACHED" || -n "$UNATTACHED" ]]; then
+    volume_found=true
+    echo "💾 ATTACHED VOLUMES:"
+    [[ -n "$ATTACHED" ]] && echo "$ATTACHED"
+    echo "💤 UNATTACHED VOLUMES:"
+    [[ -n "$UNATTACHED" ]] && echo "$UNATTACHED"
+  fi
+
+  CLUSTERS=$(aws eks list-clusters --region "$region" --output text 2>/dev/null || true)
+  if [[ -n "$CLUSTERS" ]]; then
+    eks_found=true
+    echo "☸️ EKS CLUSTERS:"
+    for cluster in $CLUSTERS; do
+      CREATOR=$(aws eks describe-cluster --name "$cluster" --region "$region" \
+        --query "cluster.tags.CreatedBy" --output text 2>/dev/null || echo "(unknown)")
+      [[ -z "$CREATOR" || "$CREATOR" == "None" ]] && CREATOR="(unknown)"
+      echo "   • Cluster: $cluster | Creator: $CREATOR"
+    done
+  fi
+
+  if ! $ec2_found && ! $volume_found && ! $eks_found && ! $s3_found; then
+    echo "  → No findings in $region"
+  fi
+
+  echo
+done
+
+echo "✅ Scan complete."
+{% endraw %}</code></pre>
+        </div>
+    </div>
+
+    <!-- ec2_docker_user-data.sh -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span class="header-title">ec2_docker_user-data.sh</span>
+            <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+<pre><code class="language-bash">{% raw %}
+#!/bin/bash
+# Installs Docker automatically on an EC2 Ubuntu instance
+
+apt-get update
+apt-get install -y vim tree net-tools
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
+{% endraw %}</code></pre>
+        </div>
+    </div>
+</div>
