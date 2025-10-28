@@ -34,7 +34,10 @@ def log_visitor():
 
     cursor = db.cursor()
     
-    visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    # visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    ip_from_header = request.headers.get('X-Forwarded-For', request.remote_addr)
+    first_ip = ip_from_header.split(',')[0]
+    visitor_ip = first_ip.strip().strip("'").strip('"').strip('\\')
     user_agent = request.headers.get('User-Agent')
     page_route = request.path
 

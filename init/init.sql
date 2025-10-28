@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS visitors (
     first_visit_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     last_visit_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     user_agent TEXT
+);
 
 CREATE TABLE IF NOT EXISTS page_views (
     view_id SERIAL PRIMARY KEY,
