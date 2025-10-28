@@ -48,33 +48,5 @@ def contact():
     app.logger.info(f"[{request.path}] - Contact page accessed.")
     return render_template('contact.html')
 
-@app.route('/Jenkinsfile-demo')
-def download_jenkinsfile():
-    directory = os.path.join(app.root_path, 'static', 'files')
-    try:
-        app.logger.info(f"[{request.path}] - Attempting to send file 'Jenkinsfile-demo'.")
-        return send_from_directory(
-            directory=directory,
-            path='Jenkinsfile-demo',
-            as_attachment=True
-        )
-    except FileNotFoundError:
-        app.logger.error(f"[{request.path}] - File not found at path: {os.path.join(directory, 'Jenkinsfile-demo')}")
-        return "File not found.", 404
-
-@app.route('/github-actions-demo')
-def download_github_actions():
-    """Provides the GitHub Actions YAML file for download."""
-    directory = os.path.join(app.root_path, 'static', 'files')
-    try:
-        return send_from_directory(
-            directory,
-            'githubactions-demo.yaml',
-            as_attachment=True,
-            download_name='push-image.yaml'
-        )
-    except FileNotFoundError:
-        return "File not found.", 404
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

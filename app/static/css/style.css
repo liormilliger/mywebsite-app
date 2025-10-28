@@ -322,24 +322,7 @@ footer {
     color: #a7c5eb;
 }
 
-.download-link {
-    text-decoration: none;
-    color: inherit;
-}
-
-.downloadable-title {
-    transition: color 0.3s ease;
-}
-
-.download-link:hover .downloadable-title {
-    color: #FFFFFF;
-}
-
-.downloadable-title .fa-download {
-    font-size: 1.2rem;
-    margin-left: 10px;
-    opacity: 0.7;
-}
+/* Removed .download-link and .downloadable-title styles */
 
 .snippet-intro {
     background-color: rgba(12, 26, 46, 0.7);
