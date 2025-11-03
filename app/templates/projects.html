@@ -36,22 +36,42 @@
                 </a>
             </div>
         </div>
-
+        
         <div class="project-card">
-            <h2>GateUP (Serverless)</h2>
-            <p>A utility tool designed to manage and automate gate operations, focusing on system integration and remote control. Based on Serverless event-based operations</p>
+            <h2>Blue-Green Deployment</h2>
+            <p>A demonstration of Blue-Green deployment using Terraform and AWS. Nginx redirects traffic to the green server and has the blue server as a backup server in case the green one fails.</p>
             <div class="project-links">
-                <a href="https://github.com/liormilliger/GateUP.git" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/liormilliger/Blue-Green-Demo.git" target="_blank" rel="noopener noreferrer">
                     <i class="fab fa-github"></i> View on GitHub
                 </a>
             </div>
         </div>
 
         <div class="project-card">
+            <h2>Kafka Data Shipping</h2>
+            <p>Kafka data shipping microservices architecture, using Java producer-consumer services to stream data between MySQL and Kafka. Deployed on AWS::EKS using Terraform IaC. The CICD process was automated with GitHub Actions to build and push container images to ECR/p>
+            <div class="project-links">
+                <a href="https://github.com/liormilliger/kafka-data-shipper.git" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+            </div>
+        </div>
+        
+        <div class="project-card">
             <h2>Prometheus Data Collector</h2>
             <p>A custom data collector (exporter) for the Prometheus monitoring system, created to gather and expose specific metrics for observability.</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/prometheus-data-collector.git" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <h2>GateUP (Serverless)</h2>
+            <p>A utility tool designed to manage and automate gate operations, focusing on system integration and remote control. Based on Serverless event-based operations</p>
+            <div class="project-links">
+                <a href="https://github.com/liormilliger/GateUP.git" target="_blank" rel="noopener noreferrer">
                     <i class="fab fa-github"></i> View on GitHub
                 </a>
             </div>
@@ -66,22 +86,6 @@
                 </a>
             </div>
         </div>
-
-        <div class="project-card">
-            <h2>Blue-Green Deployment</h2>
-            <p>A demonstration of Blue-Green deployment using Terraform and AWS. Nginx redirects traffic to the green server and has the blue server as a backup server in case the green one fails.</p>
-            <div class="project-links">
-                <a href="https://github.com/liormilliger/Blue-Green-Demo.git" target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-github"></i> View on GitHub
-                </a>
-            </div>
-        </div>
-
-        <div class="project-card">
-            <h2>Kafka</h2>
-            <p>Work in progress. More details coming soon!</p>
-        </div>
-
     </div>
 </div>
 {% endblock %}
