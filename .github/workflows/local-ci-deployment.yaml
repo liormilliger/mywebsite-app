@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - "app/**"
-  workflow_dispatch:
 
 jobs:
   deploy:
@@ -14,43 +13,42 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup SSH key
+      - name: Create SSH key file
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/ec2_key
           chmod 600 ~/.ssh/ec2_key
 
-      - name: Add EC2 to known hosts
+      - name: Add EC2 host to known_hosts
         run: |
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: SSH into EC2 and deploy
+      - name: Deploy to EC2
         run: |
-          ssh -i ~/.ssh/ec2_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
 
           set -e
 
-          # Go to repo
           cd ~/mywebsite-iac
 
-          echo "=== Pulling latest changes ==="
+          echo ">>> Pulling latest repo changes"
           git pull origin main
 
-          echo "=== Rebuilding app image ==="
+          echo ">>> Rebuilding the app image"
           docker-compose build app
 
-          echo "=== Starting new container with minimal downtime ==="
+          echo ">>> Restarting only the app container"
           docker-compose up -d app
 
-          echo "=== Health check: container status ==="
+          echo ">>> Checking running containers"
           docker ps
 
-          echo "=== Wait a few seconds for app to boot ==="
+          echo ">>> Waiting 5 seconds for app to start"
           sleep 5
 
-          echo "=== Curl check ==="
+          echo ">>> Doing curl health check"
           curl -I https://liormilliger.com || exit 1
 
-          echo "=== Deployment Finished Successfully ==="
-
+          echo ">>> Deployment completed successfully"
           EOF
