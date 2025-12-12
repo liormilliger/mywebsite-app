@@ -16,29 +16,32 @@ jobs:
       - name: Update Code & Restart
         run: |
           # --- CONFIGURATION ---
+          # 1. Corrected Path based on your comment
           PROD_DIR="/root/mywebsite-app"
 
           echo "--- Checking Directory (with sudo) ---"
-          # We must use 'sudo test -d' because 'ubuntu' cannot look inside '/root'
           if ! sudo test -d "$PROD_DIR"; then
-            echo "Error: Directory $PROD_DIR does not exist or is not accessible."
+            echo "Error: Directory $PROD_DIR does not exist."
             exit 1
           fi
 
           echo "--- Fixing Git Permissions ---"
-          # Allow operations on the root-owned directory
           sudo git config --global --add safe.directory "$PROD_DIR"
 
-          echo "--- Pulling Latest Code ---"
-          # -C runs git inside that folder without needing to 'cd'
-          sudo git -C "$PROD_DIR" pull origin main
+          echo "--- Force Updating Code ---"
+          # 2. We use 'fetch' + 'reset --hard' to overwrite local changes (fixes the JPG conflict)
+          sudo git -C "$PROD_DIR" fetch origin main
+          sudo git -C "$PROD_DIR" reset --hard origin/main
 
           echo "--- Building App Image ---"
-          # --project-directory ensures Docker finds the .env file in /root/mywebsite-app
+          # Build using the .env file located inside that folder
           sudo docker compose --project-directory "$PROD_DIR" build app
 
-          echo "--- Recreating App Container ---"
-          # Recreates only the app container, keeps DB/Nginx alive
+          echo "--- Removing Old Container ---"
+          # -f stops and removes it. || true prevents failure if it's already gone.
+          sudo docker rm -f mywebsite-app || true
+
+          echo "--- Starting New Container ---"
           sudo docker compose --project-directory "$PROD_DIR" up -d --no-deps app
 
       - name: Verify Health
