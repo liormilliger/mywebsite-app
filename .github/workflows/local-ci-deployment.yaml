@@ -3,37 +3,35 @@ name: Deploy via Ansible
 on:
   push:
     paths:
-      - 'app/**'      # Only trigger on app changes
+      - 'app/**'
     branches:
       - main
 
 jobs:
-  deploy:
+  ansible-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up SSH Key
-        # Ansible needs the private key file to connect
+      - name: Create SSH Key File
+        # We use a specific shell command to handle multiline secrets safely
         run: |
           mkdir -p ~/.ssh/
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          printf "%s" "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          # Add your Static IP to known_hosts to avoid "Are you sure?" prompt
-          ssh-keyscan -H 98.89.71.95 >> ~/.ssh/known_hosts
 
-      - name: Create Ansible Inventory
-        # We map your specific Static IP to the 'webserver' group used in the playbook
+      - name: Create Inventory File
         run: |
           echo "[webserver]" > inventory
           echo "98.89.71.95 ansible_user=${{ secrets.EC2_USER }}" >> inventory
 
       - name: Run Ansible Playbook
-        # We point to the inventory file created above
+        env:
+          # This disables the "Are you sure?" prompt and bypasses ssh-keyscan
+          ANSIBLE_HOST_KEY_CHECKING: 'False'
         run: |
           ansible-playbook ansible/deploy.yaml \
             -i inventory \
             --private-key ~/.ssh/id_rsa
-            
