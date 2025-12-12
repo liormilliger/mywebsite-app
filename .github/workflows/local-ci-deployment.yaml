@@ -16,32 +16,37 @@ jobs:
       - name: Update Code & Restart
         run: |
           # --- CONFIGURATION ---
-          PROD_DIR="/mywebsite"
+          PROD_DIR="/root/mywebsite"
 
-          echo "--- Checking Directory ---"
-          if [ ! -d "$PROD_DIR" ]; then
-            echo "Error: Directory $PROD_DIR does not exist."
+          echo "--- Checking Directory (with sudo) ---"
+          # We must use 'sudo test -d' because 'ubuntu' cannot look inside '/root'
+          if ! sudo test -d "$PROD_DIR"; then
+            echo "Error: Directory $PROD_DIR does not exist or is not accessible."
             exit 1
           fi
 
           echo "--- Fixing Git Permissions ---"
-          sudo git config --global --add safe.directory $PROD_DIR
+          # Allow operations on the root-owned directory
+          sudo git config --global --add safe.directory "$PROD_DIR"
 
           echo "--- Pulling Latest Code ---"
-          sudo git -C $PROD_DIR pull origin main
+          # -C runs git inside that folder without needing to 'cd'
+          sudo git -C "$PROD_DIR" pull origin main
 
           echo "--- Building App Image ---"
-          sudo docker compose --project-directory $PROD_DIR build app
+          # --project-directory ensures Docker finds the .env file in /root/mywebsite
+          sudo docker compose --project-directory "$PROD_DIR" build app
 
           echo "--- Recreating App Container ---"
-          sudo docker compose --project-directory $PROD_DIR up -d --no-deps app
+          # Recreates only the app container, keeps DB/Nginx alive
+          sudo docker compose --project-directory "$PROD_DIR" up -d --no-deps app
 
       - name: Verify Health
         run: |
           PROD_DIR="/root/mywebsite"
           
           echo "--- Internal Docker Check ---"
-          if [ -z "$(sudo docker compose --project-directory $PROD_DIR ps -q app)" ]; then
+          if [ -z "$(sudo docker compose --project-directory "$PROD_DIR" ps -q app)" ]; then
             echo "Error: App container is not running!"
             exit 1
           fi
