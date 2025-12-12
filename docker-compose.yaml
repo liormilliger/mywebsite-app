@@ -27,6 +27,8 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
       - ./logs/nginx:/var/log/nginx
+      - ./app/templates/error.html:/var/www/error_pages/error.html
+      - ./app/static/files/blackcat-pipelines.jpg:/var/www/error_pages/blackcat-pipelines.jpg
     depends_on:
       - app
 
