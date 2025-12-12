@@ -16,7 +16,7 @@ jobs:
       - name: Update Code & Restart
         run: |
           # --- CONFIGURATION ---
-          PROD_DIR="/root/mywebsite"
+          PROD_DIR="/mywebsite"
 
           echo "--- Checking Directory ---"
           if [ ! -d "$PROD_DIR" ]; then
