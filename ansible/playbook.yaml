@@ -1,0 +1,58 @@
+---
+- name: Deploy App to EC2
+  hosts: webserver       # Targets the group we define in CI
+  become: true           # Runs everything with sudo (root privileges)
+  gather_facts: no       # Speeds up run by skipping hardware checks
+
+  vars:
+    # We use the ansible_user (the SSH user) to find the home directory dynamically
+    project_root: "/root/mywebsite-app"
+    repo_url: "https://github.com/liormilliger/mywebsite-app.git"
+
+  tasks:
+    - name: Ensure project directory exists
+      file:
+        path: "{{ project_root }}"
+        state: directory
+        mode: '0755'
+
+    - name: Update Repository (Safe Pull)
+      # This handles the "git pull" safely. 
+      # 'force: yes' ensures local changes don't block the pull, but it won't delete un-tracked files (like .env)
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ project_root }}"
+        version: main
+        force: yes
+      register: git_output
+
+    - name: Build the App Image
+      # We always build to ensure latest code is used
+      command: docker compose build app
+      args:
+        chdir: "{{ project_root }}"
+
+    - name: Smart Restart (App Only)
+      # -d: Detached
+      # --no-deps: Do NOT restart DB or Nginx
+      # app: Target specific service
+      command: docker compose up -d --no-deps app
+      args:
+        chdir: "{{ project_root }}"
+
+    - name: Wait for App to initialize
+      wait_for:
+        timeout: 15
+
+    - name: Verify App Container is Running
+      shell: |
+        if [ -z "$(docker compose ps -q app)" ]; then exit 1; fi
+      args:
+        chdir: "{{ project_root }}"
+
+    - name: HTTP Health Check
+      uri:
+        url: "https://liormilliger.com"
+        method: GET
+        status_code: 200
+        follow_redirects: all
