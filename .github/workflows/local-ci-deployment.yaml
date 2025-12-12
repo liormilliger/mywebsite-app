@@ -1,38 +1,32 @@
-name: Deploy via Ansible
+name: Deploy via Self-Hosted Runner
 
 on:
+  # Allows you to click "Run workflow" manually in GitHub Actions tab
   workflow_dispatch:
+
   push:
     paths:
-      - 'app/**'
+      - 'app/**'  # Trigger only on app changes
     branches:
       - main
 
 jobs:
-  ansible-deploy:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: self-hosted  # Runs directly on your EC2 agent
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Ops Code
         uses: actions/checkout@v4
 
-      - name: Create SSH Key File
-        # We use a specific shell command to handle multiline secrets safely
+      - name: Install Ansible (if missing)
         run: |
-          mkdir -p ~/.ssh/
-          printf "%s" "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Create Inventory File
-        run: |
-          echo "[webserver]" > inventory
-          echo "98.89.71.95 ansible_user=${{ secrets.EC2_USER }}" >> inventory
+          if ! command -v ansible-playbook &> /dev/null; then
+              echo "Installing Ansible..."
+              sudo apt-get update
+              sudo apt-get install -y ansible
+          fi
 
       - name: Run Ansible Playbook
-        env:
-          # This disables the "Are you sure?" prompt and bypasses ssh-keyscan
-          ANSIBLE_HOST_KEY_CHECKING: 'False'
+        # Runs the playbook locally on the EC2
         run: |
-          ansible-playbook ansible/playbook.yaml \
-            -i inventory \
-            --private-key ~/.ssh/id_rsa
+          ansible-playbook ansible/playbook.yaml

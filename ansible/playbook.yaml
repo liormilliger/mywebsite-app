@@ -1,12 +1,12 @@
 ---
-- name: Deploy App to EC2
-  hosts: webserver       # Targets the group we define in CI
-  become: true           # Runs everything with sudo (root privileges)
-  gather_facts: no       # Speeds up run by skipping hardware checks
+- name: Deploy App to EC2 (Local)
+  hosts: localhost
+  connection: local
+  become: true        # <--- Runs ALL tasks as root (sudo)
 
   vars:
-    # We use the ansible_user (the SSH user) to find the home directory dynamically
-    project_root: "/root/mywebsite-app"
+    # UPDATED: Pointing to the actual root directory you mentioned
+    project_root: "/root/mywebsite"
     repo_url: "https://github.com/liormilliger/mywebsite-app.git"
 
   tasks:
@@ -14,35 +14,39 @@
       file:
         path: "{{ project_root }}"
         state: directory
+        owner: root   # Explicitly set owner to root
+        group: root
         mode: '0755'
 
-    - name: Update Repository (Safe Pull)
-      # This handles the "git pull" safely. 
-      # 'force: yes' ensures local changes don't block the pull, but it won't delete un-tracked files (like .env)
+    - name: Update Repository
       git:
         repo: "{{ repo_url }}"
         dest: "{{ project_root }}"
         version: main
         force: yes
-      register: git_output
+        # safe_directory is needed when git is run by a different user than the owner
+        # We configure git globally for this run to trust this directory
+      environment:
+        GIT_OPTS: "--config safe.directory={{ project_root }}"
+
+    - name: Trust the git directory (Safe Directory Fix)
+      # Git creates a safety error if you try to pull a folder owned by root 
+      # while running via sudo. This fixes it.
+      command: git config --global --add safe.directory "{{ project_root }}"
 
     - name: Build the App Image
-      # We always build to ensure latest code is used
       command: docker compose build app
       args:
         chdir: "{{ project_root }}"
 
     - name: Smart Restart (App Only)
-      # -d: Detached
-      # --no-deps: Do NOT restart DB or Nginx
-      # app: Target specific service
       command: docker compose up -d --no-deps app
       args:
         chdir: "{{ project_root }}"
 
     - name: Wait for App to initialize
       wait_for:
-        timeout: 15
+        timeout: 10
 
     - name: Verify App Container is Running
       shell: |
