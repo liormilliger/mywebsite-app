@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Unavailable</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .bg-container {
+            /* The image used */
+            background-image: url('/app/static/files/blackcat-pipelines.jpg');
+
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+
+            /* Flexbox to center the text */
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .error-text {
+            color: red;
+            font-weight: bold;
+            font-size: 4rem; /* "Big" size */
+            text-align: center;
+            text-shadow: 2px 2px 4px #000000; /* Adds a shadow to ensure readability against the image */
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-container">
+        <div class="error-text">
+            The website is unavailable right now
+        </div>
+    </div>
+
+</body>
+</html>
