@@ -33,6 +33,6 @@ jobs:
           # This disables the "Are you sure?" prompt and bypasses ssh-keyscan
           ANSIBLE_HOST_KEY_CHECKING: 'False'
         run: |
-          ansible-playbook ansible/deploy.yaml \
+          ansible-playbook ansible/playbook.yaml \
             -i inventory \
             --private-key ~/.ssh/id_rsa
