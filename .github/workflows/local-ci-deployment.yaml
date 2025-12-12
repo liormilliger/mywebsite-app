@@ -16,7 +16,7 @@ jobs:
       - name: Update Code & Restart
         run: |
           # --- CONFIGURATION ---
-          PROD_DIR="/root/mywebsite-app"
+          PROD_DIR="/root/mywebsite"
 
           echo "--- Checking Directory ---"
           if [ ! -d "$PROD_DIR" ]; then
@@ -38,7 +38,7 @@ jobs:
 
       - name: Verify Health
         run: |
-          PROD_DIR="/root/mywebsite-app"
+          PROD_DIR="/root/mywebsite"
           
           echo "--- Internal Docker Check ---"
           if [ -z "$(sudo docker compose --project-directory $PROD_DIR ps -q app)" ]; then
