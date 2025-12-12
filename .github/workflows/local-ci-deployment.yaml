@@ -1,6 +1,7 @@
 name: Deploy via Ansible
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'app/**'
