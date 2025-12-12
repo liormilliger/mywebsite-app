@@ -1,32 +1,57 @@
-name: Deploy via Self-Hosted Runner
+name: Deploy to Production (In-Place)
 
 on:
-  # Allows you to click "Run workflow" manually in GitHub Actions tab
   workflow_dispatch:
-
   push:
     paths:
-      - 'app/**'  # Trigger only on app changes
+      - 'app/**'
     branches:
       - main
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Runs directly on your EC2 agent
+    runs-on: self-hosted
 
     steps:
-      - name: Checkout Ops Code
-        uses: actions/checkout@v4
-
-      - name: Install Ansible (if missing)
+      - name: Update Code & Restart
+        # We assume the runner has sudo permissions (since you installed it with sudo)
+        # We perform everything in a single block to maintain directory context
         run: |
-          if ! command -v ansible-playbook &> /dev/null; then
-              echo "Installing Ansible..."
-              sudo apt-get update
-              sudo apt-get install -y ansible
+          # 1. Define the production path
+          PROD_DIR="/root/mywebsite"
+          
+          echo "--- Navigating to Production Folder ---"
+          cd $PROD_DIR
+
+          # 2. Fix the "Safe Directory" git error if owned by root
+          # This ensures git doesn't block us from pulling
+          sudo git config --global --add safe.directory $PROD_DIR
+
+          # 3. Pull the latest code
+          # This updates the code but leaves your .env file untouched
+          echo "--- Pulling latest changes ---"
+          sudo git pull origin main
+
+          # 4. Build the new image
+          # This uses the .env file ALREADY present in this folder
+          echo "--- Building App Image ---"
+          sudo docker compose build app
+
+          # 5. Smart Restart
+          # Since we are in the correct folder, Docker knows this is the SAME project.
+          # It will recreate 'mywebsite-app' gracefully with the new image.
+          echo "--- Recreating App Container ---"
+          sudo docker compose up -d --no-deps app
+
+      - name: Verify Health
+        run: |
+          echo "--- Checking Docker Container ---"
+          if [ -z "$(sudo docker compose ps -q app)" ]; then
+            echo "Error: App container is not running!"
+            exit 1
           fi
 
-      - name: Run Ansible Playbook
-        # Runs the playbook locally on the EC2
-        run: |
-          ansible-playbook ansible/playbook.yaml
+          echo "--- Checking Website URL ---"
+          # Wait a moment for Nginx/App handshake
+          sleep 5
+          curl -f -I -L https://liormilliger.com
