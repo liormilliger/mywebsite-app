@@ -16,7 +16,7 @@ jobs:
       - name: Update Code & Restart
         run: |
           # --- CONFIGURATION ---
-          PROD_DIR="/root/mywebsite"
+          PROD_DIR="/root/mywebsite-app"
 
           echo "--- Checking Directory (with sudo) ---"
           # We must use 'sudo test -d' because 'ubuntu' cannot look inside '/root'
@@ -34,7 +34,7 @@ jobs:
           sudo git -C "$PROD_DIR" pull origin main
 
           echo "--- Building App Image ---"
-          # --project-directory ensures Docker finds the .env file in /root/mywebsite
+          # --project-directory ensures Docker finds the .env file in /root/mywebsite-app
           sudo docker compose --project-directory "$PROD_DIR" build app
 
           echo "--- Recreating App Container ---"
@@ -43,7 +43,7 @@ jobs:
 
       - name: Verify Health
         run: |
-          PROD_DIR="/root/mywebsite"
+          PROD_DIR="/root/mywebsite-app"
           
           echo "--- Internal Docker Check ---"
           if [ -z "$(sudo docker compose --project-directory "$PROD_DIR" ps -q app)" ]; then
