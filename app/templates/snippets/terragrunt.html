@@ -1,0 +1,49 @@
+<h2>Terragrunt: Infrastructure Orchestration & DRY Principles</h2>
+<p>
+    This project represents a comprehensive self-study course I developed to master <strong>Terragrunt</strong>. It demonstrates how to wrap Terraform to create maintainable, production-grade infrastructure by following the "Don't Repeat Yourself" (DRY) philosophy.
+</p>
+
+<div class="snippet-intro">
+    <p>
+        <strong>Core Project Goal:</strong> Deploying a full production stack (VPC + EKS) using modular inheritance and dependency management. <br>
+        <strong>GitHub Repository:</strong> <a href="https://github.com/liormilliger/terragrunt-course.git" target="_blank" rel="noopener noreferrer"><b>github.com/liormilliger/terragrunt-course.git</b></a>
+    </p>
+</div>
+
+<h3>Course Progression & Key Milestones</h3>
+<ul>
+    <li><strong>Stage 1: The DRY Architecture</strong> - Implementing Parent-Child inheritance to manage multiple environments (Dev/Stage/Prod) without duplicating provider or backend blocks.</li>
+    <li><strong>Stage 2: Remote State Management</strong> - Automating the creation of S3 backends and DynamoDB locks, ensuring unique state keys using <code>path_relative_to_include()</code>.</li>
+    <li><strong>Stage 3: Dependencies & Stack Connection</strong> - Using <code>dependency</code> blocks to pass outputs between isolated modules (e.g., passing VPC IDs to an EKS module).</li>
+    <li><strong>Stage 4: Production Capstone</strong> - Deploying a complete AWS VPC and EKS cluster using official Registry modules via <code>tfr:///</code> and orchestrating the stack with <code>terragrunt run-all</code>.</li>
+</ul>
+
+<h4>Project Structure Snippet</h4>
+<div class="code-container">
+<pre><code><span class="code-comment"># Root terragrunt.hcl (Parent)</span>
+<span class="code-keyword">remote_state</span> {
+  backend = <span class="code-string">"s3"</span>
+  config = {
+    bucket         = <span class="code-string">"my-terraform-state-${get_aws_account_id()}"</span>
+    key            = <span class="code-string">"${path_relative_to_include()}/terraform.tfstate"</span>
+    region         = <span class="code-string">"us-east-2"</span>
+    encrypt        = <span class="code-keyword">true</span>
+    dynamodb_table = <span class="code-string">"terraform-locks"</span>
+  }
+}
+
+<span class="code-comment"># Child module (live/dev/eks/terragrunt.hcl)</span>
+<span class="code-keyword">include</span> <span class="code-string">"root"</span> {
+  path = find_in_parent_folders()
+}
+
+<span class="code-keyword">dependency</span> <span class="code-string">"vpc"</span> {
+  config_path = <span class="code-string">"../vpc"</span>
+}
+
+<span class="code-keyword">inputs</span> = {
+  vpc_id     = dependency.vpc.outputs.vpc_id
+  subnet_ids = dependency.vpc.outputs.private_subnets
+}
+</code></pre>
+</div>

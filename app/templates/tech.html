@@ -52,6 +52,10 @@
                         <img src="{{ url_for('static', filename='images/tech/terraform.svg') }}" alt="Terraform Logo" class="tech-icon">
                         <span class="tech-link-text">Terraform</span>
                     </a>
+                    <a href="#" class="tech-link" data-target="terragrunt" title="Terraform wrapper for DRY code">
+                        <img src="{{ url_for('static', filename='images/tech/terragrunt-logo.png') }}" alt="Terragrunt Logo" class="tech-icon">
+                        <span class="tech-link-text">Terragrunt</span>
+                    </a>
                 </div>
             </div>
 
@@ -189,6 +193,7 @@
             <div id="kubernetes" class="tech-content-panel" style="display: none;">{% include 'snippets/Kubernetes.html' %}</div>
             <div id="helm" class="tech-content-panel" style="display: none;">{% include 'snippets/Helm.html' %}</div>
             <div id="terraform" class="tech-content-panel" style="display: none;">{% include 'snippets/Terraform.html' %}</div>
+            <div id="terragrunt" class="tech-content-panel" style="display: none;">{% include 'snippets/terragrunt.html' %}</div>
             <div id="aws-ecr" class="tech-content-panel" style="display: none;">{% include 'snippets/AWS_ECR.html' %}</div>
             <div id="artifactory" class="tech-content-panel" style="display: none;">{% include 'snippets/artifactory.html' %}</div>
             <div id="xray" class="tech-content-panel" style="display: none;">{% include 'snippets/Xray.html' %}</div>
