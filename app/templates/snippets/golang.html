@@ -1,0 +1,50 @@
+<h2>Go (Golang): Concurrency-Driven Booking Application</h2>
+<p>
+    As I expand my DevOps toolkit, I've integrated Go for building high-performance CLI tools and microservices. This snippet demonstrates a booking application that leverages Go's powerful concurrency model.
+</p>
+<ul>
+    <li><strong>Strong Typing & Structs:</strong> Uses custom <code>UserData</code> types to manage complex data structures cleanly.</li>
+    <li><strong>Concurrency:</strong> Implements <code>go routines</code> and <code>sync.WaitGroup</code> to simulate asynchronous tasks, such as sending emails, without blocking the main execution thread.</li>
+    <li><strong>Input Validation:</strong> Features robust logic for validating user strings, email formats, and ticket availability before processing transactions.</li>
+</ul>
+
+<h4>main.go</h4>
+<div class="code-container">
+<pre><code><span class="code-keyword">package</span> main
+
+<span class="code-keyword">import</span> (
+    <span class="code-string">"fmt"</span>
+    <span class="code-string">"sync"</span>
+    <span class="code-string">"time"</span>
+)
+
+<span class="code-keyword">type</span> UserData <span class="code-keyword">struct</span> {
+    firstName       <span class="code-keyword">string</span>
+    lastName        <span class="code-keyword">string</span>
+    email           <span class="code-keyword">string</span>
+    numberOfTickets <span class="code-keyword">uint</span>
+}
+
+<span class="code-keyword">var</span> wg = sync.WaitGroup{}
+
+<span class="code-keyword">func</span> main() {
+    <span class="code-comment">// ... (Greeting and Input logic)</span>
+    <span class="code-keyword">if</span> isValidName && isValidEmail && isValidTicketNumber {
+        bookTicket(userTickets, firstName, lastName, email)
+
+        <span class="code-comment">// Start a goroutine for asynchronous processing</span>
+        wg.Add(<span class="code-number">1</span>)
+        <span class="code-keyword">go</span> sendTicket(userTickets, firstName, lastName, email)
+
+        wg.Wait()
+    }
+}
+
+<span class="code-keyword">func</span> sendTicket(userTickets <span class="code-keyword">uint</span>, firstName <span class="code-keyword">string</span>, lastName <span class="code-keyword">string</span>, email <span class="code-keyword">string</span>) {
+    time.Sleep(<span class="code-number">10</span> * time.Second)
+    <span class="code-keyword">var</span> ticket = fmt.Sprintf(<span class="code-string">"%v tickets for %v %v"</span>, userTickets, firstName, lastName)
+    fmt.Printf(<span class="code-string">"Sending ticket: %v to email address %v\n"</span>, ticket, email)
+    wg.Done()
+}
+</code></pre>
+</div>
