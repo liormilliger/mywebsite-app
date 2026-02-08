@@ -1,11 +1,13 @@
 <h2>Go (Golang): Concurrency-Driven Booking Application</h2>
 <p>
-    As I expand my DevOps toolkit, I've integrated Go for building high-performance CLI tools and microservices. This snippet demonstrates a booking application that leverages Go's powerful concurrency model.
+    This application demonstrates the use of Go for building efficient CLI tools.<br>
+    It manages a ticket booking system for a conference, utilizing Go's unique features to handle data validation,<br>
+    structured data, and asynchronous tasks.
 </p>
 <ul>
-    <li><strong>Strong Typing & Structs:</strong> Uses custom <code>UserData</code> types to manage complex data structures cleanly.</li>
-    <li><strong>Concurrency:</strong> Implements <code>go routines</code> and <code>sync.WaitGroup</code> to simulate asynchronous tasks, such as sending emails, without blocking the main execution thread.</li>
-    <li><strong>Input Validation:</strong> Features robust logic for validating user strings, email formats, and ticket availability before processing transactions.</li>
+    <li><strong>Concurrency with Goroutines:</strong> Uses <code>go sendTicket(...)</code> to handle time-consuming tasks in the background without blocking the user flow.</li>
+    <li><strong>WaitGroups:</strong> Implements <code>sync.WaitGroup</code> to ensure the main program waits for all background tasks to complete before exiting.</li>
+    <li><strong>Structs and Slices:</strong> Manages complex user data through custom <code>struct</code> types and dynamic <code>slices</code> for storage.</li>
 </ul>
 
 <h4>main.go</h4>
@@ -18,6 +20,12 @@
     <span class="code-string">"time"</span>
 )
 
+<span class="code-keyword">const</span> conferenceTickets = <span class="code-number">50</span>
+
+<span class="code-keyword">var</span> conferenceName = <span class="code-string">"Go Conference"</span>
+<span class="code-keyword">var</span> remainingTickets <span class="code-keyword">uint</span> = <span class="code-number">50</span>
+<span class="code-keyword">var</span> bookings = make([]UserData, <span class="code-number">0</span>)
+
 <span class="code-keyword">type</span> UserData <span class="code-keyword">struct</span> {
     firstName       <span class="code-keyword">string</span>
     lastName        <span class="code-keyword">string</span>
@@ -28,22 +36,89 @@
 <span class="code-keyword">var</span> wg = sync.WaitGroup{}
 
 <span class="code-keyword">func</span> main() {
-    <span class="code-comment">// ... (Greeting and Input logic)</span>
+    greetUsers()
+
+    firstName, lastName, email, userTickets := getUserInput()
+    <span class="code-comment">// Validation logic assumed via helper functions</span>
+    isValidName, isValidEmail, isValidTicketNumber := validateUserInput(firstName, lastName, email, userTickets, remainingTickets)
+
     <span class="code-keyword">if</span> isValidName && isValidEmail && isValidTicketNumber {
         bookTicket(userTickets, firstName, lastName, email)
 
-        <span class="code-comment">// Start a goroutine for asynchronous processing</span>
         wg.Add(<span class="code-number">1</span>)
         <span class="code-keyword">go</span> sendTicket(userTickets, firstName, lastName, email)
 
-        wg.Wait()
+        firstNames := getFirstNames()
+        fmt.Printf(<span class="code-string">"The first names of bookings are: %v\n"</span>, firstNames)
+
+        <span class="code-keyword">if</span> remainingTickets == <span class="code-number">0</span> {
+            fmt.Println(<span class="code-string">"Our conference is booked out. Come back next year!"</span>)
+        }
+    } <span class="code-keyword">else</span> {
+        <span class="code-keyword">if</span> !isValidName {
+            fmt.Println(<span class="code-string">"first name or last name you entered is shorter than 2 characters"</span>)
+        }
+        <span class="code-keyword">if</span> !isValidEmail {
+            fmt.Println(<span class="code-string">"email address you entered doesn't contain @ sign"</span>)
+        }
+        <span class="code-keyword">if</span> !isValidTicketNumber {
+            fmt.Println(<span class="code-string">"number of tickets you entered is invalid"</span>)
+        }
     }
+    wg.Wait()
+}
+
+<span class="code-keyword">func</span> greetUsers() {
+    fmt.Printf(<span class="code-string">"Welcome to %v booking application\n"</span>, conferenceName)
+    fmt.Printf(<span class="code-string">"We have a total of %v tickets, and %v are still available\n"</span>, conferenceTickets, remainingTickets)
+    fmt.Println(<span class="code-string">"Get your tickets here to attend"</span>)
+}
+
+<span class="code-keyword">func</span> getFirstNames() []<span class="code-keyword">string</span> {
+    firstNames := []<span class="code-keyword">string</span>{}
+    <span class="code-keyword">for</span> _, booking := <span class="code-keyword">range</span> bookings {
+        firstNames = append(firstNames, booking.firstName)
+    }
+    <span class="code-keyword">return</span> firstNames
+}
+
+<span class="code-keyword">func</span> getUserInput() (<span class="code-keyword">string</span>, <span class="code-keyword">string</span>, <span class="code-keyword">string</span>, <span class="code-keyword">uint</span>) {
+    <span class="code-keyword">var</span> firstName, lastName, email <span class="code-keyword">string</span>
+    <span class="code-keyword">var</span> userTickets <span class="code-keyword">uint</span>
+
+    fmt.Println(<span class="code-string">"Please enter your first name: "</span>)
+    fmt.Scan(&firstName)
+    fmt.Println(<span class="code-string">"Please enter your last name: "</span>)
+    fmt.Scan(&lastName)
+    fmt.Println(<span class="code-string">"Please enter your email address: "</span>)
+    fmt.Scan(&email)
+    fmt.Println(<span class="code-string">"How many tickets do you want? "</span>)
+    fmt.Scan(&userTickets)
+
+    <span class="code-keyword">return</span> firstName, lastName, email, userTickets
+}
+
+<span class="code-keyword">func</span> bookTicket(userTickets <span class="code-keyword">uint</span>, firstName <span class="code-keyword">string</span>, lastName <span class="code-keyword">string</span>, email <span class="code-keyword">string</span>) {
+    remainingTickets = remainingTickets - userTickets
+
+    <span class="code-keyword">var</span> userData = UserData{
+        firstName:       firstName,
+        lastName:        lastName,
+        email:           email,
+        numberOfTickets: userTickets,
+    }
+
+    bookings = append(bookings, userData)
+    fmt.Printf(<span class="code-string">"Thank you %v %v for booking %v tickets. Confirmation sent to %v\n"</span>, firstName, lastName, userTickets, email)
+    fmt.Printf(<span class="code-string">"%v remaining tickets for %v\n"</span>, remainingTickets, conferenceName)
 }
 
 <span class="code-keyword">func</span> sendTicket(userTickets <span class="code-keyword">uint</span>, firstName <span class="code-keyword">string</span>, lastName <span class="code-keyword">string</span>, email <span class="code-keyword">string</span>) {
     time.Sleep(<span class="code-number">10</span> * time.Second)
     <span class="code-keyword">var</span> ticket = fmt.Sprintf(<span class="code-string">"%v tickets for %v %v"</span>, userTickets, firstName, lastName)
-    fmt.Printf(<span class="code-string">"Sending ticket: %v to email address %v\n"</span>, ticket, email)
+    fmt.Println(<span class="code-string">"################"</span>)
+    fmt.Printf(<span class="code-string">"Sending ticket:\n %v to email address %v\n"</span>, ticket, email)
+    fmt.Println(<span class="code-string">"################"</span>)
     wg.Done()
 }
 </code></pre>
