@@ -23,6 +23,10 @@ def home():
     app.logger.info(f"[{request.path}] - Home page accessed.")
     return render_template('index.html')
 
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('static', 'sitemap.xml')
+
 @app.route('/about-me')
 def about():
     app.logger.info(f"[{request.path}] - About Me page accessed.")
