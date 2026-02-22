@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template, send_from_directory, request, redirect
 from prometheus_flask_exporter import PrometheusMetrics
 import os
 import logging
@@ -46,13 +46,18 @@ def home():
     app.logger.warning(f"[{request.path}] - This is a sample warning message for demonstration.")
     return render_template('index.html')
 
+@app.before_request
+def remove_trailing_slash():
+    if request.path != '/' and request.path.endswith('/'):
+        return redirect(request.path[:-1], code=301)
+    
 @app.route('/sitemap.xml')
 def sitemap():
-    return send_from_directory('static', 'sitemap.xml')
+    return send_from_directory('static', 'sitemap.xml', mimetype='application/xml')
 
 @app.route('/robots.txt')
 def robots():
-    return send_from_directory('static', 'robots.txt')
+    return send_from_directory('static', 'robots.txt', mimetype='text/plain')
 
 @app.route('/about-me')
 def about():
