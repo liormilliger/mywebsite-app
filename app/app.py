@@ -50,6 +50,10 @@ def home():
 def sitemap():
     return send_from_directory('static', 'sitemap.xml')
 
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory('static', 'robots.txt')
+
 @app.route('/about-me')
 def about():
     app.logger.info(f"[{request.path}] - About Me page accessed.")
