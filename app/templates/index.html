@@ -7,18 +7,17 @@
     
     <div class="intro-container">
         <img src="{{ url_for('static', filename='files/LiorPhoto.jpg') }}" alt="A photo of Lior Milliger" class="profile-photo">
-        <h1 class="welcome-heading">Lior Milliger - DevOps Engineer</h1>
+        <div class="welcome-text">
+            <h1 class="welcome-heading">Lior Milliger</h1>
+            <p class="role-titles">Platform Engineer · DevOps & Cloud Infrastructure · AI Systems Architect</p>
+        </div>
     </div>
 
-        
     <div class="about-text">
-        <p>As a transformed professional improvising musician, I am well practiced with learning new languages and approaches. Structures are fluid, theory is translated to hands-on performance, compositions, orchestrations — all well harmonized to serve music at its best.</p>
-        <p>I do DevOps now, and I find my abilities as a musician take place and ownership in the tech world. I like to challenge myself with new technologies, structures and tasks that push my limits further, exploring new territories.</p>
-        <p>My experience as a musical education project manager has given me skills to plan, lead and execute large scale projects end to end, working with amazing pros together to deliver in a fast-paced, changing demands time framework.</p>
-        <p>From architecting Kubernetes clusters to implementing IaC with Terraform and Terragrunt, I build systems that are resilient and scalable. I design and optimize CI/CD pipelines — utilizing tools like Jenkins, GHA and ArgoCD — to ensure the journey from commit to production is seamless.</p>
-        <p>My technical curiosity extends into building custom tools in Go and Python backed by CCNA-level networking knowledge. I leverage AI and agentic workflows to automate complex DevOps tasks, pushing the boundaries of progress and moving infrastructure management into the next generation of efficiency.</p>
-        <p>With strong interpersonal abilities and communication, I facilitate better collaboration between different teams to remove friction and align goals to get things done. Much like with musical improvisation, I am comfortable pivoting in high-pressure environments and adapting to shifting project requirements.</p>
-        <p>I take full responsibility for the project lifecycle, managing complex tasks with a focus on accountability and high-quality results.</p>
+        <p>Platform Engineer and AI Systems Architect with 4+ years building production infrastructure end-to-end — from cloud-native Kubernetes platforms on AWS to edge deployments and air-gapped environments. AWS SAA and CKA certified.</p>
+        <p>Currently at Polus Tech, I led the full migration of an edge intelligence platform to a 13-microservice K3s cluster with FluxCD GitOps, and architected AI-Ops ingestion pipelines using RAG, n8n, and AWS Bedrock. At JFrog, I applied FinOps practices that eliminated 80% of cloud waste — cutting monthly cloud spend by 30%.</p>
+        <p>I specialize in microservices migrations, GitOps automation, and AI-driven systems. My stack covers Kubernetes, Helm, Terraform/Terragrunt, GitHub Actions, Jenkins, and ArgoCD — and on the AI side: Claude, Gemini APIs, n8n, Qdrant, and AWS Bedrock. I build with Python, Go, and Bash.</p>
+        <p>Before tech, I spent 30 years as a professional musician — founding a 20-piece Big Band, designing education networks for municipalities, and performing in New York City. That career is where I learned to orchestrate complex systems, lead under pressure, and adapt fast. Those same skills are how I build infrastructure today.</p>
     </div>
 </div>
 {% endblock %}

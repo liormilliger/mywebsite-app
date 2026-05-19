@@ -142,10 +142,24 @@ main {
     object-fit: cover;
 }
 
+.welcome-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
 .intro-container .welcome-heading {
     font-size: 1.8rem;
     font-weight: 300;
     margin: 0;
+    text-align: center;
+}
+
+.role-titles {
+    font-size: 0.9rem;
+    color: rgba(236, 223, 204, 0.65);
+    margin: 0;
+    letter-spacing: 0.03em;
     text-align: center;
 }
 
@@ -998,6 +1012,10 @@ footer {
     }
     .intro-container .welcome-heading {
         font-size: 2.2rem;
+        text-align: left;
+    }
+
+    .role-titles {
         text-align: left;
     }
 
