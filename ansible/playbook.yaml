@@ -44,6 +44,19 @@
       args:
         chdir: "{{ project_root }}"
 
+    - name: Ensure certbot container is running
+      command: docker compose up -d --no-deps certbot
+      args:
+        chdir: "{{ project_root }}"
+
+    - name: Install daily nginx reload cron (picks up renewed certs)
+      cron:
+        name: "reload nginx after certbot renewal"
+        minute: "30"
+        hour: "3"
+        job: "/usr/bin/docker exec mywebsite-nginx nginx -s reload >> /var/log/nginx-reload.log 2>&1"
+        user: root
+
     - name: Wait for App to initialize
       wait_for:
         timeout: 10
