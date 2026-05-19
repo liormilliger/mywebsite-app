@@ -28,7 +28,7 @@ fi
 echo "### Creating dummy certificate for $domains ..."
 path="/etc/letsencrypt/live/$domains"
 mkdir -p "$data_path/conf/live/$domains"
-docker-compose --env-file .env run --rm --entrypoint "\
+docker compose --env-file .env run --rm --entrypoint "\
   openssl req -x509 -nodes -newkey rsa:$rsa_key_size -days 1\
     -keyout '$path/privkey.pem' \
     -out '$path/fullchain.pem' \
@@ -36,11 +36,11 @@ docker-compose --env-file .env run --rm --entrypoint "\
 echo
 
 echo "### Starting nginx ..."
-docker-compose --env-file .env up --force-recreate -d nginx
+docker compose --env-file .env up --force-recreate -d nginx
 echo
 
 echo "### Deleting dummy certificate for $domains ..."
-docker-compose --env-file .env run --rm --entrypoint "\
+docker compose --env-file .env run --rm --entrypoint "\
   rm -Rf /etc/letsencrypt/live/$domains && \
   rm -Rf /etc/letsencrypt/archive/$domains && \
   rm -Rf /etc/letsencrypt/renewal/$domains.conf" certbot
@@ -60,7 +60,7 @@ esac
 staging_arg=""
 if [ $staging != "0" ]; then staging_arg="--staging"; fi
 
-docker-compose --env-file .env run --rm --entrypoint "\
+docker compose --env-file .env run --rm --entrypoint "\
   certbot certonly --webroot -w /var/www/certbot \
     $staging_arg \
     $email_arg \
@@ -71,11 +71,11 @@ docker-compose --env-file .env run --rm --entrypoint "\
 echo
 
 echo "### Reloading nginx ..."
-docker-compose --env-file .env exec nginx nginx -s reload
+docker compose --env-file .env exec nginx nginx -s reload
 echo
 
 echo "### Starting all application services ..."
-docker-compose --env-file .env up -d
+docker compose --env-file .env up -d
 echo
 
 echo "### SSL staging setup complete! Your application is running with a test certificate. ###"
