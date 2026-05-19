@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory, request, redirect
+from flask import Flask, render_template, send_from_directory, request, redirect, g
 from prometheus_flask_exporter import PrometheusMetrics
 import os
 import logging
@@ -8,8 +8,11 @@ from db import log_visitor, get_db
 app = Flask(__name__)
 
 # --- Database Setup ---
-# Initialize the database and register a command to run it from the command line if needed.
-app.teardown_appcontext(lambda e: get_db().close())
+@app.teardown_appcontext
+def close_db(e=None):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
 
 # --- Prometheus Metrics Configuration ---
 metrics = PrometheusMetrics(app)
