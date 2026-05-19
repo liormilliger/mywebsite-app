@@ -1019,9 +1019,10 @@ footer {
         text-align: left;
     }
 
-    /* Tech stack */
-    .tech-list { grid-template-columns: repeat(5, 1fr); }
-    .tech-display { display: block; }
+    /* Tech stack: side-by-side panel layout */
+    .tech-container { flex-direction: row; align-items: flex-start; gap: 2rem; }
+    .tech-list { flex: 0 0 250px; grid-template-columns: 1fr; position: sticky; top: 1.5rem; align-self: flex-start; }
+    .tech-display { flex: 1; display: block; min-width: 0; }
     .tech-content-panel code { font-size: 0.95rem; }
 
     /* Grids */

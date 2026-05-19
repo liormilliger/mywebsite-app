@@ -273,9 +273,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 targetPanel.style.display = 'block';
             }
             
-            // Hide the list and show the content display area
-            if (techList) techList.style.display = 'none';
-            if (techDisplay) techDisplay.style.display = 'block';
+            // Mobile: swap to full-screen display view. Desktop: list stays visible.
+            if (window.innerWidth < 993) {
+                if (techList) techList.style.display = 'none';
+                if (techDisplay) techDisplay.style.display = 'block';
+            }
 
             // Close any open dropdowns
             document.querySelectorAll('.tech-category-content.open').forEach(openContent => {
