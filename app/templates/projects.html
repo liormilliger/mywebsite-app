@@ -6,10 +6,18 @@
 <div class="page-content">
     <h1>My Projects</h1>
     <div class="projects-grid">
-        
-        <div class="project-card">
+
+        <div class="project-card project-card--featured">
             <h2>This Website</h2>
-            <p>The portfolio website you are currently viewing, built with Python (Flask), HTML, CSS, and JavaScript, based on Terraform Iac, AWS, K8S and ArgoCD, to showcase my work and skills.</p>
+            <div class="tech-chips">
+                <span class="chip">Python</span>
+                <span class="chip">Flask</span>
+                <span class="chip">Docker</span>
+                <span class="chip">Kubernetes</span>
+                <span class="chip">Terraform</span>
+                <span class="chip">ArgoCD</span>
+            </div>
+            <p>The portfolio website you are currently viewing, built with Python (Flask), HTML, CSS, and JavaScript, based on Terraform IaC, AWS, K8S and ArgoCD, to showcase my work and skills.</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/mywebsite-app.git" target="_blank" rel="noopener noreferrer">
                     <i class="fab fa-github"></i> View on GitHub
@@ -19,6 +27,13 @@
 
         <div class="project-card">
             <h2>Portfolio Blog</h2>
+            <div class="tech-chips">
+                <span class="chip">Docker</span>
+                <span class="chip">Kubernetes</span>
+                <span class="chip">Nginx</span>
+                <span class="chip">MySQL</span>
+                <span class="chip">Microservices</span>
+            </div>
             <p>A full-stack microservices blog application designed to host articles, tutorials, and project deep-dives, demonstrating content management and web development skills, and Monolith to Microservices migration</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/Portfolio-app.git" target="_blank" rel="noopener noreferrer">
@@ -26,9 +41,16 @@
                 </a>
             </div>
         </div>
-        
-        <div class="project-card">
+
+        <div class="project-card project-card--featured">
             <h2>Mission Recorder Subsystem</h2>
+            <div class="tech-chips">
+                <span class="chip">Python</span>
+                <span class="chip">Docker</span>
+                <span class="chip">Fluent-bit</span>
+                <span class="chip">Edge</span>
+                <span class="chip">Air-gapped</span>
+            </div>
             <p>An event-triggered data collection subsystem designed for air-gapped edge devices. It automates the gathering and packaging of logs and system data using Python, Docker, and Fluent-bit to ensure observability in isolated environments.</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/mission-recorder.git" target="_blank" rel="noopener noreferrer">
@@ -39,6 +61,13 @@
 
         <div class="project-card">
             <h2>Terragrunt Infrastructure</h2>
+            <div class="tech-chips">
+                <span class="chip">Terraform</span>
+                <span class="chip">Terragrunt</span>
+                <span class="chip">AWS</span>
+                <span class="chip">EKS</span>
+                <span class="chip">IaC</span>
+            </div>
             <p>This project is a result of a self-made course for understanding the core of Terragrunt. It demonstrates advanced IaC principles by DRYing up Terraform code, managing remote state, and orchestrating multi-environment deployments for VPCs and EKS clusters.</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/terragrunt-course.git" target="_blank" rel="noopener noreferrer">
@@ -49,6 +78,11 @@
 
         <div class="project-card">
             <h2>Golang Booking Application</h2>
+            <div class="tech-chips">
+                <span class="chip">Go</span>
+                <span class="chip">Concurrency</span>
+                <span class="chip">CLI</span>
+            </div>
             <p>A CLI-based application built while mastering the Go programming language. It focuses on core Golang concepts such as concurrency (Goroutines), pointers, and structured data to handle real-time booking logic efficiently.</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/golang-booking-app.git" target="_blank" rel="noopener noreferrer">
@@ -56,9 +90,15 @@
                 </a>
             </div>
         </div>
-        
+
         <div class="project-card">
             <h2>Chatapp</h2>
+            <div class="tech-chips">
+                <span class="chip">WebSockets</span>
+                <span class="chip">MySQL</span>
+                <span class="chip">Nginx</span>
+                <span class="chip">Docker</span>
+            </div>
             <p>A real-time chat application built to explore and implement WebSocket technology for instant two-way communication. Based on a simple microservices architecture including MySQL DB and Nginx reverse-proxy</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/Chatapp.git" target="_blank" rel="noopener noreferrer">
@@ -66,9 +106,14 @@
                 </a>
             </div>
         </div>
-        
+
         <div class="project-card">
             <h2>Blue-Green Deployment</h2>
+            <div class="tech-chips">
+                <span class="chip">Terraform</span>
+                <span class="chip">AWS</span>
+                <span class="chip">Nginx</span>
+            </div>
             <p>A demonstration of Blue-Green deployment using Terraform and AWS. Nginx redirects traffic to the green server and has the blue server as a backup server in case the green one fails.</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/Blue-Green-Demo.git" target="_blank" rel="noopener noreferrer">
@@ -77,18 +122,30 @@
             </div>
         </div>
 
-        <div class="project-card">
+        <div class="project-card project-card--featured">
             <h2>Kafka Data Shipping</h2>
-            <p>Kafka data shipping microservices architecture, using Java producer-consumer services to stream data between MySQL and Kafka. Deployed on AWS::EKS using Terraform IaC, CICD process was automated with GitHub Actions to build and push container images to ECR.</p>
+            <div class="tech-chips">
+                <span class="chip">Kafka</span>
+                <span class="chip">Java</span>
+                <span class="chip">AWS EKS</span>
+                <span class="chip">Terraform</span>
+                <span class="chip">GitHub Actions</span>
+            </div>
+            <p>Kafka data shipping microservices architecture, using Java producer-consumer services to stream data between MySQL and Kafka. Deployed on AWS EKS using Terraform IaC, CI/CD process was automated with GitHub Actions to build and push container images to ECR.</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/kafka-data-shipper.git" target="_blank" rel="noopener noreferrer">
                     <i class="fab fa-github"></i> View on GitHub
                 </a>
             </div>
         </div>
-        
+
         <div class="project-card">
             <h2>Prometheus Data Collector</h2>
+            <div class="tech-chips">
+                <span class="chip">Prometheus</span>
+                <span class="chip">Python</span>
+                <span class="chip">Metrics</span>
+            </div>
             <p>A custom data collector (exporter) for the Prometheus monitoring system, created to gather and expose specific metrics for observability.</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/prometheus-data-collector.git" target="_blank" rel="noopener noreferrer">
@@ -99,6 +156,11 @@
 
         <div class="project-card">
             <h2>GateUP (Serverless)</h2>
+            <div class="tech-chips">
+                <span class="chip">AWS Lambda</span>
+                <span class="chip">Serverless</span>
+                <span class="chip">Automation</span>
+            </div>
             <p>A utility tool designed to manage and automate gate operations, focusing on system integration and remote control. Based on Serverless event-based operations</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/GateUP.git" target="_blank" rel="noopener noreferrer">
@@ -109,6 +171,11 @@
 
         <div class="project-card">
             <h2>Ansible Automation</h2>
+            <div class="tech-chips">
+                <span class="chip">Ansible</span>
+                <span class="chip">Zero-downtime</span>
+                <span class="chip">DevOps</span>
+            </div>
             <p>An automation project demonstrating rolling update deployment strategies using Ansible playbooks. Designed to ensure zero-downtime deployments by updating server groups sequentially while maintaining service availability.</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/ansible-rolling-update.git" target="_blank" rel="noopener noreferrer">
@@ -119,6 +186,11 @@
 
         <div class="project-card">
             <h2>Linux Server Data Collection</h2>
+            <div class="tech-chips">
+                <span class="chip">Bash</span>
+                <span class="chip">Linux</span>
+                <span class="chip">Shell</span>
+            </div>
             <p>A collection of Bash scripts and tools for gathering, processing, and analyzing performance and system data from Linux servers.</p>
             <div class="project-links">
                 <a href="https://github.com/liormilliger/linux-srv-data-collection.git" target="_blank" rel="noopener noreferrer">

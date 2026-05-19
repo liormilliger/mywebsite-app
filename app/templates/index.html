@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Lior Milliger - Home{% endblock %}
+{% block title %}Lior Milliger | Platform Engineer & AI Systems Architect{% endblock %}
 
 {% block content %}
 <div class="homepage-content">
@@ -10,6 +10,26 @@
         <div class="welcome-text">
             <h1 class="welcome-heading">Lior Milliger</h1>
             <p class="role-titles">Platform Engineer · DevOps & Cloud Infrastructure · AI Systems Architect</p>
+            <span class="availability-badge">Open to Opportunities</span>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-number">4+</span>
+            <span class="stat-label">Years Experience</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">3</span>
+            <span class="stat-label">Certifications</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">13</span>
+            <span class="stat-label">Microservice Platform</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">30%</span>
+            <span class="stat-label">Cloud Cost Reduction</span>
         </div>
     </div>
 
@@ -18,6 +38,15 @@
         <p>Currently at Polus Tech, I led the full migration of an edge intelligence platform to a 13-microservice K3s cluster with FluxCD GitOps, and architected AI-Ops ingestion pipelines using RAG, n8n, and AWS Bedrock. At JFrog, I applied FinOps practices that eliminated 80% of cloud waste — cutting monthly cloud spend by 30%.</p>
         <p>I specialize in microservices migrations, GitOps automation, and AI-driven systems. My stack covers Kubernetes, Helm, Terraform/Terragrunt, GitHub Actions, Jenkins, and ArgoCD — and on the AI side: Claude, Gemini APIs, n8n, Qdrant, and AWS Bedrock. I build with Python, Go, and Bash.</p>
         <p>Before tech, I spent 30 years as a professional musician — founding a 20-piece Big Band, designing education networks for municipalities, and performing in New York City. That career is where I learned to orchestrate complex systems, lead under pressure, and adapt fast. Those same skills are how I build infrastructure today.</p>
+    </div>
+
+    <div class="hero-cta">
+        <a href="{{ url_for('static', filename='files/LiorMilligerCV.pdf') }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-download"></i> Download CV
+        </a>
+        <a href="{{ url_for('contact') }}" class="btn btn-secondary">
+            <i class="fas fa-envelope"></i> Contact Me
+        </a>
     </div>
 </div>
 {% endblock %}

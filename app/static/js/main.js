@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.toggle('active');
             const icon = this.querySelector('.accordion-icon');
             const content = this.nextElementSibling;
-            
+
             if (content.style.maxHeight) {
                 content.style.maxHeight = null;
                 if(icon) icon.textContent = '+';
@@ -45,4 +45,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // --- Scroll Fade-in Animations ---
+    if ('IntersectionObserver' in window) {
+        const targets = [
+            ...document.querySelectorAll('.project-card'),
+            ...document.querySelectorAll('.grid-item'),
+            ...document.querySelectorAll('.contact-item'),
+            ...document.querySelectorAll('.stat-item'),
+            ...document.querySelectorAll('.about-me-content section'),
+        ];
+
+        targets.forEach(el => el.classList.add('fade-in-up'));
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.08 });
+
+        targets.forEach(el => observer.observe(el));
+    }
 });

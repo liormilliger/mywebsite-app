@@ -2,7 +2,7 @@
 body {
     background-color: #0B192C;
     color: #ECDFCC;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
@@ -16,7 +16,7 @@ nav {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 1.5rem;
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
     position: relative;
     z-index: 1001;
@@ -157,7 +157,7 @@ main {
 
 .role-titles {
     font-size: 0.9rem;
-    color: rgba(236, 223, 204, 0.65);
+    color: rgba(56, 189, 248, 0.85);
     margin: 0;
     letter-spacing: 0.03em;
     text-align: center;
@@ -223,7 +223,7 @@ footer {
 .tech-category-frame {
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 8px;
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     position: relative;
     margin-bottom: 0;
 }
@@ -272,7 +272,7 @@ footer {
     left: 0;
     right: 0;
     z-index: 100;
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-top: none;
     border-radius: 0 0 8px 8px;
@@ -428,7 +428,7 @@ footer {
     align-items: center;
     text-align: center;
     gap: 0.5rem;
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 8px;
     padding: 1rem;
@@ -479,7 +479,7 @@ footer {
 .about-me-menu {
     position: static;
     align-self: stretch;
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 8px;
     padding: 4px 0;
@@ -553,7 +553,7 @@ footer {
 }
 
 .accordion-header {
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     color: #ECDFCC;
     cursor: pointer;
     padding: 12px 18px;
@@ -621,7 +621,7 @@ footer {
     text-align: center;
     font-weight: bold;
     color: rgba(236, 223, 204, 0.6);
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     border-right: none;
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
     transition: background-color 0.5s ease, color 0.5s ease;
@@ -694,7 +694,7 @@ footer {
 }
 
 .grid-item {
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 8px;
     padding: 1rem;
@@ -820,7 +820,7 @@ footer {
 }
 
 .vulnerability-table thead th {
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     font-weight: bold;
     color: #FFFFFF;
 }
@@ -845,7 +845,7 @@ footer {
 }
 
 .project-card {
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     border: 1px solid rgba(236, 223, 204, 0.2);
     border-radius: 8px;
     padding: 1.5rem;
@@ -1101,7 +1101,7 @@ footer {
     border-bottom: 1px solid rgba(236, 223, 204, 0.2);
 }
 .python-accordion .accordion-header {
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     color: #ECDFCC;
     cursor: pointer;
     padding: 15px 20px;
@@ -1156,7 +1156,7 @@ footer {
 .code-class { color: #8be9fd; }
 
 .helm-accordion {
-    background-color: #0c1a2e;
+    background-color: #0d1f38;
     color: #ECDFCC;
     cursor: pointer;
     padding: 18px;
@@ -1211,3 +1211,252 @@ footer {
 .accordion-header.active + .accordion-content { max-height: 3000px; }
 .python-accordion .accordion-header.active + .accordion-content { max-height: 3000px; }
 .helm-accordion.active + .helm-panel { max-height: 3000px; }
+
+/* ===================================================================== */
+/* =================== TYPOGRAPHY: SPACE GROTESK HEADINGS ============== */
+/* ===================================================================== */
+
+h1, h2, h3, h4, h5,
+.nav-brand a,
+.welcome-heading,
+.stat-number,
+.btn,
+.featured-badge,
+.availability-badge,
+.chip {
+    font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+}
+
+/* ===================================================================== */
+/* =================== ACCENT COLOUR OVERRIDES ========================= */
+/* ===================================================================== */
+
+.nav-icon-links .nav-button {
+    border-color: #38BDF8;
+    color: #38BDF8;
+}
+.nav-icon-links .nav-button:hover {
+    background-color: #38BDF8;
+    color: #0B192C;
+}
+
+.tech-link.active {
+    background-color: rgba(56, 189, 248, 0.12);
+}
+.tech-link.active .tech-link-text {
+    color: #38BDF8;
+}
+
+.snippet-intro { border-left-color: #38BDF8; }
+
+.about-me-menu a:hover { border-bottom-color: #38BDF8; }
+@media (min-width: 993px) {
+    .about-me-menu a:hover { border-left-color: #38BDF8; border-bottom-color: transparent; }
+}
+
+.project-links a { border-color: rgba(56, 189, 248, 0.5); color: #38BDF8; }
+.project-links a:hover { background-color: #38BDF8; color: #0B192C; }
+
+.back-to-list-btn { border-color: #38BDF8; color: #38BDF8; }
+#reset-pipeline-btn { border-color: #38BDF8; color: #38BDF8; }
+#reset-pipeline-btn:hover { background-color: #38BDF8; color: #0B192C; }
+
+.about-me-content a,
+.about-me-intro a { color: #38BDF8; }
+
+/* ===================================================================== */
+/* =================== AVAILABILITY BADGE ============================== */
+/* ===================================================================== */
+
+.availability-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #38BDF8;
+    background-color: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-top: 0.6rem;
+    width: fit-content;
+}
+
+.availability-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #38BDF8;
+    flex-shrink: 0;
+    animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* ===================================================================== */
+/* =================== HERO CTA BUTTONS ================================ */
+/* ===================================================================== */
+
+.hero-cta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 11px 26px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+    border: none;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background-color: #38BDF8;
+    color: #0B192C;
+}
+.btn-primary:hover {
+    background-color: #7DD3FC;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #38BDF8;
+    border: 1px solid rgba(56, 189, 248, 0.5);
+}
+.btn-secondary:hover {
+    background-color: rgba(56, 189, 248, 0.08);
+    border-color: #38BDF8;
+    transform: translateY(-2px);
+}
+
+@media (min-width: 993px) {
+    .hero-cta { justify-content: flex-start; }
+}
+
+/* ===================================================================== */
+/* =================== STATS BAR ======================================= */
+/* ===================================================================== */
+
+.stats-bar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background-color: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.12);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 2rem 0;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 1rem;
+    background-color: #0d1f38;
+    text-align: center;
+    gap: 0.3rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #38BDF8;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.72rem;
+    color: rgba(236, 223, 204, 0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-family: 'Inter', sans-serif;
+}
+
+@media (min-width: 769px) {
+    .stats-bar { grid-template-columns: repeat(4, 1fr); }
+    .stat-number { font-size: 2.2rem; }
+}
+
+/* ===================================================================== */
+/* =================== TECH CHIPS ON PROJECT CARDS ===================== */
+/* ===================================================================== */
+
+.tech-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+}
+
+.chip {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: rgba(56, 189, 248, 0.85);
+    background-color: rgba(56, 189, 248, 0.07);
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    border-radius: 4px;
+    padding: 2px 8px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+/* ===================================================================== */
+/* =================== FEATURED PROJECT CARDS ========================== */
+/* ===================================================================== */
+
+.project-card--featured {
+    border-color: rgba(56, 189, 248, 0.35);
+    position: relative;
+    overflow: visible;
+}
+
+.project-card--featured::before {
+    content: 'Featured';
+    position: absolute;
+    top: -1px;
+    right: 1.2rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #0B192C;
+    background-color: #38BDF8;
+    padding: 3px 10px;
+    border-radius: 0 0 6px 6px;
+}
+
+/* ===================================================================== */
+/* =================== SCROLL FADE-IN ANIMATIONS ======================= */
+/* ===================================================================== */
+
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
