@@ -49,12 +49,13 @@
       args:
         chdir: "{{ project_root }}"
 
-    - name: Install daily nginx reload cron (picks up renewed certs)
+    - name: Install weekly cert renewal cron
       cron:
-        name: "reload nginx after certbot renewal"
+        name: "renew letsencrypt cert and reload nginx"
         minute: "30"
         hour: "3"
-        job: "/usr/bin/docker exec mywebsite-nginx nginx -s reload >> /var/log/nginx-reload.log 2>&1"
+        weekday: "1"
+        job: "cd {{ project_root }} && bash renew-cert.sh >> /var/log/cert-renew.log 2>&1"
         user: root
 
     - name: Wait for App to initialize
