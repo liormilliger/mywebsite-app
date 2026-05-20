@@ -66,6 +66,8 @@ jobs:
       - name: Start services using Docker Compose
         env:
           WEB_IMAGE: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ needs.build.outputs.image_tag }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         run: docker-compose -f docker-compose.ci.yaml -p ci up -d
 
       - name: Wait for services to be healthy
@@ -74,13 +76,16 @@ jobs:
           sleep 15
 
       - name: Execute Database Test Script
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         run: |
           docker run --rm --network=ci_default \
             -v $(pwd)/test_db.py:/test_db.py \
             -e POSTGRES_HOST=db \
             -e POSTGRES_DB=mywebsite \
-            -e POSTGRES_USER=admin \
-            -e POSTGRES_PASSWORD=password \
+            -e POSTGRES_USER=$POSTGRES_USER \
+            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
             --entrypoint="" \
             python:3.9-slim \
             sh -c "pip install psycopg2-binary requests && python -u /test_db.py"
