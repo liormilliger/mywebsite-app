@@ -46,6 +46,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // --- Ticker Strip ---
+    const tickerEl = document.querySelector('.ticker-text');
+    if (tickerEl) {
+        const messages = [
+            '30% Cloud Cost Savings',
+            'Complex K8s Migrations',
+            'Agentic Workflows for Automating Tasks',
+            'Data Pipelines for LLMs',
+            'Modular Ansible Deployments',
+            'Umbrella-Subchart Helm Deployments',
+            'Per-Service CI/CD Pipelines',
+        ];
+        let idx = 0;
+        tickerEl.textContent = messages[0];
+
+        setInterval(() => {
+            tickerEl.classList.add('fade-out');
+            setTimeout(() => {
+                idx = (idx + 1) % messages.length;
+                tickerEl.textContent = messages[idx];
+                tickerEl.classList.remove('fade-out');
+            }, 350);
+        }, 2500);
+    }
+
     // --- Scroll Fade-in Animations ---
     if ('IntersectionObserver' in window) {
         const targets = [
