@@ -11,9 +11,9 @@ def get_db():
         try:
             g.db = psycopg2.connect(
                 host=os.environ.get('POSTGRES_HOST', 'db'),
-                dbname=os.environ.get('POSTGRES_DB', 'mywebsite'),
-                user=os.environ.get('POSTGRES_USER', 'admin'),
-                password=os.environ.get('POSTGRES_PASSWORD', 'password'),
+                dbname=os.environ['POSTGRES_DB'],
+                user=os.environ['POSTGRES_USER'],
+                password=os.environ['POSTGRES_PASSWORD'],
                 port=os.environ.get('POSTGRES_PORT', 5432)
             )
             current_app.logger.info("Database connection established.")
