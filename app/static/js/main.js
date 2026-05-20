@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 tickerEl.textContent = messages[idx];
                 tickerEl.classList.remove('fade-out');
             }, 350);
-        }, 2500);
+        }, 6000);
     }
 
     // --- Scroll Fade-in Animations ---
