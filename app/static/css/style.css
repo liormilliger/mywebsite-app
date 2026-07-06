@@ -1361,7 +1361,7 @@ h1, h2, h3, h4, h5,
 
 .stats-bar {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1px;
     background-color: rgba(56, 189, 248, 0.08);
     border: 1px solid rgba(56, 189, 248, 0.12);
@@ -1422,7 +1422,7 @@ h1, h2, h3, h4, h5,
 }
 
 @media (min-width: 769px) {
-    .stats-bar { grid-template-columns: repeat(4, 1fr); }
+    .stats-bar { grid-template-columns: repeat(5, 1fr); }
     .stat-number { font-size: 2.2rem; }
 }
 
