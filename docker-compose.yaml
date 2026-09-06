@@ -30,6 +30,7 @@ services:
       - ./logs/nginx:/var/log/nginx
       - ./app/templates/error.html:/var/www/error_pages/error.html
       - ./app/static/files/blackcat-pipelines.jpg:/var/www/error_pages/blackcat-pipelines.jpg
+    command: /bin/sh -c "nginx -g 'daemon off;' & while :; do sleep 12h & wait $$!; nginx -s reload; done"
     depends_on:
       - app
 
@@ -41,7 +42,7 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
     entrypoint: /bin/sh
-    command: -c "trap exit TERM; while :; do certbot renew --quiet; sleep 12h & wait $${!}; done;"
+    command: -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;"
 
   db:
     image: postgres:15-alpine
