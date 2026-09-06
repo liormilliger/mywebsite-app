@@ -27,6 +27,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // --- About section mobile expand/collapse ---
+    const aboutBlock = document.getElementById('aboutSummaryBlock');
+    const aboutBtn   = document.getElementById('aboutExpandBtn');
+    if (aboutBlock && aboutBtn) {
+        aboutBtn.addEventListener('click', () => {
+            const expanded = aboutBlock.classList.toggle('expanded');
+            aboutBtn.textContent = expanded ? 'Show less ↑' : 'Read more ↓';
+            aboutBtn.setAttribute('aria-expanded', expanded);
+        });
+    }
+
     // --- Hamburger Menu Logic ---
     const hamburger = document.querySelector('.hamburger-menu');
     const navLinksContainer = document.querySelector('.nav-links-container');

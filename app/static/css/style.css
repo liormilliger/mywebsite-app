@@ -1595,6 +1595,39 @@ nav { position: sticky; top: 0; z-index: 1001; }
     margin-bottom: 0;
 }
 
+.about-expand-btn {
+    display: none;
+}
+
+/* Mobile-only collapse behaviour */
+@media (max-width: 768px) {
+    .about-extra {
+        display: none;
+    }
+
+    .about-summary-block.expanded .about-extra {
+        display: block;
+    }
+
+    .about-expand-btn {
+        display: inline-block;
+        margin-top: 1rem;
+        background: none;
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        border-radius: 6px;
+        color: #38BDF8;
+        font-size: 0.88rem;
+        padding: 0.4rem 0.9rem;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+    }
+
+    .about-expand-btn:hover {
+        background: rgba(56, 189, 248, 0.08);
+        border-color: rgba(56, 189, 248, 0.7);
+    }
+}
+
 .about-cta {
     text-align: center;
     margin-top: 1rem;
