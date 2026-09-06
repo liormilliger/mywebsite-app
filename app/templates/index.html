@@ -1,60 +1,510 @@
 {% extends "base.html" %}
-
 {% block title %}Lior Milliger | Platform Engineer & AI Systems Architect{% endblock %}
 
 {% block content %}
-<div class="homepage-content">
-    
-    <div class="intro-container">
-        <img src="{{ url_for('static', filename='files/LiorPhoto.jpg') }}" alt="A photo of Lior Milliger" class="profile-photo">
-        <div class="welcome-text">
-            <h1 class="welcome-heading">Lior Milliger</h1>
-            <p class="role-titles">Platform Engineer · DevOps & Cloud Infrastructure · AI Systems Architect</p>
-            <span class="availability-badge">Open to Opportunities</span>
-        </div>
-    </div>
 
-    <div class="stats-bar">
-        <div class="stat-item">
-            <span class="stat-number">4+</span>
-            <span class="stat-label">Years of Experience</span>
-        </div>
-        <div class="stat-item">
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section id="hero" class="sp-section sp-hero">
+  <div class="sp-container">
+    <div class="hero-layout">
+      <div class="hero-photo-col">
+        <img src="{{ url_for('static', filename='files/LiorPhoto.jpg') }}" alt="Lior Milliger" class="hero-photo">
+      </div>
+      <div class="hero-text-col">
+        <h1 class="hero-name">Lior Milliger</h1>
+        <p class="hero-roles">Platform Engineer · DevOps & Cloud Infrastructure · AI Systems Architect</p>
+        <span class="availability-badge">Open to Opportunities</span>
+
+        <div class="stats-bar">
+          <div class="stat-item">
+            <span class="stat-number">3+</span>
+            <span class="stat-label">Years Experience</span>
+          </div>
+          <div class="stat-item">
             <span class="stat-number">30+</span>
             <span class="stat-label">Microservices Migrated</span>
-        </div>
-        <div class="stat-item">
+          </div>
+          <div class="stat-item">
             <span class="stat-number">80%</span>
             <span class="stat-label">Cloud Waste Eliminated</span>
-        </div>
-        <div class="stat-item">
+          </div>
+          <div class="stat-item">
             <span class="stat-number">70%</span>
-            <span class="stat-label">Faster Agentic Troubleshooting</span>
-        </div>
-        <div class="stat-item">
+            <span class="stat-label">Faster AI Troubleshooting</span>
+          </div>
+          <div class="stat-item">
             <span class="stat-number">5+</span>
             <span class="stat-label">AI Systems in Production</span>
+          </div>
         </div>
-    </div>
 
-    <div class="ticker-strip">
-        <span class="ticker-text"></span>
-    </div>
+        <div class="ticker-strip">
+          <span class="ticker-text"></span>
+        </div>
 
-    <div class="about-text">
-        <p>Platform Engineer and AI Systems Architect with 4+ years building production infrastructure end-to-end — from cloud-native Kubernetes platforms on AWS to edge deployments and air-gapped environments. AWS SAA and CKA certified.</p>
-        <p>Currently at Polus Tech, I led the full migration of an edge intelligence platform to a 13-microservice K3s cluster with FluxCD GitOps, and architected AI-Ops ingestion pipelines using RAG, n8n, and AWS Bedrock. At JFrog, I applied FinOps practices that eliminated 80% of cloud waste — cutting monthly cloud spend by 30%.</p>
-        <p>I specialize in microservices migrations, GitOps automation, and AI-driven systems. My stack covers Kubernetes, Helm, Terraform/Terragrunt, GitHub Actions, Jenkins, and ArgoCD — and on the AI side: Claude, Gemini APIs, n8n, Qdrant, and AWS Bedrock. I build with Python, Go, and Bash.</p>
-        <p>Before tech, I spent 30 years as a professional musician — founding a 20-piece Big Band, designing education networks for municipalities, and performing in New York City. That career is where I learned to orchestrate complex systems, lead under pressure, and adapt fast. Those same skills are how I build infrastructure today.</p>
-    </div>
-
-    <div class="hero-cta">
-        <a href="{{ url_for('static', filename='files/LiorMilligerCV.pdf') }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+        <div class="hero-cta">
+          <a href="{{ url_for('static', filename='files/LiorMilligerCV.pdf') }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
             <i class="fas fa-download"></i> Download CV
-        </a>
-        <a href="{{ url_for('contact') }}" class="btn btn-secondary">
+          </a>
+          <a href="#contact" class="btn btn-secondary">
             <i class="fas fa-envelope"></i> Contact Me
-        </a>
+          </a>
+        </div>
+      </div>
     </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ ABOUT ═══════════════════ -->
+<section id="about" class="sp-section sp-about">
+  <div class="sp-container">
+    <h2 class="sp-section-title">About Me</h2>
+    <p class="sp-section-sub">From music to infrastructure — a career built on orchestrating complex systems</p>
+    <div class="about-story-grid">
+      <div class="story-block">
+        <span class="story-number">01</span>
+        <h3>The Foundation</h3>
+        <p>30 years as a professional musician — founding a 20-piece Big Band, designing music education networks for municipalities, and performing in New York City. I learned to orchestrate complex systems, lead under pressure, and adapt fast. My album title says it all: <em>"Your Comfort Zone Will Kill You."</em></p>
+      </div>
+      <div class="story-block">
+        <span class="story-number">02</span>
+        <h3>The Transition</h3>
+        <p>Dove headfirst into DevOps through Develeap's rigorous 16-week bootcamp and intensive self-study across Python, CI/CD, cloud, and Kubernetes. Earned <strong>AWS SAA</strong> and <strong>CKA</strong> certifications. Built deep, practical experience across the full infrastructure lifecycle from day one.</p>
+      </div>
+      <div class="story-block">
+        <span class="story-number">03</span>
+        <h3>JFrog</h3>
+        <p>As a DevOps Support Engineer, applied FinOps using Terraform and Lambda across AWS Organizations — eliminating <strong>80% of cloud waste</strong> and cutting monthly spend by <strong>30%</strong>. Mastered deep troubleshooting across enterprise-level infrastructure, networking, and performance issues.</p>
+      </div>
+      <div class="story-block">
+        <span class="story-number">04</span>
+        <h3>Today</h3>
+        <p>Platform Engineer and AI Systems Architect at Polus Tech — leading the full migration of an edge intelligence platform to a 13-microservice K3s cluster with FluxCD GitOps, and architecting AI-Ops ingestion pipelines using RAG, n8n, and AWS Bedrock. Open to roles in cloud infrastructure, platform engineering, and AI-driven systems.</p>
+      </div>
+    </div>
+    <div class="about-cta">
+      <a href="/about-me" class="btn btn-secondary">Read Full Story</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ TECH STACK ═══════════════════ -->
+<section id="tech" class="sp-section sp-tech">
+  <div class="sp-container">
+    <h2 class="sp-section-title">Tech Stack</h2>
+    <p class="sp-section-sub">Click a category to explore the tools</p>
+    <div class="tech-cats-grid">
+      <button class="tech-cat-btn" data-cat="CI/CD">
+        <span class="cat-icon">🔄</span>
+        <span class="cat-name">CI/CD</span>
+      </button>
+      <button class="tech-cat-btn" data-cat="Containers & K8s">
+        <span class="cat-icon">📦</span>
+        <span class="cat-name">Containers & K8s</span>
+      </button>
+      <button class="tech-cat-btn" data-cat="IaC & Automation">
+        <span class="cat-icon">🏗️</span>
+        <span class="cat-name">IaC & Automation</span>
+      </button>
+      <button class="tech-cat-btn" data-cat="Cloud">
+        <span class="cat-icon">☁️</span>
+        <span class="cat-name">Cloud (AWS)</span>
+      </button>
+      <button class="tech-cat-btn" data-cat="AI & MLOps">
+        <span class="cat-icon">🤖</span>
+        <span class="cat-name">AI & MLOps</span>
+      </button>
+      <button class="tech-cat-btn" data-cat="Observability">
+        <span class="cat-icon">📊</span>
+        <span class="cat-name">Observability</span>
+      </button>
+      <button class="tech-cat-btn" data-cat="Security">
+        <span class="cat-icon">🔒</span>
+        <span class="cat-name">Security & Artifacts</span>
+      </button>
+      <button class="tech-cat-btn" data-cat="Data">
+        <span class="cat-icon">🗄️</span>
+        <span class="cat-name">Data & Messaging</span>
+      </button>
+      <button class="tech-cat-btn" data-cat="Languages">
+        <span class="cat-icon">💻</span>
+        <span class="cat-name">Languages</span>
+      </button>
+      <button class="tech-cat-btn" data-cat="Web">
+        <span class="cat-icon">🌐</span>
+        <span class="cat-name">Web & Proxy</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Modal -->
+<div class="tech-modal-overlay" id="techModalOverlay">
+  <div class="tech-modal-box">
+    <button class="tech-modal-close" id="techModalClose" aria-label="Close">×</button>
+    <h3 class="tech-modal-title" id="techModalTitle"></h3>
+    <div class="tech-modal-grid" id="techModalGrid"></div>
+  </div>
 </div>
+
+<!-- ═══════════════════ PROJECTS ═══════════════════ -->
+<section id="projects" class="sp-section sp-projects">
+  <div class="sp-container">
+    <h2 class="sp-section-title">Projects</h2>
+    <p class="sp-section-sub">Selected work across infrastructure, automation, and systems engineering</p>
+    <div class="projects-grid">
+
+      <div class="project-card project-card--featured">
+        <h2>This Website</h2>
+        <div class="tech-chips">
+          <span class="chip">Python</span><span class="chip">Flask</span>
+          <span class="chip">Docker</span><span class="chip">Kubernetes</span>
+          <span class="chip">Terraform</span><span class="chip">ArgoCD</span>
+        </div>
+        <p>The portfolio website you are currently viewing, built with Python (Flask), HTML, CSS, and JavaScript, based on Terraform IaC, AWS, K8S and ArgoCD, to showcase my work and skills.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/mywebsite-app.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card project-card--featured">
+        <h2>Mission Recorder Subsystem</h2>
+        <div class="tech-chips">
+          <span class="chip">Python</span><span class="chip">Docker</span>
+          <span class="chip">Fluent-bit</span><span class="chip">Edge</span>
+          <span class="chip">Air-gapped</span>
+        </div>
+        <p>An event-triggered data collection subsystem designed for air-gapped edge devices. It automates the gathering and packaging of logs and system data using Python, Docker, and Fluent-bit to ensure observability in isolated environments.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/mission-recorder.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card project-card--featured">
+        <h2>Kafka Data Shipping</h2>
+        <div class="tech-chips">
+          <span class="chip">Kafka</span><span class="chip">Java</span>
+          <span class="chip">AWS EKS</span><span class="chip">Terraform</span>
+          <span class="chip">GitHub Actions</span>
+        </div>
+        <p>Kafka data shipping microservices architecture, using Java producer-consumer services to stream data between MySQL and Kafka. Deployed on AWS EKS using Terraform IaC, CI/CD process was automated with GitHub Actions to build and push container images to ECR.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/kafka-data-shipper.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h2>Portfolio Blog</h2>
+        <div class="tech-chips">
+          <span class="chip">Docker</span><span class="chip">Kubernetes</span>
+          <span class="chip">Nginx</span><span class="chip">MySQL</span>
+          <span class="chip">Microservices</span>
+        </div>
+        <p>A full-stack microservices blog application demonstrating content management and web development skills, and Monolith to Microservices migration.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/Portfolio-app.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h2>Terragrunt Infrastructure</h2>
+        <div class="tech-chips">
+          <span class="chip">Terraform</span><span class="chip">Terragrunt</span>
+          <span class="chip">AWS</span><span class="chip">EKS</span>
+          <span class="chip">IaC</span>
+        </div>
+        <p>Advanced IaC by DRYing up Terraform code, managing remote state, and orchestrating multi-environment deployments for VPCs and EKS clusters.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/terragrunt-course.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h2>Golang Booking Application</h2>
+        <div class="tech-chips">
+          <span class="chip">Go</span><span class="chip">Concurrency</span>
+          <span class="chip">CLI</span>
+        </div>
+        <p>CLI-based application built while mastering Go — focuses on core concepts such as concurrency (Goroutines), pointers, and structured data to handle real-time booking logic.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/golang-booking-app.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h2>Chatapp</h2>
+        <div class="tech-chips">
+          <span class="chip">WebSockets</span><span class="chip">MySQL</span>
+          <span class="chip">Nginx</span><span class="chip">Docker</span>
+        </div>
+        <p>A real-time chat application built to implement WebSocket technology for instant two-way communication, on a simple microservices architecture.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/Chatapp.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h2>Blue-Green Deployment</h2>
+        <div class="tech-chips">
+          <span class="chip">Terraform</span><span class="chip">AWS</span>
+          <span class="chip">Nginx</span>
+        </div>
+        <p>Blue-Green deployment using Terraform and AWS. Nginx redirects traffic to the green server with the blue server as a backup.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/Blue-Green-Demo.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h2>Prometheus Data Collector</h2>
+        <div class="tech-chips">
+          <span class="chip">Prometheus</span><span class="chip">Python</span>
+          <span class="chip">Metrics</span>
+        </div>
+        <p>A custom exporter for the Prometheus monitoring system, built to gather and expose specific metrics for observability.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/prometheus-data-collector.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h2>GateUP (Serverless)</h2>
+        <div class="tech-chips">
+          <span class="chip">AWS Lambda</span><span class="chip">Serverless</span>
+          <span class="chip">Automation</span>
+        </div>
+        <p>A utility tool to manage and automate gate operations focusing on system integration and remote control, based on serverless event-based operations.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/GateUP.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h2>Ansible Automation</h2>
+        <div class="tech-chips">
+          <span class="chip">Ansible</span><span class="chip">Zero-downtime</span>
+          <span class="chip">DevOps</span>
+        </div>
+        <p>Rolling update deployment strategies using Ansible playbooks — updating server groups sequentially while maintaining service availability.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/ansible-rolling-update.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h2>Linux Server Data Collection</h2>
+        <div class="tech-chips">
+          <span class="chip">Bash</span><span class="chip">Linux</span>
+          <span class="chip">Shell</span>
+        </div>
+        <p>A collection of Bash scripts and tools for gathering, processing, and analyzing performance and system data from Linux servers.</p>
+        <div class="project-links">
+          <a href="https://github.com/liormilliger/linux-srv-data-collection.git" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ EDUCATION ═══════════════════ -->
+<section id="education" class="sp-section sp-education">
+  <div class="sp-container">
+    <h2 class="sp-section-title">Education & Certifications</h2>
+
+    <h3 class="sp-sub-title">Certifications</h3>
+    <div class="edu-certs-row">
+      <a href="{{ url_for('static', filename='images/tech/AWS-CCP.pdf') }}" target="_blank" rel="noopener noreferrer" class="edu-cert-item">
+        <img src="{{ url_for('static', filename='images/education/CCP-badge.png') }}" alt="AWS CCP" class="certificate-badge">
+        <span>AWS Cloud Practitioner</span>
+      </a>
+      <a href="{{ url_for('static', filename='images/tech/AWS-SAA.pdf') }}" target="_blank" rel="noopener noreferrer" class="edu-cert-item">
+        <img src="{{ url_for('static', filename='images/education/SAA-badge.png') }}" alt="AWS SAA" class="certificate-badge">
+        <span>AWS Solutions Architect</span>
+      </a>
+      <a href="{{ url_for('static', filename='images/tech/CKA.pdf') }}" target="_blank" rel="noopener noreferrer" class="edu-cert-item">
+        <img src="{{ url_for('static', filename='images/education/CKA-badge.png') }}" alt="CKA" class="certificate-badge">
+        <span>Certified Kubernetes Admin</span>
+      </a>
+    </div>
+
+    <h3 class="sp-sub-title">Bootcamps & Courses</h3>
+    <div class="edu-courses-row">
+      <a href="https://udemy-certificate.s3.amazonaws.com/image/UC-abc961ff-8f59-44fa-b947-16a7ee2fd51d.jpg" target="_blank" rel="noopener noreferrer" class="edu-course-item">Python Bootcamp</a>
+      <a href="https://udemy-certificate.s3.amazonaws.com/image/UC-93064727-9a40-400f-bb49-43f9c52f267f.jpg" target="_blank" rel="noopener noreferrer" class="edu-course-item">DevOps Bootcamp</a>
+      <a href="{{ url_for('static', filename='images/education/Develeap-certificate.jpg') }}" target="_blank" rel="noopener noreferrer" class="edu-course-item">Develeap Bootcamp <span class="course-tag">16 weeks</span></a>
+      <a href="https://udemy-certificate.s3.amazonaws.com/image/UC-f6c31cbe-98e2-483a-9e37-97717beb78d8.jpg" target="_blank" rel="noopener noreferrer" class="edu-course-item">GitHub Actions</a>
+    </div>
+
+    <h3 class="sp-sub-title">Academic Degrees</h3>
+    <div class="edu-degrees-row">
+      <div class="edu-degree-item">
+        <span class="degree-abbr">B.Mus</span>
+        <span class="degree-full">Bachelor of Music</span>
+      </div>
+      <div class="edu-degree-item">
+        <span class="degree-abbr">B.Mus.Ed</span>
+        <span class="degree-full">Bachelor of Music Education</span>
+      </div>
+      <div class="edu-degree-item">
+        <span class="degree-abbr">M.Mus</span>
+        <span class="degree-full">Master of Music</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════ CONTACT ═══════════════════ -->
+<section id="contact" class="sp-section sp-contact">
+  <div class="sp-container">
+    <h2 class="sp-section-title">Get in Touch</h2>
+    <p class="sp-section-sub">Open to new opportunities, collaborations, or just a friendly chat.</p>
+    <div class="contact-info sp-contact-grid">
+      <div class="contact-item">
+        <i class="fas fa-envelope icon"></i>
+        <a href="mailto:liormilliger@gmail.com">liormilliger@gmail.com</a>
+      </div>
+      <div class="contact-item">
+        <i class="fas fa-phone-alt icon"></i>
+        <span>051-5517768</span>
+      </div>
+      <div class="contact-item">
+        <i class="fab fa-linkedin icon"></i>
+        <a href="https://www.linkedin.com/in/lior-milliger/" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a>
+      </div>
+      <div class="contact-item">
+        <i class="fab fa-github icon"></i>
+        <a href="https://github.com/liormilliger/mywebsite-app" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ TECH MODAL JS ═══════════════════ -->
+<script>
+(function () {
+  const techData = {
+    'CI/CD': [
+      { name: 'Jenkins',        img: '/static/images/tech/Jenkins.png' },
+      { name: 'GitHub Actions', img: '/static/images/tech/GitHubActions.png' },
+      { name: 'ArgoCD',         img: '/static/images/tech/argocd.webp' },
+      { name: 'FluxCD',         color: '#3B82F6' },
+    ],
+    'Containers & K8s': [
+      { name: 'Docker',     img: '/static/images/tech/docker.png' },
+      { name: 'Kubernetes', img: '/static/images/tech/Kubernetes.svg.png' },
+      { name: 'Helm',       img: '/static/images/tech/helm-logo.png' },
+      { name: 'K3s',        color: '#06B6D4' },
+    ],
+    'IaC & Automation': [
+      { name: 'Terraform',  img: '/static/images/tech/terraform.svg' },
+      { name: 'Terragrunt', img: '/static/images/tech/terragrunt-logo.png' },
+      { name: 'Pulumi',     img: '/static/images/tech/Pulumi.svg' },
+      { name: 'Ansible',    color: '#14B8A6' },
+    ],
+    'Cloud': [
+      { name: 'AWS',     img: '/static/images/tech/AWS.svg.png' },
+      { name: 'EKS',     color: '#F97316' },
+      { name: 'Lambda',  color: '#F97316' },
+      { name: 'ECR',     color: '#F97316' },
+      { name: 'Bedrock', color: '#F97316' },
+      { name: 'S3',      color: '#F97316' },
+    ],
+    'AI & MLOps': [
+      { name: 'AWS Bedrock', color: '#A855F7' },
+      { name: 'n8n',         color: '#A855F7' },
+      { name: 'Qdrant',      color: '#A855F7' },
+      { name: 'Claude API',  color: '#A855F7' },
+      { name: 'Gemini API',  color: '#A855F7' },
+      { name: 'RAG',         color: '#A855F7' },
+    ],
+    'Observability': [
+      { name: 'Prometheus', img: '/static/images/tech/Prometheus.svg.png' },
+      { name: 'Grafana',    img: '/static/images/tech/Grafana.svg.png' },
+      { name: 'ELK Stack',  img: '/static/images/tech/elk-logo.png' },
+      { name: 'Fluent-bit', img: '/static/images/tech/fluentbit.jpeg' },
+    ],
+    'Security': [
+      { name: 'JFrog Xray',  img: '/static/images/tech/Jfrog-Xray-logo.png' },
+      { name: 'Artifactory', img: '/static/images/tech/artifactory-logo.png' },
+      { name: 'Gitleaks',    color: '#EF4444' },
+      { name: 'Trivy',       color: '#EF4444' },
+    ],
+    'Data': [
+      { name: 'PostgreSQL', img: '/static/images/tech/postgresql-logo.jpg' },
+      { name: 'MySQL',      img: '/static/images/tech/mysql-logo.png' },
+      { name: 'Kafka',      color: '#22C55E' },
+    ],
+    'Languages': [
+      { name: 'Python', img: '/static/images/tech/Python-logo.png' },
+      { name: 'Go',     img: '/static/images/tech/golang-icon.png' },
+      { name: 'Bash',   img: '/static/images/tech/Bash_Logo.png' },
+      { name: 'Java',   color: '#6366F1' },
+    ],
+    'Web': [
+      { name: 'Nginx',  img: '/static/images/tech/nginx-logo.png' },
+      { name: 'Apache', img: '/static/images/tech/apache-logo.webp' },
+      { name: 'Flask',  color: '#0EA5E9' },
+    ],
+  };
+
+  const overlay  = document.getElementById('techModalOverlay');
+  const closeBtn = document.getElementById('techModalClose');
+  const title    = document.getElementById('techModalTitle');
+  const grid     = document.getElementById('techModalGrid');
+
+  function openModal(cat) {
+    const items = techData[cat];
+    if (!items) return;
+    title.textContent = cat;
+    grid.innerHTML = items.map(item => {
+      const icon = item.img
+        ? `<img src="${item.img}" alt="${item.name}" loading="lazy">`
+        : `<span class="tech-badge" style="background:${item.color}">${item.name}</span>`;
+      return `<div class="tech-modal-item">${icon}<span>${item.name}</span></div>`;
+    }).join('');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.tech-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => openModal(btn.dataset.cat));
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+})();
+</script>
+
 {% endblock %}

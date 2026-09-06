@@ -1,4 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Single-page: active nav link on scroll ---
+    const spSections = document.querySelectorAll('.sp-section[id]');
+    const spNavLinks = document.querySelectorAll('.nav-menu-links a');
+    if (spSections.length > 0) {
+        const onScroll = () => {
+            let current = '';
+            spSections.forEach(section => {
+                if (window.scrollY >= section.offsetTop - 120) current = section.id;
+            });
+            spNavLinks.forEach(link => {
+                link.classList.toggle('sp-nav-active', link.getAttribute('href') === `/#${current}`);
+            });
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    }
+
+    // --- Single-page: smooth scroll for in-page anchor links ---
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', e => {
+            const target = document.querySelector(link.getAttribute('href'));
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
     // --- Hamburger Menu Logic ---
     const hamburger = document.querySelector('.hamburger-menu');
     const navLinksContainer = document.querySelector('.nav-links-container');
