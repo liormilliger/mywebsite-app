@@ -106,7 +106,7 @@
         <span class="cat-icon">🏗️</span>
         <span class="cat-name">IaC & Automation</span>
       </button>
-      <button class="tech-cat-btn" data-cat="Cloud">
+      <button class="tech-cat-btn" data-cat="Cloud (AWS)">
         <span class="cat-icon">☁️</span>
         <span class="cat-name">Cloud (AWS)</span>
       </button>
@@ -118,11 +118,11 @@
         <span class="cat-icon">📊</span>
         <span class="cat-name">Observability</span>
       </button>
-      <button class="tech-cat-btn" data-cat="Security">
+      <button class="tech-cat-btn" data-cat="Security & Artifacts">
         <span class="cat-icon">🔒</span>
         <span class="cat-name">Security & Artifacts</span>
       </button>
-      <button class="tech-cat-btn" data-cat="Data">
+      <button class="tech-cat-btn" data-cat="Data & Messaging">
         <span class="cat-icon">🗄️</span>
         <span class="cat-name">Data & Messaging</span>
       </button>
@@ -130,7 +130,7 @@
         <span class="cat-icon">💻</span>
         <span class="cat-name">Languages</span>
       </button>
-      <button class="tech-cat-btn" data-cat="Web">
+      <button class="tech-cat-btn" data-cat="Web & Proxy">
         <span class="cat-icon">🌐</span>
         <span class="cat-name">Web & Proxy</span>
       </button>
@@ -410,63 +410,76 @@
 (function () {
   const techData = {
     'CI/CD': [
-      { name: 'Jenkins',        img: '/static/images/tech/Jenkins.png' },
-      { name: 'GitHub Actions', img: '/static/images/tech/GitHubActions.png' },
-      { name: 'ArgoCD',         img: '/static/images/tech/argocd.webp' },
-      { name: 'FluxCD',         color: '#3B82F6' },
+      { name: 'Jenkins',             img: '/static/images/tech/Jenkins.png' },
+      { name: 'GitHub Actions',      img: '/static/images/tech/GitHubActions.png' },
+      { name: 'ArgoCD',              img: '/static/images/tech/argocd.webp' },
+      { name: 'FluxCD',              color: '#3B82F6' },
+      { name: 'Bitbucket Pipelines', img: '/static/images/tech/bitbucket.svg', invert: true },
     ],
     'Containers & K8s': [
       { name: 'Docker',     img: '/static/images/tech/docker.png' },
       { name: 'Kubernetes', img: '/static/images/tech/Kubernetes.svg.png' },
       { name: 'Helm',       img: '/static/images/tech/helm-logo.png' },
       { name: 'K3s',        color: '#06B6D4' },
+      { name: 'KEDA',       img: '/static/images/tech/keda-logo.png' },
+      { name: 'Karpenter',  img: '/static/images/tech/karpenter-logo.png' },
     ],
     'IaC & Automation': [
-      { name: 'Terraform',  img: '/static/images/tech/terraform.svg' },
-      { name: 'Terragrunt', img: '/static/images/tech/terragrunt-logo.png' },
-      { name: 'Pulumi',     img: '/static/images/tech/Pulumi.svg' },
-      { name: 'Ansible',    color: '#14B8A6' },
+      { name: 'Terraform',        img: '/static/images/tech/terraform.svg' },
+      { name: 'Terragrunt',       img: '/static/images/tech/terragrunt-logo.png' },
+      { name: 'Pulumi',           img: '/static/images/tech/Pulumi.svg' },
+      { name: 'Ansible',          color: '#14B8A6' },
+      { name: 'CloudFormation',   img: '/static/images/tech/cloudformation-logo.png' },
+      { name: 'Agentic Workflows', color: '#8B5CF6' },
     ],
-    'Cloud': [
-      { name: 'AWS',     img: '/static/images/tech/AWS.svg.png' },
-      { name: 'EKS',     color: '#F97316' },
-      { name: 'Lambda',  color: '#F97316' },
-      { name: 'ECR',     color: '#F97316' },
-      { name: 'Bedrock', color: '#F97316' },
-      { name: 'S3',      color: '#F97316' },
+    'Cloud (AWS)': [
+      { name: 'AWS',                  img: '/static/images/tech/AWS.svg.png' },
+      { name: 'Cloud Practitioner',   img: '/static/images/education/CCP-badge.png' },
+      { name: 'Solutions Architect',  img: '/static/images/education/SAA-badge.png' },
+      { name: 'SysOps Administrator', img: '/static/images/tech/sysops-badge.png' },
     ],
     'AI & MLOps': [
-      { name: 'AWS Bedrock', color: '#A855F7' },
-      { name: 'n8n',         color: '#A855F7' },
-      { name: 'Qdrant',      color: '#A855F7' },
-      { name: 'Claude API',  color: '#A855F7' },
-      { name: 'Gemini API',  color: '#A855F7' },
-      { name: 'RAG',         color: '#A855F7' },
+      { name: 'n8n',        color: '#A855F7' },
+      { name: 'Qdrant',     color: '#A855F7' },
+      { name: 'Claude API', color: '#A855F7' },
+      { name: 'Gemini API', color: '#A855F7' },
+      { name: 'RAG',        color: '#A855F7' },
+      { name: 'Embeddings', color: '#A855F7' },
+      { name: 'Ollama',     img: '/static/images/tech/ollama.svg',    invert: true },
+      { name: 'LangChain',  img: '/static/images/tech/langchain.svg', invert: true },
     ],
     'Observability': [
-      { name: 'Prometheus', img: '/static/images/tech/Prometheus.svg.png' },
-      { name: 'Grafana',    img: '/static/images/tech/Grafana.svg.png' },
-      { name: 'ELK Stack',  img: '/static/images/tech/elk-logo.png' },
-      { name: 'Fluent-bit', img: '/static/images/tech/fluentbit.jpeg' },
+      { name: 'Prometheus',     img: '/static/images/tech/Prometheus.svg.png' },
+      { name: 'Grafana',        img: '/static/images/tech/Grafana.svg.png' },
+      { name: 'ELK Stack',      img: '/static/images/tech/elk-logo.png' },
+      { name: 'Fluent-bit',     img: '/static/images/tech/fluentbit.jpeg' },
+      { name: 'CloudWatch',     img: '/static/images/tech/cloudwatch-logo.png' },
+      { name: 'OpenTelemetry',  img: '/static/images/tech/opentelemetry.svg', invert: true },
+      { name: 'Jaeger',         img: '/static/images/tech/jaeger-logo.png' },
     ],
-    'Security': [
+    'Security & Artifacts': [
       { name: 'JFrog Xray',  img: '/static/images/tech/Jfrog-Xray-logo.png' },
       { name: 'Artifactory', img: '/static/images/tech/artifactory-logo.png' },
-      { name: 'Gitleaks',    color: '#EF4444' },
       { name: 'Trivy',       color: '#EF4444' },
+      { name: 'Fail2ban',    color: '#EF4444' },
     ],
-    'Data': [
+    'Data & Messaging': [
       { name: 'PostgreSQL', img: '/static/images/tech/postgresql-logo.jpg' },
       { name: 'MySQL',      img: '/static/images/tech/mysql-logo.png' },
       { name: 'Kafka',      color: '#22C55E' },
+      { name: 'AmazonMQ',  img: '/static/images/tech/amazonmq-logo.png' },
+      { name: 'ActiveMQ',  img: '/static/images/tech/activemq-logo.png' },
+      { name: 'RDS',        img: '/static/images/tech/rds-logo.png' },
+      { name: 'Aurora',     img: '/static/images/tech/aurora-logo.png' },
+      { name: 'DynamoDB',   img: '/static/images/tech/amazondynamodb.svg', invert: true },
     ],
     'Languages': [
       { name: 'Python', img: '/static/images/tech/Python-logo.png' },
       { name: 'Go',     img: '/static/images/tech/golang-icon.png' },
-      { name: 'Bash',   img: '/static/images/tech/Bash_Logo.png' },
+      { name: 'Bash',   img: '/static/images/tech/gnubash.svg', invert: true },
       { name: 'Java',   color: '#6366F1' },
     ],
-    'Web': [
+    'Web & Proxy': [
       { name: 'Nginx',  img: '/static/images/tech/nginx-logo.png' },
       { name: 'Apache', img: '/static/images/tech/apache-logo.webp' },
       { name: 'Flask',  color: '#0EA5E9' },
@@ -483,9 +496,13 @@
     if (!items) return;
     title.textContent = cat;
     grid.innerHTML = items.map(item => {
-      const icon = item.img
-        ? `<img src="${item.img}" alt="${item.name}" loading="lazy">`
-        : `<span class="tech-badge" style="background:${item.color}">${item.name}</span>`;
+      let icon;
+      if (item.img) {
+        const style = item.invert ? ' style="filter:brightness(0) invert(0.85)"' : '';
+        icon = `<img src="${item.img}" alt="${item.name}" loading="lazy"${style}>`;
+      } else {
+        icon = `<span class="tech-badge" style="background:${item.color}">${item.name}</span>`;
+      }
       return `<div class="tech-modal-item">${icon}<span>${item.name}</span></div>`;
     }).join('');
     overlay.classList.add('open');
