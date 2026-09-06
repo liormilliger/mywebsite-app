@@ -30,7 +30,7 @@ services:
       - ./logs/nginx:/var/log/nginx
       - ./app/templates/error.html:/var/www/error_pages/error.html
       - ./app/static/files/blackcat-pipelines.jpg:/var/www/error_pages/blackcat-pipelines.jpg
-    command: /bin/sh -c "nginx -g 'daemon off;' & while :; do sleep 12h & wait $$!; nginx -s reload; done"
+    command: ["/bin/sh", "-c", "nginx -g 'daemon off;' & while :; do sleep 12h & wait $$!; nginx -s reload; done"]
     depends_on:
       - app
 
