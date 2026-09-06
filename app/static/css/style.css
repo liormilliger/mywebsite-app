@@ -1580,7 +1580,7 @@ nav { position: sticky; top: 0; z-index: 1001; }
     border: 1px solid rgba(236, 223, 204, 0.1);
     border-radius: 10px;
     padding: 2rem 2.25rem;
-    margin-top: 2rem;
+    margin-top: 0.75rem;
     margin-bottom: 2rem;
 }
 
