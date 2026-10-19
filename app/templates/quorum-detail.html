@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Quorum – Lior Milliger{% endblock %}
+
+{% block content %}
+<div class="page-content">
+
+    <a href="/my-projects" class="project-detail-back">
+        <i class="fas fa-arrow-left"></i> Back to Projects
+    </a>
+
+    <div class="project-detail-header">
+        <h1>Quorum</h1>
+        <span class="project-detail-badge">Featured</span>
+    </div>
+
+    <div class="tech-chips project-detail-chips">
+        <span class="chip">Python</span>
+        <span class="chip">FastAPI</span>
+        <span class="chip">WebSockets</span>
+        <span class="chip">AWS</span>
+        <span class="chip">Docker</span>
+    </div>
+
+    <p class="project-detail-desc">
+        A collaborative GenAI workspace where teams work with Claude together in shared sessions,
+        combining a streaming AI assistant with a Slack-style team chat. Participants share a
+        Main channel where Claude's streamed answers are visible to everyone, a team chat Claude
+        reads for context, and a private one-on-one channel with Claude per person. Features
+        role-based access via AWS Cognito, shared connectors to MCP servers and Confluence, and
+        living documents that Claude edits in real time with versioned red/green diffs and undo.
+        Built end to end — architecture, backend, frontend, AWS infrastructure as code, and test
+        suites. The source code is in a private GitHub repository.
+    </p>
+
+    <div class="project-detail-links">
+        <a href="https://github.com/liormilliger/quorum" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> <i class="fas fa-lock"></i> GitHub (private)
+        </a>
+    </div>
+
+    <h2 class="project-detail-section-title">Screenshots</h2>
+    <div class="project-screenshots-grid">
+
+        <figure class="screenshot-figure">
+            <img src="{{ url_for('static', filename='images/quorum-signin.png') }}"
+                 alt="Quorum sign-in page"
+                 loading="lazy">
+            <figcaption>Sign-in</figcaption>
+        </figure>
+
+        <figure class="screenshot-figure">
+            <img src="{{ url_for('static', filename='images/quorum-admin.png') }}"
+                 alt="Quorum admin page"
+                 loading="lazy">
+            <figcaption>Admin</figcaption>
+        </figure>
+
+        <figure class="screenshot-figure">
+            <img src="{{ url_for('static', filename='images/quorum-dashboard.png') }}"
+                 alt="Quorum dashboard"
+                 loading="lazy">
+            <figcaption>Dashboard</figcaption>
+        </figure>
+
+    </div>
+
+    <h2 class="project-detail-section-title">Architecture</h2>
+    <div class="architecture-embed-wrapper">
+        <a href="{{ url_for('static', filename='files/quorum-architecture.html') }}"
+           target="_blank" rel="noopener noreferrer"
+           class="architecture-fullscreen-link">
+            <i class="fas fa-expand"></i> Open full screen
+        </a>
+        <iframe class="architecture-embed"
+                src="{{ url_for('static', filename='files/quorum-architecture.html') }}"
+                title="Quorum Production Architecture"
+                loading="lazy">
+        </iframe>
+    </div>
+
+</div>
+{% endblock %}

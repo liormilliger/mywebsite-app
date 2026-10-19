@@ -1,0 +1,318 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Quorum Production Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: an engineering brief. One wide system drawing, then the mechanisms it hinges on, then the bill of materials. */
+:root{
+  --bg:#F5F6F8; --surface:#FFFFFF; --ink:#18202B; --muted:#5A6676; --line:#D5DAE1;
+  --wiki:#0B7A75; --wiki-soft:#E1F2F0; --later:#8A6A12; --later-soft:#FBF1D6;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11161D; --surface:#18202A; --ink:#E3E8EF; --muted:#97A3B3; --line:#2E3946;
+  --wiki:#4FC7BF; --wiki-soft:#12302E; --later:#E2BC5A; --later-soft:#33290F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161D; --surface:#18202A; --ink:#E3E8EF; --muted:#97A3B3; --line:#2E3946;
+  --wiki:#4FC7BF; --wiki-soft:#12302E; --later:#E2BC5A; --later-soft:#33290F; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.6 var(--f-body)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 56px;display:grid;gap:34px}
+header{display:grid;gap:8px}
+.eyebrow{font:500 12px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:700 32px/1.15 var(--f-body);margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font:600 21px/1.25 var(--f-body);margin:0;text-wrap:balance}
+h3{font:600 15px var(--f-body);margin:0}
+p{margin:0;max-width:72ch}
+.lede{color:var(--muted);font-size:16px}
+section{display:grid;gap:14px;min-width:0}
+code,.mono{font:500 13px var(--f-mono)}
+figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:10px;min-width:0}
+.scroll{overflow-x:auto}
+.scroll svg{display:block;width:100%;min-width:860px;height:auto;color:var(--ink)}
+figcaption{color:var(--muted);font-size:14px;max-width:none}
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{display:inline-block;width:28px;border-top:2px solid var(--ink)}
+.legend i.w{border-color:var(--wiki)} .legend i.l{border-top-style:dashed;border-color:var(--later)}
+/* svg parts, styled from the page so both themes work */
+.box{fill:var(--surface);stroke:var(--ink);stroke-width:1.2}
+.box.wiki{fill:var(--wiki-soft);stroke:var(--wiki)}
+.box.later{fill:var(--later-soft);stroke:var(--later);stroke-dasharray:5 4}
+.box.store{stroke-width:1.2}
+.t{font:600 13.5px var(--f-body);fill:var(--ink)}
+.s{font:400 11.5px var(--f-body);fill:var(--muted)}
+.e{fill:none;stroke:var(--ink);stroke-width:1.3}
+.e.wiki{stroke:var(--wiki);stroke-width:1.6}
+.e.later{stroke:var(--later);stroke-dasharray:5 4}
+.el{font:500 11px var(--f-mono);fill:var(--muted)}
+.el.wiki{fill:var(--wiki)}
+.el.later{fill:var(--later)}
+.vpc{fill:none;stroke:var(--muted);stroke-dasharray:2 4;stroke-width:1.2}
+.vpcl{font:500 11px var(--f-mono);fill:var(--muted);letter-spacing:.04em}
+.mk{fill:var(--ink)} .mk.wiki{fill:var(--wiki)} .mk.later{fill:var(--later)}
+/* flows */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;counter-reset:st;margin:0;padding:0;list-style:none}
+.flow li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:4px;align-content:start;position:relative}
+.flow li::before{counter-increment:st;content:counter(st);font:500 12px var(--f-mono);color:var(--wiki);border:1px solid var(--wiki);border-radius:50%;width:22px;height:22px;display:grid;place-items:center}
+.flow.plain li::before{color:var(--ink);border-color:var(--line)}
+.flow b{font-weight:600;font-size:14px}
+.flow span{color:var(--muted);font-size:13.5px;line-height:1.5}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.two>*{min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;gap:10px;align-content:start}
+ul.tight{margin:0;padding-left:18px;display:grid;gap:6px}
+ul.tight li{padding-left:2px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600;white-space:nowrap}
+td.poc{color:var(--muted)}
+.tag{display:inline-block;font:500 11px var(--f-mono);padding:1px 7px;border-radius:999px;background:var(--later-soft);color:var(--later);margin-left:6px;vertical-align:1px}
+.stacks{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.stacks .st{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px;display:grid;gap:2px}
+.stacks .st b{font:500 13px var(--f-mono)}
+.stacks .st span{font-size:12.5px;color:var(--muted)}
+.stacks .st.later{border-style:dashed;border-color:var(--later)}
+.stacks .arr{color:var(--muted);font:500 14px var(--f-mono)}
+.note{border-left:3px solid var(--wiki);padding:4px 0 4px 14px;color:var(--ink)}
+@media (max-width:520px){h1{font-size:26px}.wrap{padding-inline:16px}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Quorum · target design · eu-south-1</div>
+  <h1>Quorum in production</h1>
+  <p class="lede">From one EC2 with files on disk to a managed AWS stack: Postgres as the single source of truth, S3 for files, the wiki kept in sync within seconds and in order, and answers tuned to who is asking. Everything is defined in CloudFormation; CloudFront comes later.</p>
+</header>
+
+<section aria-labelledby="h-sys">
+  <h2 id="h-sys">The system</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1120 640" role="img" aria-label="Users reach Quorum through an ALB (CloudFront later); the wiki reaches it through API Gateway. Webhooks are verified by Lambda, queued in SQS FIFO per page, and applied by a worker to Aurora PostgreSQL in one transaction. The web service answers with Bedrock and fans out through ElastiCache.">
+      <defs>
+        <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk wiki" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="al" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk later" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+
+      <!-- VPC -->
+      <rect class="vpc" x="105" y="262" width="985" height="362" rx="14"/>
+      <text class="vpcl" x="120" y="284">VPC · PRIVATE SUBNETS · 2 AZ · S3, BEDROCK, SECRETS VIA VPC ENDPOINTS</text>
+
+      <!-- row 1: who talks to it -->
+      <rect class="box" x="150" y="20" width="190" height="56" rx="9"/>
+      <text class="t" x="245" y="44" text-anchor="middle">Team in the browser</text>
+      <text class="s" x="245" y="62" text-anchor="middle">pages · live sessions</text>
+      <rect class="box" x="390" y="20" width="200" height="56" rx="9"/>
+      <text class="t" x="490" y="44" text-anchor="middle">Cognito</text>
+      <text class="s" x="490" y="62" text-anchor="middle">users + Wiki M2M client</text>
+      <rect class="box wiki" x="720" y="20" width="240" height="56" rx="9"/>
+      <text class="t" x="840" y="44" text-anchor="middle">Wiki (Confluence)</text>
+      <text class="s" x="840" y="62" text-anchor="middle">pages · webhooks · Forge app</text>
+
+      <!-- row 2: edge -->
+      <rect class="box later" x="20" y="140" width="170" height="56" rx="9"/>
+      <text class="t" x="105" y="164" text-anchor="middle">CloudFront + WAF</text>
+      <text class="s" x="105" y="182" text-anchor="middle">later stage</text>
+      <rect class="box" x="215" y="140" width="180" height="56" rx="9"/>
+      <text class="t" x="305" y="164" text-anchor="middle">ALB + ACM</text>
+      <text class="s" x="305" y="182" text-anchor="middle">HTTPS · WebSocket</text>
+      <rect class="box wiki" x="640" y="140" width="200" height="56" rx="9"/>
+      <text class="t" x="740" y="164" text-anchor="middle">API Gateway</text>
+      <text class="s" x="740" y="182" text-anchor="middle">webhooks in · Wiki API</text>
+      <rect class="box wiki" x="880" y="140" width="200" height="56" rx="9"/>
+      <text class="t" x="980" y="164" text-anchor="middle">Lambda</text>
+      <text class="s" x="980" y="182" text-anchor="middle">verify signature, enqueue</text>
+
+      <!-- row 3: compute -->
+      <rect class="box" x="120" y="300" width="270" height="64" rx="9"/>
+      <text class="t" x="255" y="327" text-anchor="middle">ECS Fargate · quorum-web</text>
+      <text class="s" x="255" y="346" text-anchor="middle">pages, API, WebSocket, answers</text>
+      <rect class="box" x="440" y="300" width="160" height="64" rx="9"/>
+      <text class="t" x="520" y="327" text-anchor="middle">ElastiCache</text>
+      <text class="s" x="520" y="346" text-anchor="middle">Valkey · fan-out, presence</text>
+      <rect class="box" x="650" y="300" width="190" height="64" rx="9"/>
+      <text class="t" x="745" y="327" text-anchor="middle">ECS · quorum-worker</text>
+      <text class="s" x="745" y="346" text-anchor="middle">wiki sync · embed · reports</text>
+      <rect class="box wiki" x="880" y="300" width="200" height="64" rx="9"/>
+      <text class="t" x="980" y="327" text-anchor="middle">SQS FIFO + DLQ</text>
+      <text class="s" x="980" y="346" text-anchor="middle">one message group per page</text>
+      <rect class="box" x="880" y="394" width="200" height="48" rx="9"/>
+      <text class="t" x="980" y="414" text-anchor="middle">EventBridge Scheduler</text>
+      <text class="s" x="980" y="431" text-anchor="middle">reconcile every 15 min</text>
+
+      <!-- row 4: state -->
+      <rect class="box store" x="120" y="540" width="170" height="64" rx="9"/>
+      <text class="t" x="205" y="567" text-anchor="middle">S3</text>
+      <text class="s" x="205" y="586" text-anchor="middle">documents · versions</text>
+      <rect class="box store" x="310" y="540" width="170" height="64" rx="9"/>
+      <text class="t" x="395" y="567" text-anchor="middle">Bedrock</text>
+      <text class="s" x="395" y="586" text-anchor="middle">Claude · embeddings</text>
+      <rect class="box store" x="500" y="540" width="360" height="64" rx="9"/>
+      <text class="t" x="680" y="567" text-anchor="middle">Aurora PostgreSQL + pgvector</text>
+      <text class="s" x="680" y="586" text-anchor="middle">users · skills · sessions · wiki pages · vectors</text>
+      <rect class="box store" x="880" y="540" width="200" height="64" rx="9"/>
+      <text class="t" x="980" y="567" text-anchor="middle">Secrets Manager</text>
+      <text class="s" x="980" y="586" text-anchor="middle">KMS · rotation</text>
+
+      <!-- user path -->
+      <path class="e later" d="M178,76 L122,138" marker-end="url(#al)"/>
+      <text class="el later" x="140" y="104" text-anchor="end">later</text>
+      <path class="e later" d="M190,168 L213,168" marker-end="url(#al)"/>
+      <path class="e" d="M300,76 L300,138" marker-end="url(#a)"/>
+      <text class="el" x="308" y="112">HTTPS · WSS</text>
+      <path class="e" d="M340,48 L388,48" marker-end="url(#a)"/>
+      <text class="el" x="364" y="40" text-anchor="middle">sign in</text>
+      <path class="e" d="M300,196 L300,298" marker-end="url(#a)"/>
+      <text class="el" x="308" y="252">/, /api, /ws</text>
+      <path class="e" d="M392,332 L438,332" marker-start="url(#a)" marker-end="url(#a)"/>
+      <text class="el" x="415" y="321" text-anchor="middle">pub/sub</text>
+      <path class="e" d="M200,364 L200,538" marker-end="url(#a)"/>
+      <text class="el" x="208" y="462">files</text>
+      <path class="e" d="M330,364 L379,538" marker-end="url(#a)"/>
+      <text class="el" x="362" y="452">answers</text>
+      <path class="e" d="M385,364 L558,538" marker-end="url(#a)"/>
+      <text class="el" x="478" y="446">SQL</text>
+
+      <!-- wiki path -->
+      <path class="e wiki" d="M760,76 L760,138" marker-end="url(#aw)"/>
+      <text class="el wiki" x="768" y="112">webhooks · read calls</text>
+      <path class="e wiki" d="M840,168 L878,168" marker-end="url(#aw)"/>
+      <path class="e wiki" d="M980,196 L980,298" marker-end="url(#aw)"/>
+      <text class="el wiki" x="988" y="252">enqueue</text>
+      <path class="e wiki" d="M880,332 L842,332" marker-end="url(#aw)"/>
+      <text class="el wiki" x="861" y="293" text-anchor="middle">in order</text>
+      <path class="e wiki" d="M640,168 L397,168" marker-end="url(#aw)"/>
+      <text class="el wiki" x="518" y="160" text-anchor="middle">Wiki API /api/v1 · M2M token</text>
+      <path class="e wiki" d="M700,364 L700,538" marker-end="url(#aw)"/>
+      <text class="el wiki" x="692" y="452" text-anchor="end">one transaction:</text>
+      <text class="el wiki" x="692" y="466" text-anchor="end">page + chunks + vectors</text>
+      <path class="e wiki" d="M650,332 L602,332" marker-end="url(#aw)"/>
+      <text class="el wiki" x="626" y="324" text-anchor="middle">notify</text>
+      <path class="e wiki" d="M780,364 L780,490 L1100,490 L1100,48 L962,48" marker-end="url(#aw)"/>
+      <text class="el wiki" x="930" y="484" text-anchor="middle">fetch page vN · write back (via NAT)</text>
+      <path class="e" d="M880,418 L812,366" marker-end="url(#a)"/>
+    </svg>
+    </div>
+    <div class="legend"><span><i></i>user path</span><span><i class="w"></i>wiki path</span><span><i class="l"></i>later stage</span></div>
+    <figcaption>People come in through the ALB; the wiki comes in through API Gateway, both for webhooks and for reading Quorum data. Every wiki change is verified, queued per page, and applied by the worker to Postgres in a single transaction, which then tells any live session that uses that page.</figcaption>
+  </figure>
+</section>
+
+<section aria-labelledby="h-sync">
+  <h2 id="h-sync">Wiki → Quorum: async, but not eventual</h2>
+  <p>The webhook returns in milliseconds and the work happens behind a queue, but each page change is applied exactly once, in the order the wiki made it, and Quorum can say for every page whether it is current. A change that goes missing is caught and repaired, never left to drift.</p>
+  <ol class="flow">
+    <li><b>Wiki fires a webhook</b><span>page created, updated, moved, deleted, attachment added.</span></li>
+    <li><b>Lambda verifies and queues</b><span>checks the signature, writes <code>{page, version}</code> to SQS FIFO with the page as message group and page+version as dedup id. Returns 200.</span></li>
+    <li><b>Worker fetches vN</b><span>webhooks are thin, so the worker reads the page body and restrictions from the wiki REST API.</span></li>
+    <li><b>Embed</b><span>chunks the page and gets vectors from Bedrock.</span></li>
+    <li><b>One transaction</b><span>page row, chunks, vectors and permissions, applied only if vN is newer than what is stored. Readers see the old page or the new one, never half.</span></li>
+    <li><b>Live sessions hear about it</b><span>“The runbook you're discussing changed (v12 → v13)” in every session that uses the page.</span></li>
+  </ol>
+  <div class="two">
+    <div class="panel">
+      <h3>What makes it reliable</h3>
+      <ul class="tight">
+        <li><b>Per-page order:</b> FIFO message groups keep v13 behind v12; different pages run in parallel.</li>
+        <li><b>Idempotent:</b> the version check makes replays and duplicates harmless.</li>
+        <li><b>Bounded lag:</b> an alarm when the oldest message is older than 60 s; failures land in the DLQ, which also alarms.</li>
+        <li><b>Repair:</b> every 15 minutes the worker compares the wiki's last-modified times with Postgres and re-queues anything behind.</li>
+        <li><b>Read your own writes:</b> when Quorum writes back to the wiki, it stores the new version in the same request, so the echo webhook is a no-op.</li>
+        <li><b>Visible:</b> a sync status per page (current, catching up, failed) in Admin.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Quorum → Wiki</h3>
+      <ul class="tight">
+        <li><b>Read API</b> for the wiki: search, session reports, decisions, and document versions under <code>/api/v1</code>, behind API Gateway with throttling.</li>
+        <li><b>Machine identity:</b> a Cognito app client with client-credentials and scopes like <code>read:reports</code>, used by a small Forge app or macro in the wiki.</li>
+        <li><b>Write-back:</b> approved document changes go to the wiki with its version number, so a page edited in the meantime is a conflict to resolve, not an overwrite.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-prof">
+  <h2 id="h-prof">Answers that know who is asking</h2>
+  <p>Each person has a profile: team, role, skills with a level (say <span class="mono">Kubernetes 5</span>, <span class="mono">RF 2</span>), areas they own, and how deep they like answers. People set it themselves; admins can adjust it; Quorum can suggest skills from activity, which the person confirms.</p>
+  <ol class="flow plain">
+    <li><b>Question + profile</b><span>who is asking, in which session.</span></li>
+    <li><b>Permission filter</b><span>only chunks from pages this person may read in the wiki.</span></li>
+    <li><b>Hybrid search</b><span>pgvector similarity plus Postgres full-text, in one query.</span></li>
+    <li><b>Re-rank with skills</b><span>favour sources in the person's areas; surface owners as people to ask.</span></li>
+    <li><b>Prompt at their level</b><span>an expert gets the diff and commands; a newcomer gets context first.</span></li>
+    <li><b>Answer with sources</b><span>links to the wiki pages and versions it used.</span></li>
+  </ol>
+</section>
+
+<section aria-labelledby="h-comp">
+  <h2 id="h-comp">AWS components</h2>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Component</th><th>Job in Quorum</th><th>Replaces in the POC</th></tr></thead>
+    <tbody>
+      <tr><td>VPC</td><td>2 AZs, public and private subnets, NAT for outbound calls, VPC endpoints for S3, SQS, Secrets, ECR and Bedrock</td><td class="poc">default VPC</td></tr>
+      <tr><td>ALB + ACM + Route 53</td><td>HTTPS and WebSocket entry, a real hostname and certificate</td><td class="poc">EC2 public IP, port 8000</td></tr>
+      <tr><td>CloudFront + WAF<span class="tag">later</span></td><td>edge caching of static files, rate limits, IP rules</td><td class="poc">security group allow-list</td></tr>
+      <tr><td>Cognito</td><td>the existing pool, plus a machine client and scopes for the wiki</td><td class="poc">same pool</td></tr>
+      <tr><td>ECS Fargate + ECR</td><td><code>quorum-web</code> (2+ tasks) and <code>quorum-worker</code>; images built by Bitbucket Pipelines</td><td class="poc">Docker Compose on EC2</td></tr>
+      <tr><td>Aurora PostgreSQL Serverless v2</td><td>system of record: users, profiles, skills, sessions, members, messages, documents, reports, wiki pages, audit; pgvector for retrieval</td><td class="poc">JSON files on EBS</td></tr>
+      <tr><td>S3</td><td>uploaded files and every version, wiki attachments, exports; versioning, KMS, lifecycle rules</td><td class="poc"><code>docs/vN.md</code> on disk</td></tr>
+      <tr><td>ElastiCache (Valkey)</td><td>WebSocket fan-out across web tasks, presence, rate limits</td><td class="poc">in-process fan-out</td></tr>
+      <tr><td>API Gateway (HTTP API)</td><td>wiki webhooks in, Wiki API out, throttling, JWT authorizer</td><td class="poc">none</td></tr>
+      <tr><td>Lambda</td><td>webhook signature check and enqueue; also the Cognito password setter you already have</td><td class="poc">none</td></tr>
+      <tr><td>SQS FIFO + DLQ</td><td>ordered wiki changes per page; report and document jobs</td><td class="poc">debounce timer in the process</td></tr>
+      <tr><td>EventBridge Scheduler</td><td>15-minute reconcile, nightly re-embed and cleanup</td><td class="poc">none</td></tr>
+      <tr><td>Bedrock</td><td>Claude for answers, an embeddings model for retrieval; IAM instead of an API key</td><td class="poc">OpenRouter key (keep as fallback)</td></tr>
+      <tr><td>Secrets Manager + KMS</td><td>DB credentials with rotation, wiki API token, webhook secret</td><td class="poc">same</td></tr>
+      <tr><td>SES</td><td>invitations from your own domain, no 50-a-day limit</td><td class="poc">Cognito default email</td></tr>
+      <tr><td>CloudWatch + X-Ray</td><td>logs, queue-age and DLQ alarms, traces, token usage per session</td><td class="poc"><code>docker logs</code></td></tr>
+      <tr><td>AWS Backup</td><td>Aurora snapshots and S3 backup plans</td><td class="poc">EBS snapshots</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Check which Claude and embedding models Bedrock offers in eu-south-1 directly, and which need the EU cross-region inference profile.</p>
+</section>
+
+<section aria-labelledby="h-cfn">
+  <h2 id="h-cfn">CloudFormation stacks</h2>
+  <p>One stack per layer, each exporting what the next one needs, so the app can be redeployed many times a day without touching the network or the data.</p>
+  <div class="stacks" aria-label="Stacks in deploy order">
+    <div class="st"><b>network</b><span>VPC, subnets, NAT, endpoints</span></div><span class="arr">→</span>
+    <div class="st"><b>data</b><span>Aurora, S3, Valkey, KMS, Backup</span></div><span class="arr">→</span>
+    <div class="st"><b>auth</b><span>Cognito (exists today)</span></div><span class="arr">→</span>
+    <div class="st"><b>app</b><span>ECS, ALB, SQS, API GW, Lambda, alarms</span></div><span class="arr">→</span>
+    <div class="st later"><b>edge</b><span>CloudFront, WAF</span></div>
+  </div>
+  <p>Separate dev and prod accounts (or at least stacks), with the same templates and different parameters.</p>
+</section>
+
+<section aria-labelledby="h-open">
+  <h2 id="h-open">Decisions to make before building</h2>
+  <div class="two">
+    <div class="panel">
+      <ul class="tight">
+        <li><b>Wiki permissions.</b> Quorum must never answer from a page the person can't open in the wiki. Mirror page restrictions on sync and filter on every search.</li>
+        <li><b>PSIP and Quorum.</b> Both index the same wiki. Decide whether Quorum reads from PSIP, or the wiki index moves into Quorum's Postgres. Two indexes of one wiki will disagree.</li>
+        <li><b>Write-back approval.</b> Who approves a document change before it reaches the wiki, and what happens on a version conflict.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <ul class="tight">
+        <li><b>Cost guardrails.</b> Token budgets per person and per session, with usage on the dashboard.</li>
+        <li><b>Retention.</b> How long messages, versions and audit records are kept, and how a person's data is deleted.</li>
+        <li><b>Retrieval quality.</b> A set of real questions with known good sources, re-run whenever the index or prompts change.</li>
+        <li><b>Initial load.</b> Bulk import of the existing wiki spaces before webhooks take over.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">Why Postgres with pgvector rather than a separate vector store: the page, its chunks, its vectors and its permissions change in one transaction. That is what makes the sync consistent instead of eventual.</p>
+</section>
+</div>
+
+</body></html>

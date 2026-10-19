@@ -77,6 +77,11 @@ def projects():
     app.logger.info(f"[{request.path}] - My Projects page accessed.")
     return render_template('projects.html')
 
+@app.route('/projects/quorum')
+def quorum_detail():
+    app.logger.info(f"[{request.path}] - Quorum detail page accessed.")
+    return render_template('quorum-detail.html')
+
 @app.route('/education')
 def education():
     app.logger.info(f"[{request.path}] - Education page accessed.")
