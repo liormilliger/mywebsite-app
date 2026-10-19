@@ -3,7 +3,7 @@ from prometheus_flask_exporter import PrometheusMetrics
 import os
 import logging
 import time
-from agent import init_agent
+from agent import init_agent, home_view
 from chat_store import NullChatStore
 
 app = Flask(__name__)
@@ -26,7 +26,7 @@ init_agent(app, NullChatStore())
 @app.route('/')
 def home():
     app.logger.info(f"[{request.path}] - Home page accessed.")
-    return render_template('index.html')
+    return home_view()  # agent view by default; classic page if the visitor chose it
 
 @app.route('/sitemap.xml')
 def sitemap():

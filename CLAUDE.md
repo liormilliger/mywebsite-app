@@ -70,7 +70,8 @@ The production deployment spans three repos:
 
 ## /ask (AI agent) and conversation log
 
-- `app/agent.py` (Blueprint): `GET /ask` page, `POST /api/ask` streams Server-Sent Events, `GET /llms.txt`. Registered in both `app.py` (with `PostgresChatStore`) and `app-local.py` (with `NullChatStore`, nothing logged).
+- Routing: `/` serves the agent (`agent.home_view`). `/classic` serves the classic `index.html` and sets a `site_view=classic` cookie so `/` keeps showing the classic page to that visitor; `/ask` clears the cookie and redirects to `/`. Classic nav links point to `/classic#<section>`.
+- `app/agent.py` (Blueprint): `/ask` and `/classic` routes, `POST /api/ask` streams Server-Sent Events, `GET /llms.txt`. Registered in both `app.py` (with `PostgresChatStore`) and `app-local.py` (with `NullChatStore`, nothing logged).
 - Knowledge source is **only** `app/knowledge/profile.json`. Update it when projects or experience change; classic templates are separate.
 - Claude writes short text, then calls display tools (`show_projects`, `show_role_fit`, `show_stack`, `show_timeline`, `show_stats`, `show_certifications`, `show_site_architecture`, `draft_intro`). The server turns each tool call into a component filled from the profile; `static/js/ask.js` renders and escapes it.
 - Answer tiers: (1) Claude while today's (UTC) site-wide spend, summed from `chat_messages.cost_usd`, is under `ASK_DAILY_BUDGET_USD` (default 0.50); (2) local model via Ollama (`app/local_llm.py`) if `OLLAMA_URL` is reachable — it writes text only, from a compact slice of the profile, and the keyword router picks the cards; (3) keyword router (`route_intent` / `INTENTS`). Each tier falls through on error; if the spend can't be read, Claude is skipped (fail safe).

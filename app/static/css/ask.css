@@ -19,6 +19,9 @@
 .ask-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px 32px;flex-wrap:wrap;padding:12px 4px 18px}
 .ask-head h1{font-size:clamp(30px,4.2vw,48px);font-weight:800;line-height:1.02;color:var(--cream)}
 .ask-head p{margin:0;color:var(--muted);max-width:52ch}
+.ask-head-side{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.ask a.ask-classic{display:inline-block;font-size:14px;font-weight:600;color:var(--signal);text-decoration:none;border:1px solid var(--signal);border-radius:8px;padding:7px 12px}
+.ask a.ask-classic:hover{background:rgba(76,194,240,.1)}
 .ask-eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
 
 .ask-app{display:grid;grid-template-columns:230px minmax(0,1fr) 270px;height:min(780px,calc(100vh - 210px));min-height:560px;

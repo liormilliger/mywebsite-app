@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.scrollY >= section.offsetTop - 120) current = section.id;
             });
             spNavLinks.forEach(link => {
-                link.classList.toggle('sp-nav-active', link.getAttribute('href') === `/#${current}`);
+                link.classList.toggle('sp-nav-active', link.getAttribute('href') === `/classic#${current}`);
             });
         };
         window.addEventListener('scroll', onScroll, { passive: true });

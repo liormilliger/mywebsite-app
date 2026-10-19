@@ -4,6 +4,7 @@
 {% block head %}
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/ask.css') }}">
+<link rel="canonical" href="https://liormilliger.com/">
 <meta name="description" content="Ask questions about Lior Milliger's platform engineering and AI work. Answers come from his CV and projects, with sources.">
 {% endblock %}
 
@@ -14,7 +15,10 @@
       <span class="ask-eyebrow">AI-first view · beta</span>
       <h1>Ask the engineer.</h1>
     </div>
-    <p>Answers come only from Lior's CV and project write-ups. Prefer to scroll? <a href="/">Classic site</a>.</p>
+    <div class="ask-head-side">
+      <p>Answers come only from Lior's CV and project write-ups.</p>
+      <a class="ask-classic" href="/classic">Prefer to scroll? Open the full website →</a>
+    </div>
   </div>
 
   <div class="ask-app">
@@ -43,6 +47,7 @@
       </div>
 
       <div class="ask-links ask-hide-sm">
+        <a href="/classic">Full website</a>
         <a href="{{ profile.person.cv_url }}" target="_blank" rel="noopener noreferrer">CV (PDF)</a>
         <a href="{{ profile.person.github }}" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="{{ profile.person.linkedin }}" target="_blank" rel="noopener noreferrer">LinkedIn</a>

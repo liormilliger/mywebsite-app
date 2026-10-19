@@ -24,7 +24,7 @@ import re
 import time
 import uuid
 
-from flask import (Blueprint, Response, current_app, jsonify, render_template,
+from flask import (Blueprint, Response, current_app, jsonify, make_response, redirect, render_template,
                    request, stream_with_context)
 
 import local_llm
@@ -241,10 +241,36 @@ def get_store():
 
 # ── Routes ───────────────────────────────────────────────────────────────────
 
+# The agent is the home page. A visitor who picks the classic site gets a
+# cookie, so "/" keeps showing them the classic page until they choose /ask again.
+VIEW_COOKIE = 'site_view'
+VIEW_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
+
+
+def render_agent():
+    return render_template('ask.html', profile=PROFILE, logging_enabled=get_store().enabled)
+
+
+def home_view():
+    """Used by the '/' route in app.py and app-local.py."""
+    if request.cookies.get(VIEW_COOKIE) == 'classic':
+        return render_template('index.html')
+    return render_agent()
+
+
+@bp.route('/classic')
+def classic_page():
+    resp = make_response(render_template('index.html'))
+    resp.set_cookie(VIEW_COOKIE, 'classic', max_age=VIEW_COOKIE_MAX_AGE, samesite='Lax', secure=request.is_secure)
+    return resp
+
+
 @bp.route('/ask')
 def ask_page():
-    return render_template('ask.html', profile=PROFILE,
-                           logging_enabled=get_store().enabled)
+    """Switch back to the agent view; old /ask links keep working."""
+    resp = redirect('/', code=302)
+    resp.delete_cookie(VIEW_COOKIE)
+    return resp
 
 
 @bp.route('/llms.txt')

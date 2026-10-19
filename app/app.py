@@ -4,7 +4,7 @@ import os
 import logging
 import time
 from db import log_visitor, get_db
-from agent import init_agent
+from agent import init_agent, home_view
 from chat_store import PostgresChatStore
 
 app = Flask(__name__)
@@ -52,7 +52,7 @@ def log_request_info():
 def home():
     app.logger.info(f"[{request.path}] - Home page accessed.")
     app.logger.warning(f"[{request.path}] - This is a sample warning message for demonstration.")
-    return render_template('index.html')
+    return home_view()  # agent view by default; classic page if the visitor chose it
 
 @app.before_request
 def remove_trailing_slash():
