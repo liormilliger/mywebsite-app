@@ -141,6 +141,23 @@
     <p class="sp-section-sub">Selected work across infrastructure, automation, and systems engineering</p>
     <div class="projects-grid">
 
+      <div class="project-card project-card--featured project-card--clickable"
+           onclick="if(!event.target.closest('a'))location.href='/projects/quorum'">
+        <h2>Quorum</h2>
+        <div class="tech-chips">
+          <span class="chip">Python</span><span class="chip">FastAPI</span>
+          <span class="chip">WebSockets</span><span class="chip">AWS</span>
+          <span class="chip">Docker</span>
+        </div>
+        <p>A collaborative GenAI workspace where teams work with Claude together in shared sessions, combining a streaming AI assistant with a Slack-style team chat. Features role-based access via AWS Cognito, shared connectors to MCP servers and Confluence, and living documents that Claude edits in real time with versioned diffs. Source code is in a private GitHub repository.</p>
+        <div class="project-links">
+          <a href="/projects/quorum">View Details →</a>
+          <a href="https://github.com/liormilliger/quorum" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-github"></i> <i class="fas fa-lock"></i> GitHub
+          </a>
+        </div>
+      </div>
+
       <div class="project-card project-card--featured">
         <h2>This Website</h2>
         <div class="tech-chips">
