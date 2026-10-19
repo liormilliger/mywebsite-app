@@ -263,8 +263,74 @@
     const aud = { Recruiter: 'hiring team', Engineer: 'engineering review', Founder: 'founding team' }[state.persona] || 'your team';
     out.innerHTML = `<div class="onepager"><h5>Lior Milliger</h5><div class="r">Platform Engineer · AI Systems · prepared for ${esc(aud)}</div><ul>` +
       pins.map(p => `<li><b>${esc(clip(p.q, 120))}</b><br>${esc(clip(p.a, 420))}</li>`).join('') +
-      `</ul><div class="r" style="margin-top:8px">${esc(CONTACT.email || '')} · ${esc((CONTACT.linkedin || '').replace(/^https?:\/\/(www\.)?/, ''))}</div></div>`;
+      `</ul><div class="r" style="margin-top:8px">${[CONTACT.email, CONTACT.phone, (CONTACT.linkedin || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')].filter(Boolean).map(esc).join(' · ')}</div></div>` +
+      `<button class="btn" id="dlPdf" type="button">Download PDF</button><span class="note" id="dlNote"></span>`;
+    document.getElementById('dlPdf').addEventListener('click', () => downloadPdf(aud));
   });
+
+  // ── one-pager as a PDF, built in the browser (jsPDF, self-hosted, loaded on first use) ──
+  let jsPdfLoading = null;
+  function loadJsPdf() {
+    if (window.jspdf) return Promise.resolve(window.jspdf);
+    if (!jsPdfLoading) {
+      jsPdfLoading = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = '/static/js/vendor/jspdf-2.5.1.umd.min.js';
+        s.onload = () => resolve(window.jspdf);
+        s.onerror = () => { jsPdfLoading = null; reject(new Error('Could not load the PDF tool.')); };
+        document.head.appendChild(s);
+      });
+    }
+    return jsPdfLoading;
+  }
+  // The built-in PDF fonts cover Latin-1 only, so swap the few typographic characters we use.
+  const pdfText = s => String(s || '')
+    .replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[\u2013\u2014]/g, '-')
+    .replace(/\u2192/g, '->').replace(/\u2026/g, '...').replace(/\u2022/g, '-').replace(/\u2726/g, '*')
+    .replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g, '');
+  async function downloadPdf(aud) {
+    const note = document.getElementById('dlNote');
+    try {
+      const { jsPDF } = await loadJsPdf();
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      const W = 210, M = 18, TW = W - 2 * M, BOTTOM = 297 - 22;
+      const navy = [11, 25, 44], cyan = [20, 140, 190], grey = [90, 104, 122];
+      let y = 24;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(...navy);
+      doc.text('Lior Milliger', M, y); y += 7;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.setTextColor(...cyan);
+      doc.text('Platform Engineer - DevOps & Cloud Infrastructure - AI Systems', M, y); y += 6;
+      doc.setFontSize(9); doc.setTextColor(...grey);
+      doc.text(pdfText(`Prepared for ${aud} - ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`), M, y); y += 4;
+      doc.setDrawColor(...cyan); doc.setLineWidth(0.6); doc.line(M, y, W - M, y); y += 9;
+      const footer = () => {
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(...grey);
+        doc.text(pdfText([CONTACT.email, CONTACT.phone, (CONTACT.linkedin || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''), 'liormilliger.com'].filter(Boolean).join('  |  ')), M, 297 - 12);
+      };
+      pins.forEach((p, i) => {
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5);
+        const qt = pdfText(p.q).trim();
+        const q = doc.splitTextToSize(qt.charAt(0).toUpperCase() + qt.slice(1), TW);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
+        const a = doc.splitTextToSize(pdfText(p.a), TW);
+        const need = q.length * 5.4 + a.length * 5 + 8;
+        if (y + Math.min(need, 40) > BOTTOM) { footer(); doc.addPage(); y = 22; }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(...navy);
+        doc.text(q, M, y); y += q.length * 5.4 + 1;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5); doc.setTextColor(40, 48, 60);
+        a.forEach(line => {
+          if (y > BOTTOM) { footer(); doc.addPage(); y = 22; doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5); doc.setTextColor(40, 48, 60); }
+          doc.text(line, M, y); y += 5;
+        });
+        y += i < pins.length - 1 ? 6 : 0;
+      });
+      footer();
+      doc.save('Lior-Milliger-one-pager.pdf');
+      if (note) note.textContent = '';
+    } catch (err) {
+      if (note) note.textContent = err.message || 'Could not create the PDF.';
+    }
+  }
 
   // ── events ──
   document.addEventListener('click', e => {

@@ -98,6 +98,6 @@
   </div>
 </div>
 
-<script>window.ASK_CONTACT = {{ {"email": profile.person.email, "linkedin": profile.person.linkedin} | tojson }};</script>
+<script>window.ASK_CONTACT = {{ {"email": profile.person.email, "phone": profile.person.phone, "linkedin": profile.person.linkedin} | tojson }};</script>
 <script src="{{ url_for('static', filename='js/ask.js') }}"></script>
 {% endblock %}

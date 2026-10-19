@@ -187,3 +187,5 @@
 .ask details.ref>.gcard{border:0;border-radius:0 0 8px 8px;animation:none}
 .ask .qa-actions{display:flex;justify-content:flex-end}
 @media (max-width:760px){.ask .ref-links{display:none}}
+.ask #onepager{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.ask #onepager .onepager{align-self:stretch}
