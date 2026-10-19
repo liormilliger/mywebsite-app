@@ -30,6 +30,11 @@
   const head = (kind, title, pin) =>
     `<div class="gcard-h"><div><span class="kind">${esc(kind)}</span><h3>${esc(title)}</h3></div>` +
     `<button class="pin" type="button" data-pin="${esc(pin)}">Pin</button></div>`;
+  // Sources open in a new tab so the conversation stays put. Site sections point to the
+  // classic page (/classic#section), which doesn't switch the visitor's home view.
+  const src = (href, label) => `<a href="${safeUrl(href)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`;
+  const srcs = (...links) => `<div class="srcs"><span>sources</span>${links.filter(Boolean).join('')}</div>`;
+  const FIT_LABEL = { strong: 'strong', good: 'good', growing: 'transferable', gap: 'to confirm' };
   const chipsOf = arr => '<div class="tchips">' + (arr || []).map(t => `<span>${esc(t)}</span>`).join('') + '</div>';
 
   const R = {
@@ -38,7 +43,7 @@
       let html = '';
       if (first) {
         const img = first.image ? `<img src="${safeUrl(first.image)}" alt="${esc(first.name)} screenshot" loading="lazy">` : '';
-        const links = [first.url && `<a href="${safeUrl(first.url)}">details</a>`, first.repo && `<a href="${safeUrl(first.repo)}" target="_blank" rel="noopener noreferrer">repo</a>`].filter(Boolean).join('');
+        const links = [first.url && src(first.url, 'details'), first.repo && src(first.repo, 'repo'), src('/classic#projects', 'projects')].filter(Boolean).join('');
         html += `<div class="gcard">${head(first.featured ? 'Featured project' : 'Project', first.name, first.name + ': ' + first.summary.split('. ')[0])}
           <div class="proj${img ? '' : ' noimg'}">${img}<div><p>${esc(first.summary)}</p>${chipsOf(first.tags)}</div></div>
           ${links ? `<div class="srcs"><span>sources</span>${links}</div>` : ''}</div>`;
@@ -46,7 +51,7 @@
       if (rest.length) {
         html += `<div class="gcard">${head('Also relevant', 'Ranked for you', 'Projects: ' + rest.map(p => p.name).join(', '))}<div class="plist">` +
           rest.map(p => `<div><span>${esc(p.name)}<small>${esc(p.summary)}</small></span>${p.repo ? `<a href="${safeUrl(p.repo)}" target="_blank" rel="noopener noreferrer">repo ↗</a>` : ''}</div>`).join('') +
-          '</div></div>';
+          '</div>' + srcs(src('/classic#projects', 'all projects')) + '</div>';
       }
       return html;
     },
@@ -54,18 +59,18 @@
       const strong = c.rows.filter(r => r.fit === 'strong').map(r => r.requirement);
       return `<div class="gcard">${head('Role fit', c.role, 'Fit for ' + c.role + ': strong on ' + (strong.join(', ') || '—'))}
         <div class="fit-wrap"><table class="fit"><tr><th>Requirement</th><th>Evidence</th><th>Fit</th></tr>` +
-        c.rows.map(r => `<tr><td>${esc(r.requirement)}</td><td>${esc(r.evidence)}</td><td><span class="lvl ${esc(r.fit)}">${esc(r.fit)}</span></td></tr>`).join('') +
-        `</table></div><div class="srcs"><span>sources</span><a href="${safeUrl(CONTACT.cv || '/static/files/LiorMilligerCV.pdf')}" target="_blank" rel="noopener noreferrer">CV</a><a href="/about-me">about-me</a></div></div>`;
+        c.rows.map(r => `<tr><td>${esc(r.requirement)}</td><td>${esc(r.evidence)}</td><td><span class="lvl ${esc(r.fit)}">${esc(FIT_LABEL[r.fit] || r.fit)}</span></td></tr>`).join('') +
+        `</table></div>${srcs(src('/static/files/LiorMilligerCV.pdf', 'CV'), src('/classic#about', 'about'), src('/classic#tech', 'tech stack'))}</div>`;
     },
     stack(c) {
       return `<div class="gcard">${head('Stack', 'Tools by area', 'Stack: ' + c.groups.map(g => g.category).join(', '))}<div class="stack">` +
         c.groups.map(g => `<div><h5>${esc(g.category)}</h5>${chipsOf(g.items)}</div>`).join('') +
-        '</div><div class="srcs"><span>sources</span><a href="/tech-stack">tech-stack</a></div></div>';
+        '</div>' + srcs(src('/classic#tech', 'tech stack')) + '</div>';
     },
     timeline(c) {
       return `<div class="gcard">${head('Timeline', 'From jazz clubs to clusters', 'Story: ' + c.items.map(i => i.title).join(' → '))}<div class="tl">` +
         c.items.map(i => `<div><b>${esc(i.title)}</b><i>${esc(i.tag)}</i><p>${esc(i.text)}</p></div>`).join('') +
-        '</div><div class="srcs"><span>sources</span><a href="/about-me">about-me</a></div></div>';
+        '</div>' + srcs(src('/classic#about', 'about'), src('/about-me', 'full story')) + '</div>';
     },
     stats(c) {
       return `<div class="gcard">${head('Impact', 'In numbers', 'Impact: ' + c.items.map(s => s.value + ' ' + s.label).join(', '))}<div class="stats">` +
@@ -74,13 +79,15 @@
     certifications(c) {
       return `<div class="gcard">${head('Credentials', 'Certifications', 'Certifications: ' + c.items.map(x => x.name).join(', '))}<div class="certs">` +
         c.items.map(x => `<a href="${safeUrl(x.url)}" target="_blank" rel="noopener noreferrer"><img src="${safeUrl(x.badge)}" alt="" loading="lazy">${esc(x.name)}</a>`).join('') +
-        `</div><p class="note" style="margin-top:10px">Degrees: ${esc((c.education.degrees || []).join(' · '))}</p></div>`;
+        `</div><p class="note" style="margin-top:10px">Degrees: ${esc((c.education.degrees || []).join(' · '))}</p>${srcs(src('/classic#education', 'education'))}</div>`;
     },
     architecture(c) {
-      return `<div class="gcard">${head('How this site runs', 'Build → scan → GitOps', 'This site: ' + c.summary)}
+      const path = steps => `<div class="path">${(steps || []).map(esc).map(s => `<span>${s}</span>`).join('<i>→</i>')}</div>`;
+      return `<div class="gcard">${head('How this site runs', c.title || 'How this site runs', 'This site: ' + c.summary)}
         <p style="margin:0 0 10px;font-size:14px">${esc(c.summary)}</p>
-        <div class="path">${c.pipeline.map(esc).map(s => `<span>${s}</span>`).join('<i>→</i>')}</div>
-        <div class="srcs"><span>sources</span><a href="https://github.com/liormilliger/mywebsite-app" target="_blank" rel="noopener noreferrer">mywebsite-app</a></div></div>`;
+        <p class="note" style="margin:0 0 6px">Production · Docker Compose on EC2</p>${path(c.pipeline)}
+        ${c.pipeline_k8s ? `<p class="note" style="margin:10px 0 6px">Kubernetes path · EKS + ArgoCD, ready to switch on</p>${path(c.pipeline_k8s)}` : ''}
+        ${srcs(src('https://github.com/liormilliger/mywebsite-app', 'mywebsite-app'), src('/classic#projects', 'projects'))}</div>`;
     },
     intro(c) {
       const id = 'intro' + Math.random().toString(36).slice(2, 8);

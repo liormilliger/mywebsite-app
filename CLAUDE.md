@@ -10,7 +10,7 @@ cd app
 source venv/bin/activate
 pip install -r requirements.txt
 python3 app-local.py
-# Accessible at http://localhost:5000
+# Accessible at http://localhost:5001
 ```
 
 **Full stack with Docker Compose (nginx + Flask + PostgreSQL + certbot):**
@@ -39,6 +39,8 @@ docker-compose -f docker-compose.ci.yaml -p ci down
 
 This is a personal portfolio/CV site built with Python/Flask, backed by PostgreSQL for visitor tracking.
 
+**Where it runs:** production is Docker Compose on one EC2 instance (t3a.medium: nginx, certbot, app, PostgreSQL), deployed by `local-ci-deployment.yaml` on a self-hosted runner. The EKS + ArgoCD path (`push-image.yaml` → ECR → `mywebsite-k8s`) is kept working to demonstrate full CI/CD but isn't serving traffic, to save cost.
+
 **Two app entry points:**
 - `app/app-local.py` — no database, for local development without Docker
 - `app/app.py` — production version; imports `db.py`, registers Prometheus metrics, and logs every non-static request via a `@before_request` middleware that calls `log_visitor()`
@@ -63,16 +65,17 @@ Image tags follow the format `1.<run_number>-<branch-name>`.
 
 ## Multi-Repo Context
 
-The production deployment spans three repos:
+The full (EKS) deployment spans three repos:
 - **mywebsite-app** (this repo): Flask app, templates, Docker config
 - **mywebsite-k8s**: Kubernetes manifests and ArgoCD App-of-Apps (auto-updated by CI)
 - **mywebsite-iac**: Terraform for AWS VPC, EKS cluster, and ArgoCD Helm install
 
 ## /ask (AI agent) and conversation log
 
-- Routing: `/` serves the agent (`agent.home_view`). `/classic` serves the classic `index.html` and sets a `site_view=classic` cookie so `/` keeps showing the classic page to that visitor; `/ask` clears the cookie and redirects to `/`. Classic nav links point to `/classic#<section>`.
+- Routing: `/` serves the agent (`agent.home_view`). `/classic` serves the classic `index.html`; `/classic?view=classic` (the "full website" buttons) also sets a `site_view=classic` cookie so `/` keeps showing the classic page to that visitor. Agent answers cite sources as `/classic#<section>` links in a new tab, which don't set the cookie; `/ask` clears the cookie and redirects to `/`. Classic nav links point to `/classic#<section>`.
 - `app/agent.py` (Blueprint): `/ask` and `/classic` routes, `POST /api/ask` streams Server-Sent Events, `GET /llms.txt`. Registered in both `app.py` (with `PostgresChatStore`) and `app-local.py` (with `NullChatStore`, nothing logged).
-- Knowledge source is **only** `app/knowledge/profile.json`. Update it when projects or experience change; classic templates are separate.
+- Knowledge sources are **only** `app/knowledge/profile.json` and the skill files in `app/knowledge/skills/*.md` (one per area, loaded into the system prompt at startup; README excluded). Everything there is public: no client/product names, hosts, IPs or code from private work (rules in `skills/README.md`). Update them when experience changes; classic templates are separate.
+- Tone: the system prompt makes the agent Lior's advocate: strengths and evidence first, soft skills from `working-style.md`, no unbacked claims. Role-fit levels display as strong / good / transferable (`growing`, must name the closest experience) / to confirm (`gap`, only for non-technical items like clearance or location).
 - Claude writes short text, then calls display tools (`show_projects`, `show_role_fit`, `show_stack`, `show_timeline`, `show_stats`, `show_certifications`, `show_site_architecture`, `draft_intro`). The server turns each tool call into a component filled from the profile; `static/js/ask.js` renders and escapes it.
 - Answer tiers: (1) Claude while today's (UTC) site-wide spend, summed from `chat_messages.cost_usd`, is under `ASK_DAILY_BUDGET_USD` (default 0.50); (2) local model via Ollama (`app/local_llm.py`) if `OLLAMA_URL` is reachable — it writes text only, from a compact slice of the profile, and the keyword router picks the cards; (3) keyword router (`route_intent` / `INTENTS`). Each tier falls through on error; if the spend can't be read, Claude is skipped (fail safe).
 - Caps checked before any tier: `ASK_MAX_PROMPTS_PER_IP_PER_DAY` (60), `ASK_MAX_PROMPTS_PER_SESSION` (20), `ASK_MAX_PROMPT_CHARS` (6000, enough for a pasted job description). Claude cost uses `ANTHROPIC_PRICE_INPUT_PER_MTOK` / `ANTHROPIC_PRICE_OUTPUT_PER_MTOK` (Haiku 5.5 defaults 0.10 / 0.50), including cache reads and writes.

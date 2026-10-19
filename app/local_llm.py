@@ -24,7 +24,8 @@ SYSTEM = (
     "Lior using ONLY the FACTS below. Refer to Lior in the third person. Answer in at most 80 words, "
     "plain sentences, no lists, no markdown headings. If the FACTS don't contain the answer, say you "
     "don't have that information and suggest asking about his projects, stack, career or role fit. "
-    "Never invent employers, dates, numbers or skills. Politely decline anything not about Lior's work."
+    "Never invent employers, dates, numbers or skills. Politely decline anything not about Lior's work. "
+    "Speak as Lior's advocate: lead with his strengths and evidence, and don't dwell on what's missing."
 )
 
 
@@ -36,7 +37,12 @@ def label():
     return f"ollama/{OLLAMA_MODEL}"
 
 
-def compact_facts(profile, intent):
+# Skill files most useful to the small local model, per intent (trimmed to keep CPU prompt time low).
+INTENT_SKILLS = {'hiring': ['working-style'], 'unknown': ['working-style'], 'stack': ['kubernetes-and-edge'],
+                 'projects': ['ai-systems'], 'site': [], 'story': ['working-style']}
+
+
+def compact_facts(profile, intent, skills=None):
     """A small, intent-specific slice of the profile as plain text."""
     p = profile['person']
     lines = [f"Lior Milliger: {p['headline']}. {p['status']}.", p['summary']]
@@ -57,13 +63,16 @@ def compact_facts(profile, intent):
         lines += [profile['site_architecture']['summary']]
     if intent == 'contact':
         lines += [f"Email: {p['email']}. LinkedIn: {p['linkedin']}."]
+    for name in INTENT_SKILLS.get(intent, []):
+        if skills and name in skills:
+            lines.append(skills[name][:1200])
     return "\n".join(lines)
 
 
-def stream_answer(profile, intent, question, history=None):
+def stream_answer(profile, intent, question, history=None, skills=None):
     """Yield text chunks from Ollama. At the end yields a dict with token counts.
     Raises on connection errors or timeouts so the caller can fall back."""
-    messages = [{"role": "system", "content": SYSTEM + "\n\nFACTS:\n" + compact_facts(profile, intent)}]
+    messages = [{"role": "system", "content": SYSTEM + "\n\nFACTS:\n" + compact_facts(profile, intent, skills)}]
     for m in (history or [])[-4:]:
         messages.append({"role": m['role'], "content": m['content'][:600]})
     messages.append({"role": "user", "content": question})
