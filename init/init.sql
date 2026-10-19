@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 );
 CREATE INDEX IF NOT EXISTS idx_chat_messages_ip ON chat_messages (visitor_ip, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_chat_messages_session ON chat_messages (session_id, turn_index);
+ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS cost_usd NUMERIC(12,6);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_created ON chat_messages (created_at);
 
 -- Convenience view: full transcript grouped by IP, then session, in order.
 CREATE OR REPLACE VIEW chat_log_by_ip AS
@@ -65,7 +67,8 @@ SELECT m.visitor_ip,
        m.output_tokens,
        m.latency_ms,
        m.error,
-       m.created_at
+       m.created_at,
+       m.cost_usd
 FROM chat_messages m
 JOIN chat_sessions s USING (session_id)
 ORDER BY m.visitor_ip, s.started_at, m.turn_index, m.message_id;

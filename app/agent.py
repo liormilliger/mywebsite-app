@@ -9,8 +9,12 @@ The agent only knows what is in knowledge/profile.json. Claude writes a short
 answer and calls "display" tools; the server turns each tool call into a UI
 component filled from the profile, so cards can't contain invented projects.
 
-Without ANTHROPIC_API_KEY (or if the API fails) a keyword router answers from
-the same profile, so the page also works locally and in CI.
+Answer tiers, in order:
+  1. Claude, while today's site-wide spend is under ASK_DAILY_BUDGET_USD
+  2. a local model via Ollama (local_llm.py), if OLLAMA_URL is set and reachable
+  3. a keyword router over the same profile (always works, costs nothing)
+Each tier falls through to the next on error. Per-IP and per-session caps
+apply before any tier runs.
 
 Every prompt and answer is logged through the chat store (see chat_store.py).
 """
@@ -23,6 +27,8 @@ import uuid
 from flask import (Blueprint, Response, current_app, jsonify, render_template,
                    request, stream_with_context)
 
+import local_llm
+from secrets_loader import get_anthropic_api_key
 from chat_store import client_ip
 
 bp = Blueprint('agent', __name__)
@@ -37,6 +43,13 @@ STACK = {s['category']: s for s in PROFILE['stack']}
 MODEL = os.environ.get('ANTHROPIC_MODEL', 'claude-haiku-5-5')
 MAX_PROMPT_CHARS = int(os.environ.get('ASK_MAX_PROMPT_CHARS', 1000))
 MAX_PROMPTS_PER_DAY = int(os.environ.get('ASK_MAX_PROMPTS_PER_IP_PER_DAY', 60))
+MAX_PROMPTS_PER_SESSION = int(os.environ.get('ASK_MAX_PROMPTS_PER_SESSION', 20))
+# Site-wide Claude budget per UTC day. When it's spent, answers come from the
+# local model (if configured) or the keyword router until midnight UTC.
+DAILY_BUDGET_USD = float(os.environ.get('ASK_DAILY_BUDGET_USD', 0.50))
+# USD per million tokens; defaults are Claude Haiku 5.5 list prices.
+PRICE_IN = float(os.environ.get('ANTHROPIC_PRICE_INPUT_PER_MTOK', 0.10))
+PRICE_OUT = float(os.environ.get('ANTHROPIC_PRICE_OUTPUT_PER_MTOK', 0.50))
 MAX_HISTORY = 10
 PERSONAS = {'Recruiter', 'Engineer', 'Founder'}
 
@@ -137,39 +150,63 @@ def build_component(name, args):
     return None
 
 
-# ── Scripted fallback (no API key, or API error) ─────────────────────────────
+# ── Keyword router (used by the local model and the scripted fallback) ───────
 
-def scripted_answer(text, persona):
+INTENT_PATTERNS = [
+    ('hiring', r'\bhir|recruit|\bfit\b|\brole\b|\bjob|position|senior'),
+    ('projects', r'quorum|project|portfolio|built|\bai\b|llm|rag|agent'),
+    ('stack', r'stack|kube|k8s|terraform|aws|helm|argo|tool|skill|tech'),
+    ('story', r'music|story|background|career|jazz|journey|before tech'),
+    ('certs', r'cert|educat|degree|course|cka|saa'),
+    ('site', r'site|served|infra|deploy|pipeline|cluster|hosted'),
+    ('contact', r'contact|email|call|meet|intro|reach|book|talk'),
+]
+
+INTENTS = {
+    'hiring': ("Here's how Lior lines up against a typical senior platform role, based on his CV.",
+               [("show_role_fit", {"role": "Senior Platform Engineer", "rows": [
+                   {"requirement": "Kubernetes in production", "evidence": "CKA; migrated an edge platform to a 13-microservice K3s cluster", "fit": "strong"},
+                   {"requirement": "GitOps & CI/CD", "evidence": "ArgoCD and FluxCD; Jenkins, GitHub Actions, Bitbucket Pipelines", "fit": "strong"},
+                   {"requirement": "IaC on AWS", "evidence": "AWS SAA; Terraform, Terragrunt, CloudFormation/SAM multi-region", "fit": "strong"},
+                   {"requirement": "Cost ownership", "evidence": "Terraform + Lambda FinOps at JFrog: 80% cloud waste removed, 30% spend cut", "fit": "good"},
+                   {"requirement": "AI / LLM systems", "evidence": "Quorum; RAG pipelines with AWS Bedrock and Qdrant", "fit": "strong"},
+                   {"requirement": "Large-org scale", "evidence": "3+ years, mostly small teams with full ownership", "fit": "growing"}]}),
+                ("show_projects", {"ids": ["quorum"]})]),
+    'projects': ("Quorum is the strongest AI example: a shared workspace where a team works with Claude in real time. "
+                 "Below it are other projects worth a look.",
+                 [("show_projects", {"ids": ["quorum", "mission-recorder", "this-website", "kafka-data-shipping"]})]),
+    'stack': ("Here's the stack Lior works with, grouped by area.", [("show_stack", {})]),
+    'story': ("Lior spent 30 years in music before moving into tech, and approached the switch the same way he approached music theory.",
+              [("show_timeline", {})]),
+    'certs': ("Lior holds three cloud and Kubernetes certifications, plus degrees in music.", [("show_certifications", {})]),
+    'site': ("This site runs on the same kind of pipeline Lior builds for production work.", [("show_site_architecture", {})]),
+    'contact': ("I've drafted a short intro you can edit and copy.",
+                [("draft_intro", {"message": "Hi Lior,\n\nI came across your site and would like to talk about a platform engineering role. Do you have 20 minutes this week?\n\nThanks,"})]),
+    'unknown': ("I don't have information about that in Lior's profile, so I won't guess. "
+                "I can tell you about his AI projects, his stack, his career story, or how he'd fit a role.", []),
+}
+
+
+def route_intent(text):
     s = text.lower()
-    if re.search(r'\bhir|recruit|\bfit\b|\brole\b|\bjob|position|senior', s):
-        return ("Here's how Lior lines up against a typical senior platform role, based on his CV. "
-                "Paste a real job description and the full agent will map it line by line.",
-                [("show_role_fit", {"role": "Senior Platform Engineer", "rows": [
-                    {"requirement": "Kubernetes in production", "evidence": "CKA; migrated an edge platform to a 13-microservice K3s cluster", "fit": "strong"},
-                    {"requirement": "GitOps & CI/CD", "evidence": "ArgoCD and FluxCD; Jenkins, GitHub Actions, Bitbucket Pipelines", "fit": "strong"},
-                    {"requirement": "IaC on AWS", "evidence": "AWS SAA; Terraform, Terragrunt, CloudFormation/SAM multi-region", "fit": "strong"},
-                    {"requirement": "Cost ownership", "evidence": "Terraform + Lambda FinOps at JFrog: 80% cloud waste removed, 30% spend cut", "fit": "good"},
-                    {"requirement": "AI / LLM systems", "evidence": "Quorum; RAG pipelines with AWS Bedrock and Qdrant", "fit": "strong"},
-                    {"requirement": "Large-org scale", "evidence": "3+ years, mostly small teams with full ownership", "fit": "growing"}]}),
-                 ("show_projects", {"ids": ["quorum"]})])
-    if re.search(r'quorum|project|portfolio|built|\bai\b|llm|rag|agent', s):
-        return ("Quorum is the strongest AI example: a shared workspace where a team works with Claude in real time. "
-                "Below it are other projects worth a look.",
-                [("show_projects", {"ids": ["quorum", "mission-recorder", "this-website", "kafka-data-shipping"]})])
-    if re.search(r'stack|kube|k8s|terraform|aws|helm|argo|tool|skill|tech', s):
-        return ("Here's the stack Lior works with, grouped by area.", [("show_stack", {})])
-    if re.search(r'music|story|background|career|jazz|journey|before tech', s):
-        return ("Lior spent 30 years in music before moving into tech, and approached the switch the same way he approached music theory.",
-                [("show_timeline", {})])
-    if re.search(r'cert|educat|degree|course|cka|saa', s):
-        return ("Lior holds three cloud and Kubernetes certifications, plus degrees in music.", [("show_certifications", {})])
-    if re.search(r'site|served|infra|deploy|pipeline|cluster|hosted', s):
-        return ("This site runs on the same kind of pipeline Lior builds for production work.", [("show_site_architecture", {})])
-    if re.search(r'contact|email|call|meet|intro|reach|book|talk', s):
-        return ("I've drafted a short intro you can edit and copy.",
-                [("draft_intro", {"message": "Hi Lior,\n\nI came across your site and would like to talk about a platform engineering role. Do you have 20 minutes this week?\n\nThanks,"})])
-    return ("I don't have information about that in Lior's profile, so I won't guess. "
-            "I can tell you about his AI projects, his stack, his career story, or how he'd fit a role.", [])
+    for intent, pattern in INTENT_PATTERNS:
+        if re.search(pattern, s):
+            return intent
+    return 'unknown'
+
+
+def scripted_answer(text, persona=None):
+    return INTENTS[route_intent(text)]
+
+
+def claude_cost_usd(usage):
+    """Estimate the cost of one Claude call from its usage block."""
+    inp = usage.get('input_tokens') or 0
+    out = usage.get('output_tokens') or 0
+    cache_read = usage.get('cache_read_input_tokens') or 0
+    cache_write = usage.get('cache_creation_input_tokens') or 0
+    return round((inp * PRICE_IN + cache_write * PRICE_IN * 1.25 + cache_read * PRICE_IN * 0.1
+                  + out * PRICE_OUT) / 1_000_000, 6)
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -242,25 +279,36 @@ def api_ask():
     ip = client_ip(request)
     user_agent = request.headers.get('User-Agent')
     logger = current_app.logger
+    email = PROFILE['person']['email']
 
     if store.enabled and store.count_recent_prompts(ip) >= MAX_PROMPTS_PER_DAY:
-        return jsonify(error="You've reached today's question limit. Email liormilliger@gmail.com and Lior will answer directly."), 429
+        return jsonify(error=f"You've reached today's question limit. Email {email} and Lior will answer directly."), 429
+    if store.count_session_prompts(session_id) >= MAX_PROMPTS_PER_SESSION:
+        return jsonify(error=f"That's {MAX_PROMPTS_PER_SESSION} questions in this session, the limit for now. "
+                             f"Email {email} to continue the conversation with Lior."), 429
+
+    # Decide whether Claude may answer, before logging this prompt.
+    api_key = get_anthropic_api_key(logger)
+    spend = store.claude_spend_today() if api_key else 0.0
+    budget_ok = spend is not None and spend < DAILY_BUDGET_USD
 
     # Save the prompt before anything else, so it's kept even if the answer fails.
     store.log_user_message(session_id=session_id, ip=ip, user_agent=user_agent, persona=persona,
                            turn_index=turn_index, content=prompt,
                            metadata={"history_turns": len(history), "referrer": request.referrer})
 
-    api_key = os.environ.get('ANTHROPIC_API_KEY')
-
     def generate():
         started = time.time()
         st = {"text": [], "components": [], "trace": [], "tool_calls": [], "model": None,
-              "usage": {}, "error": None, "finished": False}
+              "usage": {}, "errors": [], "finished": False, "cost": None}
 
         def step(label):
             st["trace"].append(label)
             return sse('trace', {"step": label})
+
+        def emit_text(chunk):
+            st["text"].append(chunk)
+            return sse('text', {"delta": chunk})
 
         try:
             yield sse('meta', {"session_id": session_id})
@@ -268,7 +316,10 @@ def api_ask():
             if persona:
                 yield step(f"persona · {persona}")
 
-            if api_key:
+            # ── Tier 1: Claude ──
+            if api_key and not budget_ok:
+                yield step("daily AI budget reached · using fallback")
+            if api_key and budget_ok:
                 try:
                     import anthropic
                     client = anthropic.Anthropic(api_key=api_key)
@@ -282,33 +333,58 @@ def api_ask():
                     ) as stream:
                         for event in stream:
                             if event.type == 'text':
-                                st["text"].append(event.text)
-                                yield sse('text', {"delta": event.text})
+                                yield emit_text(event.text)
                             elif event.type == 'content_block_start' and getattr(event.content_block, 'type', '') == 'tool_use':
                                 yield step(f"tool · {event.content_block.name}")
                         final = stream.get_final_message()
-                    st["model"] = final.model
                     u = final.usage
                     st["usage"] = {"input_tokens": u.input_tokens, "output_tokens": u.output_tokens,
-                                   "cache_read_input_tokens": getattr(u, 'cache_read_input_tokens', None)}
+                                   "cache_read_input_tokens": getattr(u, 'cache_read_input_tokens', None),
+                                   "cache_creation_input_tokens": getattr(u, 'cache_creation_input_tokens', None)}
+                    st["cost"] = claude_cost_usd(st["usage"])
                     st["tool_calls"] = [(b.name, b.input) for b in final.content if b.type == 'tool_use']
+                    st["model"] = final.model
                 except GeneratorExit:
                     raise
-                except Exception as e:  # fall back to the scripted answer, but record why
-                    st["error"] = f"{type(e).__name__}: {e}"[:500]
-                    logger.error(f"/api/ask Claude call failed: {st['error']}")
-                    yield step("model unavailable · answering from profile")
+                except Exception as e:
+                    st["errors"].append(f"claude: {type(e).__name__}: {e}"[:400])
+                    logger.error(f"/api/ask Claude call failed: {st['errors'][-1]}")
+                    yield step("Claude unavailable · using fallback")
 
+            intent = route_intent(prompt) if not st["model"] else None
+
+            # ── Tier 2: local model (text only; cards come from the router) ──
+            if not st["model"] and not st["text"] and local_llm.enabled():
+                try:
+                    yield step(f"model · {local_llm.label()} (local)")
+                    for chunk in local_llm.stream_answer(PROFILE, intent, prompt, history):
+                        if isinstance(chunk, dict):
+                            st["usage"] = chunk
+                        else:
+                            yield emit_text(chunk)
+                    if st["text"]:
+                        st["model"] = local_llm.label()
+                        st["cost"] = 0
+                        st["tool_calls"] = INTENTS[intent][1]
+                except GeneratorExit:
+                    raise
+                except Exception as e:
+                    st["errors"].append(f"local: {type(e).__name__}: {e}"[:400])
+                    logger.error(f"/api/ask local model failed: {st['errors'][-1]}")
+                    yield step("local model unavailable · answering from profile")
+                    if st["text"]:
+                        yield emit_text("\n\n")
+
+            # ── Tier 3: keyword router ──
             if not st["model"]:
                 st["model"] = 'scripted'
-                if st["text"]:  # partial text streamed before an error
-                    st["text"].append("\n\n")
-                else:
-                    yield step("router · keyword match")
-                answer, st["tool_calls"] = scripted_answer(prompt, persona)
+                st["cost"] = 0
+                if st["text"]:
+                    yield emit_text("\n\n")
+                yield step(f"router · {intent}")
+                answer, st["tool_calls"] = INTENTS[intent]
                 for word in re.split(r'(\s+)', answer):
-                    st["text"].append(word)
-                    yield sse('text', {"delta": word})
+                    yield emit_text(word)
 
             for name, args in st["tool_calls"]:
                 comp = build_component(name, args)
@@ -317,21 +393,22 @@ def api_ask():
                     yield sse('component', comp)
 
             st["finished"] = True
-            yield sse('done', {"model": st["model"], "latency_ms": int((time.time() - started) * 1000), **st["usage"]})
+            usage_public = {k: v for k, v in st["usage"].items() if k in ('input_tokens', 'output_tokens')}
+            yield sse('done', {"model": st["model"], "latency_ms": int((time.time() - started) * 1000), **usage_public})
         finally:
             # Runs on success, on error and when the visitor closes the tab mid-answer.
-            error = st["error"]
+            errors = list(st["errors"])
             if not st["finished"]:
-                error = (error + " | " if error else "") + "stream interrupted before completion"
+                errors.append("stream interrupted before completion")
             store.log_assistant_message(
                 session_id=session_id, ip=ip, turn_index=turn_index + 1, content=''.join(st["text"]).strip(),
                 components=st["components"], trace=st["trace"],
                 metadata={"tool_calls": [{"name": n, "input": a} for n, a in st["tool_calls"]],
-                          "persona": persona,
-                          "cache_read_input_tokens": st["usage"].get('cache_read_input_tokens')},
+                          "persona": persona, "usage": st["usage"],
+                          "claude_spend_before_usd": spend, "daily_budget_usd": DAILY_BUDGET_USD},
                 model=st["model"], input_tokens=st["usage"].get('input_tokens'),
-                output_tokens=st["usage"].get('output_tokens'),
-                latency_ms=int((time.time() - started) * 1000), error=error)
+                output_tokens=st["usage"].get('output_tokens'), cost_usd=st["cost"],
+                latency_ms=int((time.time() - started) * 1000), error=" | ".join(errors) or None)
 
     headers = {"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
     return Response(stream_with_context(generate()), mimetype='text/event-stream', headers=headers)

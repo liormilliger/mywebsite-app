@@ -17,6 +17,7 @@ and the logging happens after the Flask request context may be gone.
 import json
 import os
 import threading
+import time
 
 import psycopg2
 
@@ -51,11 +52,13 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 );
 CREATE INDEX IF NOT EXISTS idx_chat_messages_ip ON chat_messages (visitor_ip, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_chat_messages_session ON chat_messages (session_id, turn_index);
+ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS cost_usd NUMERIC(12,6);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_created ON chat_messages (created_at);
 
 CREATE OR REPLACE VIEW chat_log_by_ip AS
 SELECT m.visitor_ip, m.session_id, s.persona, s.user_agent, m.turn_index, m.role,
        m.content, m.components, m.model, m.input_tokens, m.output_tokens,
-       m.latency_ms, m.error, m.created_at
+       m.latency_ms, m.error, m.created_at, m.cost_usd
 FROM chat_messages m
 JOIN chat_sessions s USING (session_id)
 ORDER BY m.visitor_ip, s.started_at, m.turn_index, m.message_id;
@@ -69,8 +72,14 @@ def client_ip(request):
 
 
 class NullChatStore:
-    """Used by app-local.py (no database). Logs nothing, limits nothing."""
+    """Used by app-local.py (no database). Saves no conversations, but keeps
+    in-memory counters so the session cap and daily budget behave the same."""
     enabled = False
+
+    def __init__(self):
+        self._sessions = {}
+        self._spend = {}
+        self._lock = threading.Lock()
 
     def ensure_schema(self):
         pass
@@ -78,10 +87,22 @@ class NullChatStore:
     def count_recent_prompts(self, ip, hours=24):
         return 0
 
-    def log_user_message(self, **kwargs):
+    def count_session_prompts(self, session_id):
+        return self._sessions.get(session_id, 0)
+
+    def claude_spend_today(self):
+        return self._spend.get(time.strftime('%Y-%m-%d', time.gmtime()), 0.0)
+
+    def log_user_message(self, *, session_id, **kwargs):
+        with self._lock:
+            self._sessions[session_id] = self._sessions.get(session_id, 0) + 1
         return None
 
-    def log_assistant_message(self, **kwargs):
+    def log_assistant_message(self, *, cost_usd=None, **kwargs):
+        if cost_usd:
+            day = time.strftime('%Y-%m-%d', time.gmtime())
+            with self._lock:
+                self._spend[day] = self._spend.get(day, 0.0) + float(cost_usd)
         return None
 
 
@@ -142,6 +163,40 @@ class PostgresChatStore:
             self.logger.error(f"Chat rate check failed: {e}")
             return 0
 
+    def count_session_prompts(self, session_id):
+        self.ensure_schema()
+        try:
+            conn = self._connect()
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT COUNT(*) FROM chat_messages WHERE session_id = %s AND role = 'user'",
+                                (session_id,))
+                    return cur.fetchone()[0]
+            finally:
+                conn.close()
+        except Exception as e:
+            self.logger.error(f"Chat session count failed: {e}")
+            return 0
+
+    def claude_spend_today(self):
+        """Estimated Claude spend since 00:00 UTC, in USD. Returns None if the
+        database can't be read, so the caller can fail safe (skip Claude)."""
+        self.ensure_schema()
+        try:
+            conn = self._connect()
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """SELECT COALESCE(SUM(cost_usd), 0) FROM chat_messages
+                           WHERE role = 'assistant'
+                             AND created_at >= date_trunc('day', NOW() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'""")
+                    return float(cur.fetchone()[0])
+            finally:
+                conn.close()
+        except Exception as e:
+            self.logger.error(f"Chat spend check failed: {e}")
+            return None
+
     def log_user_message(self, *, session_id, ip, user_agent, persona, turn_index, content, metadata=None):
         """Upsert the session and store the visitor's prompt. Called before the model runs,
         so the prompt is kept even if the answer fails or the visitor closes the tab."""
@@ -174,7 +229,7 @@ class PostgresChatStore:
 
     def log_assistant_message(self, *, session_id, ip, turn_index, content, components=None, trace=None,
                               metadata=None, model=None, input_tokens=None, output_tokens=None,
-                              latency_ms=None, error=None):
+                              latency_ms=None, error=None, cost_usd=None):
         self.ensure_schema()
         try:
             conn = self._connect()
@@ -183,12 +238,12 @@ class PostgresChatStore:
                     cur.execute(
                         """INSERT INTO chat_messages
                              (session_id, visitor_ip, turn_index, role, content, components, trace, metadata,
-                              model, input_tokens, output_tokens, latency_ms, error)
-                           VALUES (%s, %s, %s, 'assistant', %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                              model, input_tokens, output_tokens, latency_ms, error, cost_usd)
+                           VALUES (%s, %s, %s, 'assistant', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                            RETURNING message_id""",
                         (session_id, ip, turn_index, content or '',
                          json.dumps(components or []), json.dumps(trace or []), json.dumps(metadata or {}),
-                         model, input_tokens, output_tokens, latency_ms, error),
+                         model, input_tokens, output_tokens, latency_ms, error, cost_usd),
                     )
                     message_id = cur.fetchone()[0]
                     cur.execute(
