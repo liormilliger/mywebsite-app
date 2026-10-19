@@ -4,4 +4,5 @@ COPY ./app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY ./app /app
 EXPOSE 5000
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+# gthread workers so a streaming /ask answer doesn't block other visitors
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--worker-class", "gthread", "--workers", "2", "--threads", "8", "--timeout", "120", "app:app"]

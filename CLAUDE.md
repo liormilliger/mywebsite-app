@@ -67,3 +67,13 @@ The production deployment spans three repos:
 - **mywebsite-app** (this repo): Flask app, templates, Docker config
 - **mywebsite-k8s**: Kubernetes manifests and ArgoCD App-of-Apps (auto-updated by CI)
 - **mywebsite-iac**: Terraform for AWS VPC, EKS cluster, and ArgoCD Helm install
+
+## /ask (AI agent) and conversation log
+
+- `app/agent.py` (Blueprint): `GET /ask` page, `POST /api/ask` streams Server-Sent Events, `GET /llms.txt`. Registered in both `app.py` (with `PostgresChatStore`) and `app-local.py` (with `NullChatStore`, nothing logged).
+- Knowledge source is **only** `app/knowledge/profile.json`. Update it when projects or experience change; classic templates are separate.
+- Claude writes short text, then calls display tools (`show_projects`, `show_role_fit`, `show_stack`, `show_timeline`, `show_stats`, `show_certifications`, `show_site_architecture`, `draft_intro`). The server turns each tool call into a component filled from the profile; `static/js/ask.js` renders and escapes it.
+- Without `ANTHROPIC_API_KEY`, or if the API call fails, a keyword router (`scripted_answer`) answers from the same profile. Env: `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` (default `claude-haiku-5-5`), `ASK_MAX_PROMPT_CHARS` (1000), `ASK_MAX_PROMPTS_PER_IP_PER_DAY` (60).
+- `app/chat_store.py` logs every prompt (before the model runs) and every answer (text, components, trace, tool calls, model, tokens, latency, error, including interrupted streams). Tables `chat_sessions` and `chat_messages` plus view `chat_log_by_ip` are created on first use, so existing databases need no migration; the same DDL is in `init/init.sql`.
+- Read the log: `SELECT * FROM chat_log_by_ip WHERE visitor_ip = '1.2.3.4';`
+- The Dockerfile runs gunicorn with `gthread` workers so a streaming answer doesn't block other requests.

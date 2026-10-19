@@ -10,7 +10,7 @@ DB_HOST = os.environ.get('POSTGRES_HOST', 'db')
 DB_NAME = os.environ.get('POSTGRES_DB', 'mywebsite')
 DB_USER = os.environ.get('POSTGRES_USER', 'admin')
 DB_PASS = os.environ.get('POSTGRES_PASSWORD', 'password')
-APP_URL = "http://web:5000" # The service name 'web' is used as the hostname
+APP_URL = os.environ.get("APP_URL", "http://web:5000") # The service name 'web' is used as the hostname
 
 # --- Helper Functions ---
 
@@ -102,6 +102,39 @@ def test_03_app_and_db_connectivity():
     finally:
         conn.close()
 
+def test_04_ask_agent_logs_conversation():
+    """
+    Ask the /api/ask agent a question (scripted mode in CI, no API key) and
+    verify both the prompt and the answer were saved under the caller's IP.
+    """
+    test_ip = "198.51.100.42"
+    response = requests.post(
+        f"{APP_URL}/api/ask",
+        json={"message": "What certifications does Lior have?", "turn_index": 0},
+        headers={"X-Forwarded-For": test_ip, "User-Agent": "CI-Test-Agent"},
+        timeout=60,
+    )
+    assert response.status_code == 200, f"/api/ask returned {response.status_code}"
+    assert "event: done" in response.text, "Answer stream did not finish."
+    time.sleep(1)
+
+    conn = get_db_connection()
+    if not conn:
+        raise ConnectionError("Database connection failed.")
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """SELECT role, content FROM chat_messages
+                   WHERE visitor_ip = %s ORDER BY message_id DESC LIMIT 2;""",
+                (test_ip,),
+            )
+            rows = cur.fetchall()
+            roles = sorted(r[0] for r in rows)
+            assert roles == ["assistant", "user"], f"Expected a prompt and an answer, got {roles}"
+            assert any("certifications" in r[1] for r in rows if r[0] == "user"), "Prompt text was not saved."
+    finally:
+        conn.close()
+
 
 # ===============================================
 # Main Execution Block
@@ -114,7 +147,8 @@ if __name__ == "__main__":
     tests_to_run = [
         test_01_check_table_existence,
         test_02_app_health_check,
-        test_03_app_and_db_connectivity
+        test_03_app_and_db_connectivity,
+        test_04_ask_agent_logs_conversation
     ]
     
     results = [run_test(test) for test in tests_to_run]
