@@ -4,6 +4,8 @@ import os
 import logging
 import time
 from db import log_visitor, get_db
+from agent import init_agent
+from chat_store import PostgresChatStore
 
 app = Flask(__name__)
 
@@ -28,6 +30,9 @@ formatter.converter = time.gmtime
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.INFO)
+
+# --- AI agent (/ask) with Postgres conversation log ---
+init_agent(app, PostgresChatStore(app.logger))
 
 # --- Middleware to Log Every Visit ---
 @app.before_request

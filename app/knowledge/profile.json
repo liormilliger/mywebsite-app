@@ -1,0 +1,73 @@
+{
+  "person": {
+    "name": "Lior Milliger",
+    "headline": "Platform Engineer · DevOps & Cloud Infrastructure · AI Systems Architect",
+    "status": "Open to opportunities",
+    "location": "Israel",
+    "email": "liormilliger@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/lior-milliger/",
+    "github": "https://github.com/liormilliger",
+    "cv_url": "/static/files/LiorMilligerCV.pdf",
+    "summary": "Platform Engineer and AI Systems Architect with 3+ years building production infrastructure end-to-end, from cloud-native Kubernetes platforms to edge and air-gapped environments. AWS SAA and CKA certified. Specializes in microservices migrations, GitOps automation and AI-driven pipelines.",
+    "about": [
+      "Experienced DevOps and Infrastructure Engineer, taking end-to-end ownership of production environments, from bare-metal and edge devices to highly available Kubernetes clusters.",
+      "Specialized in Kubernetes architecture, Helm chart design, and CI/CD pipelines (Jenkins, GitHub Actions, Bitbucket Pipelines) with GitOps automation (FluxCD, ArgoCD). Hands-on with Ansible for zero-touch provisioning and k3s for air-gapped edge deployments, including full monolith-to-Kubernetes migrations for production environments.",
+      "Designing multi-region AWS platforms (CloudFormation, SAM) with VPN-first architectures (WireGuard) linking edge deployments to cloud-hosted services. Layered IaC with Terraform, Terragrunt, and CloudFormation for modular, reusable infrastructure.",
+      "Building agentic AI systems and organizational knowledge infrastructure, including an Organizational Brain reasoning layer, an AI-awareness layer, and multi-session Claude architectures. Working with LangChain, embedding models, and Qdrant to power retrieval and memory for these pipelines.",
+      "What drives him is ownership: seeing a system through from design to production, and being the person a team can rely on when something breaks. Picks up new tools and domains fast, thrives on ambiguity, and believes the best infrastructure gets built by teams that trust each other."
+    ]
+  },
+  "stats": [
+    {"value": "3+", "label": "years in platform & DevOps"},
+    {"value": "30+", "label": "microservices migrated"},
+    {"value": "80%", "label": "cloud waste eliminated"},
+    {"value": "70%", "label": "faster AI troubleshooting"},
+    {"value": "5+", "label": "AI systems in production"}
+  ],
+  "timeline": [
+    {"id": "overture", "title": "The Overture", "tag": "music, 30+ years", "text": "Music career from the Jerusalem Academy of Music to the jazz clubs of New York City. Designed and implemented music-education networks for entire municipalities, founded and conducted a 20-piece big band. Recorded an album in NYC titled \"Your Comfort Zone Will Kill You\"."},
+    {"id": "transition", "title": "The Transition", "tag": "bootcamps and certifications", "text": "Self-study bootcamps in Python and DevOps, then Develeap's 16-week hands-on DevOps bootcamp (Git, Jenkins, Docker, Kubernetes, Terraform, AWS, Prometheus, Grafana, EFK). Earned AWS Cloud Practitioner, AWS Solutions Architect Associate and CKA."},
+    {"id": "jfrog", "title": "First Movement: JFrog", "tag": "DevOps Support Engineer", "text": "DevOps Support Engineer for Infrastructure at JFrog, supporting enterprise customers' DevOps pipelines: logs, Java code, networking, performance and storage. A FinOps project using Terraform and Lambda to automate cost-saving across AWS Organizations eliminated 80% of cloud waste and cut monthly spend by 30%."},
+    {"id": "now", "title": "Second Movement: Platform & AI Engineering", "tag": "current", "text": "At Polus Tech: owns the full migration of an edge intelligence platform to a 13-microservice K3s cluster, architects AI-Ops ingestion pipelines with RAG and AWS Bedrock, and engineers per-unit provisioning automation with Ansible. In a parallel role, building a full-stack web platform from scratch, owning frontend, backend, Kubernetes infrastructure and authentication end-to-end."}
+  ],
+  "stack": [
+    {"category": "CI/CD", "items": ["Jenkins", "GitHub Actions", "ArgoCD", "FluxCD", "Bitbucket Pipelines"]},
+    {"category": "Containers & K8s", "items": ["Docker", "Kubernetes", "Helm", "K3s", "KEDA", "Karpenter"]},
+    {"category": "IaC & Automation", "items": ["Terraform", "Terragrunt", "Pulumi", "Ansible", "CloudFormation", "Agentic workflows"]},
+    {"category": "Cloud (AWS)", "items": ["AWS", "Cloud Practitioner", "Solutions Architect", "SysOps Administrator"]},
+    {"category": "AI & MLOps", "items": ["n8n", "Qdrant", "Claude API", "Gemini API", "RAG", "Embeddings", "Ollama", "LangChain", "AWS Bedrock"]},
+    {"category": "Observability", "items": ["Prometheus", "Grafana", "ELK Stack", "Fluent-bit", "CloudWatch", "OpenTelemetry", "Jaeger"]},
+    {"category": "Security & Artifacts", "items": ["JFrog Xray", "Artifactory", "Trivy", "Gitleaks", "Fail2ban", "WireGuard"]},
+    {"category": "Data & Messaging", "items": ["PostgreSQL", "MySQL", "Kafka", "AmazonMQ", "ActiveMQ", "RDS", "Aurora", "DynamoDB"]},
+    {"category": "Languages", "items": ["Python", "Go", "Bash", "Java"]},
+    {"category": "Web & Proxy", "items": ["Nginx", "Apache", "Flask", "FastAPI"]}
+  ],
+  "certifications": [
+    {"name": "AWS Certified Cloud Practitioner", "url": "/static/images/tech/AWS-CCP.pdf", "badge": "/static/images/education/CCP-badge.png"},
+    {"name": "AWS Certified Solutions Architect – Associate", "url": "/static/images/tech/AWS-SAA.pdf", "badge": "/static/images/education/SAA-badge.png"},
+    {"name": "Certified Kubernetes Administrator (CKA)", "url": "/static/images/tech/CKA.pdf", "badge": "/static/images/education/CKA-badge.png"}
+  ],
+  "education": {
+    "courses": ["Python Bootcamp (Udemy)", "DevOps Bootcamp (Udemy)", "Develeap DevOps Bootcamp, 16 weeks", "GitHub Actions (Udemy)"],
+    "degrees": ["B.Mus – Bachelor of Music", "B.Mus.Ed – Bachelor of Music Education", "M.Mus – Master of Music"]
+  },
+  "projects": [
+    {"id": "quorum", "name": "Quorum", "featured": true, "tags": ["Python", "FastAPI", "WebSockets", "AWS Cognito", "MCP", "Docker"], "summary": "A collaborative GenAI workspace where teams work with Claude together in shared sessions: a Main channel where Claude's streamed answers are visible to everyone, a Slack-style team chat Claude reads for context, and a private one-on-one channel with Claude per person. Role-based access via AWS Cognito, shared connectors to MCP servers and Confluence, and living documents that Claude edits in real time with versioned red/green diffs and undo. Built end to end: architecture, backend, frontend, AWS IaC and test suites. Source is private.", "url": "/projects/quorum", "repo": "https://github.com/liormilliger/quorum", "image": "/static/images/quorum-dashboard.png"},
+    {"id": "this-website", "name": "This website", "featured": true, "tags": ["Python", "Flask", "Docker", "Kubernetes", "Terraform", "ArgoCD"], "summary": "This portfolio site: Flask app with PostgreSQL visitor tracking, built by GitHub Actions (Gitleaks + Trivy scans) into ECR, deployed with ArgoCD GitOps to AWS EKS provisioned with Terraform. Three repos: mywebsite-app, mywebsite-k8s, mywebsite-iac.", "repo": "https://github.com/liormilliger/mywebsite-app"},
+    {"id": "mission-recorder", "name": "Mission Recorder Subsystem", "featured": true, "tags": ["Python", "Docker", "Fluent-bit", "Edge", "Air-gapped"], "summary": "Event-triggered data collection subsystem for air-gapped edge devices. Automates gathering and packaging of logs and system data with Python, Docker and Fluent-bit to keep observability in isolated environments.", "repo": "https://github.com/liormilliger/mission-recorder"},
+    {"id": "kafka-data-shipping", "name": "Kafka Data Shipping", "featured": true, "tags": ["Kafka", "Java", "AWS EKS", "Terraform", "GitHub Actions"], "summary": "Microservices architecture with Java producer/consumer services streaming data between MySQL and Kafka. Deployed on AWS EKS with Terraform; CI/CD with GitHub Actions building and pushing images to ECR.", "repo": "https://github.com/liormilliger/kafka-data-shipper"},
+    {"id": "portfolio-blog", "name": "Portfolio Blog", "tags": ["Docker", "Kubernetes", "Nginx", "MySQL", "Microservices"], "summary": "Full-stack microservices blog application demonstrating a monolith-to-microservices migration.", "repo": "https://github.com/liormilliger/Portfolio-app"},
+    {"id": "terragrunt", "name": "Terragrunt Infrastructure", "tags": ["Terraform", "Terragrunt", "AWS", "EKS", "IaC"], "summary": "DRY Terraform with Terragrunt: remote state and multi-environment deployments for VPCs and EKS clusters.", "repo": "https://github.com/liormilliger/terragrunt-course"},
+    {"id": "golang-booking", "name": "Golang Booking Application", "tags": ["Go", "Concurrency", "CLI"], "summary": "CLI booking application built while learning Go: goroutines, pointers and structured data for real-time booking logic.", "repo": "https://github.com/liormilliger/golang-booking-app"},
+    {"id": "chatapp", "name": "Chatapp", "tags": ["WebSockets", "MySQL", "Nginx", "Docker"], "summary": "Real-time chat application using WebSockets for two-way communication on a simple microservices architecture.", "repo": "https://github.com/liormilliger/Chatapp"},
+    {"id": "blue-green", "name": "Blue-Green Deployment", "tags": ["Terraform", "AWS", "Nginx"], "summary": "Blue-green deployment with Terraform on AWS; Nginx routes traffic to green with blue as backup.", "repo": "https://github.com/liormilliger/Blue-Green-Demo"},
+    {"id": "prometheus-collector", "name": "Prometheus Data Collector", "tags": ["Prometheus", "Python", "Metrics"], "summary": "Custom Prometheus exporter that gathers and exposes specific metrics for observability.", "repo": "https://github.com/liormilliger/prometheus-data-collector"},
+    {"id": "gateup", "name": "GateUP (Serverless)", "tags": ["AWS Lambda", "Serverless", "Automation"], "summary": "Serverless, event-based tool to manage and automate gate operations with remote control.", "repo": "https://github.com/liormilliger/GateUP"},
+    {"id": "ansible-rolling", "name": "Ansible Automation", "tags": ["Ansible", "Zero-downtime", "DevOps"], "summary": "Rolling-update deployment with Ansible playbooks, updating server groups sequentially while keeping the service available.", "repo": "https://github.com/liormilliger/ansible-rolling-update"},
+    {"id": "linux-data-collection", "name": "Linux Server Data Collection", "tags": ["Bash", "Linux", "Shell"], "summary": "Bash scripts for gathering, processing and analyzing performance and system data from Linux servers.", "repo": "https://github.com/liormilliger/linux-srv-data-collection"}
+  ],
+  "site_architecture": {
+    "summary": "This site is a Flask app (gunicorn) with PostgreSQL. GitHub Actions builds the image, scans it with Gitleaks and Trivy, pushes to AWS ECR and bumps the tag in the mywebsite-k8s repo; ArgoCD syncs it to EKS. Infrastructure (VPC, EKS, ArgoCD) is Terraform in mywebsite-iac. Prometheus metrics are exported by the app. The /ask agent calls the Claude API with this profile as its only knowledge source.",
+    "pipeline": ["build image 1.<run>-<branch>", "Gitleaks + Trivy scans", "push to AWS ECR", "bump tag in mywebsite-k8s", "ArgoCD sync to EKS"]
+  }
+}

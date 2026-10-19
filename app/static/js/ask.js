@@ -1,0 +1,237 @@
+// /ask — streams answers from /api/ask (Server-Sent Events) and renders generated components.
+(function () {
+  const thread = document.getElementById('thread');
+  const form = document.getElementById('askForm');
+  const input = document.getElementById('q');
+  const sendBtn = form.querySelector('.send');
+  const CONTACT = window.ASK_CONTACT || {};
+
+  // ── session state ──
+  function newId() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+  }
+  let sessionId;
+  try { sessionId = sessionStorage.getItem('ask_sid') || newId(); sessionStorage.setItem('ask_sid', sessionId); }
+  catch (_) { sessionId = newId(); }
+  const state = { persona: null, history: [], turn: 0, tokens: 0, busy: false };
+
+  // ── safe HTML ──
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const safeUrl = u => (/^(https?:\/\/|\/)/.test(String(u || '')) ? esc(u) : '#');
+  function md(text) {
+    return esc(text).split(/\n{2,}/).map(p =>
+      '<p>' + p.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>') + '</p>').join('');
+  }
+
+  // ── component renderers (data comes from the server, always escaped) ──
+  const head = (kind, title, pin) =>
+    `<div class="gcard-h"><div><span class="kind">${esc(kind)}</span><h3>${esc(title)}</h3></div>` +
+    `<button class="pin" type="button" data-pin="${esc(pin)}">Pin</button></div>`;
+  const chipsOf = arr => '<div class="tchips">' + (arr || []).map(t => `<span>${esc(t)}</span>`).join('') + '</div>';
+
+  const R = {
+    projects(c) {
+      const [first, ...rest] = c.items;
+      let html = '';
+      if (first) {
+        const img = first.image ? `<img src="${safeUrl(first.image)}" alt="${esc(first.name)} screenshot" loading="lazy">` : '';
+        const links = [first.url && `<a href="${safeUrl(first.url)}">details</a>`, first.repo && `<a href="${safeUrl(first.repo)}" target="_blank" rel="noopener noreferrer">repo</a>`].filter(Boolean).join('');
+        html += `<div class="gcard">${head(first.featured ? 'Featured project' : 'Project', first.name, first.name + ': ' + first.summary.split('. ')[0])}
+          <div class="proj${img ? '' : ' noimg'}">${img}<div><p>${esc(first.summary)}</p>${chipsOf(first.tags)}</div></div>
+          ${links ? `<div class="srcs"><span>sources</span>${links}</div>` : ''}</div>`;
+      }
+      if (rest.length) {
+        html += `<div class="gcard">${head('Also relevant', 'Ranked for you', 'Projects: ' + rest.map(p => p.name).join(', '))}<div class="plist">` +
+          rest.map(p => `<div><span>${esc(p.name)}<small>${esc(p.summary)}</small></span>${p.repo ? `<a href="${safeUrl(p.repo)}" target="_blank" rel="noopener noreferrer">repo ↗</a>` : ''}</div>`).join('') +
+          '</div></div>';
+      }
+      return html;
+    },
+    role_fit(c) {
+      const strong = c.rows.filter(r => r.fit === 'strong').map(r => r.requirement);
+      return `<div class="gcard">${head('Role fit', c.role, 'Fit for ' + c.role + ': strong on ' + (strong.join(', ') || '—'))}
+        <div class="fit-wrap"><table class="fit"><tr><th>Requirement</th><th>Evidence</th><th>Fit</th></tr>` +
+        c.rows.map(r => `<tr><td>${esc(r.requirement)}</td><td>${esc(r.evidence)}</td><td><span class="lvl ${esc(r.fit)}">${esc(r.fit)}</span></td></tr>`).join('') +
+        `</table></div><div class="srcs"><span>sources</span><a href="${safeUrl(CONTACT.cv || '/static/files/LiorMilligerCV.pdf')}" target="_blank" rel="noopener noreferrer">CV</a><a href="/about-me">about-me</a></div></div>`;
+    },
+    stack(c) {
+      return `<div class="gcard">${head('Stack', 'Tools by area', 'Stack: ' + c.groups.map(g => g.category).join(', '))}<div class="stack">` +
+        c.groups.map(g => `<div><h5>${esc(g.category)}</h5>${chipsOf(g.items)}</div>`).join('') +
+        '</div><div class="srcs"><span>sources</span><a href="/tech-stack">tech-stack</a></div></div>';
+    },
+    timeline(c) {
+      return `<div class="gcard">${head('Timeline', 'From jazz clubs to clusters', 'Story: ' + c.items.map(i => i.title).join(' → '))}<div class="tl">` +
+        c.items.map(i => `<div><b>${esc(i.title)}</b><i>${esc(i.tag)}</i><p>${esc(i.text)}</p></div>`).join('') +
+        '</div><div class="srcs"><span>sources</span><a href="/about-me">about-me</a></div></div>';
+    },
+    stats(c) {
+      return `<div class="gcard">${head('Impact', 'In numbers', 'Impact: ' + c.items.map(s => s.value + ' ' + s.label).join(', '))}<div class="stats">` +
+        c.items.slice(0, 4).map(s => `<div><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join('') + '</div></div>';
+    },
+    certifications(c) {
+      return `<div class="gcard">${head('Credentials', 'Certifications', 'Certifications: ' + c.items.map(x => x.name).join(', '))}<div class="certs">` +
+        c.items.map(x => `<a href="${safeUrl(x.url)}" target="_blank" rel="noopener noreferrer"><img src="${safeUrl(x.badge)}" alt="" loading="lazy">${esc(x.name)}</a>`).join('') +
+        `</div><p class="note" style="margin-top:10px">Degrees: ${esc((c.education.degrees || []).join(' · '))}</p></div>`;
+    },
+    architecture(c) {
+      return `<div class="gcard">${head('How this site runs', 'Build → scan → GitOps', 'This site: ' + c.summary)}
+        <p style="margin:0 0 10px;font-size:14px">${esc(c.summary)}</p>
+        <div class="path">${c.pipeline.map(esc).map(s => `<span>${s}</span>`).join('<i>→</i>')}</div>
+        <div class="srcs"><span>sources</span><a href="https://github.com/liormilliger/mywebsite-app" target="_blank" rel="noopener noreferrer">mywebsite-app</a></div></div>`;
+    },
+    intro(c) {
+      const id = 'intro' + Math.random().toString(36).slice(2, 8);
+      return `<div class="gcard">${head('Action · needs your OK', 'Intro to Lior', 'Contact: ' + c.to)}
+        <div class="form"><label for="${id}to">To</label><input id="${id}to" value="${esc(c.to)}" readonly>
+        <label for="${id}">Message</label><textarea id="${id}">${esc(c.message)}</textarea>
+        <div class="row"><button class="btn" type="button" data-copy="${id}">Copy message</button>
+        <a class="btn ghost" href="mailto:${esc(c.to)}?subject=${encodeURIComponent('Hello from your website')}" data-mail="${id}">Open in email</a>
+        <span class="note" data-copynote="${id}"></span></div>
+        <p class="note">Nothing is sent for you. Copy the message or open it in your email app.</p></div></div>`;
+    },
+  };
+
+  // ── turns ──
+  function addUserTurn(text) {
+    const u = document.createElement('div');
+    u.className = 'turn user';
+    u.innerHTML = '<div class="bubble"></div>';
+    u.firstChild.textContent = text;
+    thread.appendChild(u);
+  }
+  const scroll = () => { thread.scrollTop = thread.scrollHeight; };
+
+  function setBusy(b) {
+    state.busy = b; sendBtn.disabled = b; input.disabled = b;
+    document.querySelectorAll('.ask .chip').forEach(c => { if (c.tagName === 'BUTTON') c.disabled = b; });
+  }
+
+  async function ask(text, persona) {
+    text = (text || '').trim();
+    if (!text || state.busy) return;
+    if (persona) {
+      state.persona = persona;
+      document.getElementById('ctxRole').textContent = persona;
+      document.querySelectorAll('[data-persona]').forEach(x => x.classList.toggle('on', x.dataset.persona === persona));
+    }
+    setBusy(true);
+    addUserTurn(text);
+    const t = document.createElement('div');
+    t.className = 'turn';
+    t.innerHTML = '<div class="who"><b>lior.agent</b> · thinking</div><details class="trace" open><summary>trace</summary></details><div class="answer"><p><span class="caret"></span></p></div>';
+    thread.appendChild(t); scroll();
+    const trace = t.querySelector('.trace');
+    const answerEl = t.querySelector('.answer');
+    let answer = '', steps = 0, done = null;
+
+    try {
+      const res = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, session_id: sessionId, persona: state.persona, history: state.history, turn_index: state.turn }),
+      });
+      if (!res.ok || !res.body) {
+        let msg = 'Something went wrong. Try again in a moment.';
+        try { msg = (await res.json()).error || msg; } catch (_) {}
+        throw new Error(msg);
+      }
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let buf = '';
+      for (;;) {
+        const { value, done: end } = await reader.read();
+        if (end) break;
+        buf += dec.decode(value, { stream: true });
+        let i;
+        while ((i = buf.indexOf('\n\n')) >= 0) {
+          const raw = buf.slice(0, i); buf = buf.slice(i + 2);
+          const ev = (raw.match(/^event: (.*)$/m) || [])[1];
+          const dataLine = (raw.match(/^data: (.*)$/m) || [])[1];
+          if (!ev || dataLine == null) continue;
+          const data = JSON.parse(dataLine);
+          if (ev === 'trace') {
+            steps++;
+            const d = document.createElement('div'); d.className = 'step'; d.textContent = data.step; trace.appendChild(d);
+          } else if (ev === 'text') {
+            answer += data.delta;
+            answerEl.innerHTML = md(answer);
+            const last = answerEl.lastElementChild; if (last) last.insertAdjacentHTML('beforeend', '<span class="caret"></span>');
+          } else if (ev === 'component') {
+            const fn = R[data.type];
+            if (fn) t.insertAdjacentHTML('beforeend', fn(data));
+          } else if (ev === 'done') {
+            done = data;
+          }
+          scroll();
+        }
+      }
+      answerEl.innerHTML = md(answer || '…');
+    } catch (err) {
+      answerEl.innerHTML = `<p class="err">${esc(err.message)}</p>`;
+    }
+
+    trace.open = false;
+    trace.querySelector('summary').textContent = `trace · ${steps} steps`;
+    const tok = done ? (done.input_tokens || 0) + (done.output_tokens || 0) : 0;
+    state.tokens += tok;
+    t.querySelector('.who').innerHTML = '<b>lior.agent</b>' + (done ? ` · ${esc(done.model)} · ${(done.latency_ms / 1000).toFixed(1)}s` + (tok ? ` · ${tok} tokens` : '') : '');
+    if (done) {
+      document.getElementById('hLat').textContent = (done.latency_ms / 1000).toFixed(1) + 's';
+      document.getElementById('hTok').textContent = state.tokens.toLocaleString();
+      document.getElementById('hModel').textContent = done.model;
+    }
+    if (answer) {
+      state.history.push({ role: 'user', content: text }, { role: 'assistant', content: answer });
+      state.history = state.history.slice(-10);
+    }
+    state.turn += 2;
+    document.getElementById('ctxQ').textContent = state.turn / 2;
+    setBusy(false);
+    input.focus();
+    scroll();
+  }
+
+  // ── brief ──
+  const pins = [];
+  function renderPins() {
+    const box = document.getElementById('pins');
+    box.innerHTML = pins.length ? '' : '<div class="empty">Nothing pinned yet. Use “Pin” on any card.</div>';
+    pins.forEach((p, i) => {
+      const d = document.createElement('div');
+      d.innerHTML = '<span></span><button type="button" aria-label="Remove">×</button>';
+      d.firstChild.textContent = p.split(':')[0];
+      d.lastChild.addEventListener('click', () => { pins.splice(i, 1); renderPins(); });
+      box.appendChild(d);
+    });
+  }
+  document.getElementById('gen').addEventListener('click', () => {
+    const out = document.getElementById('onepager');
+    if (!pins.length) { out.innerHTML = '<p class="note">Pin at least one card first.</p>'; return; }
+    const aud = { Recruiter: 'hiring team', Engineer: 'engineering review', Founder: 'founding team' }[state.persona] || 'your team';
+    out.innerHTML = `<div class="onepager"><h5>Lior Milliger</h5><div class="r">Platform Engineer · AI Systems · prepared for ${esc(aud)}</div><ul>` +
+      pins.map(p => `<li>${esc(p)}</li>`).join('') +
+      `</ul><div class="r" style="margin-top:8px">${esc(CONTACT.email || '')} · ${esc((CONTACT.linkedin || '').replace(/^https?:\/\/(www\.)?/, ''))}</div></div>`;
+  });
+
+  // ── events ──
+  document.addEventListener('click', e => {
+    const pb = e.target.closest('.ask .pin');
+    if (pb) { if (!pins.includes(pb.dataset.pin)) { pins.push(pb.dataset.pin); renderPins(); } pb.textContent = 'Pinned'; pb.classList.add('done'); return; }
+    const cp = e.target.closest('[data-copy]');
+    if (cp) {
+      const el = document.getElementById(cp.dataset.copy);
+      const note = document.querySelector(`[data-copynote="${cp.dataset.copy}"]`);
+      const fallback = () => { el.select(); if (note) note.textContent = 'Selected, press Ctrl/Cmd+C'; };
+      try { navigator.clipboard.writeText(el.value).then(() => { if (note) note.textContent = 'Copied'; }, fallback); } catch (_) { fallback(); }
+      return;
+    }
+    const ml = e.target.closest('[data-mail]');
+    if (ml) { const el = document.getElementById(ml.dataset.mail); ml.href = ml.href.split('&body=')[0] + '&body=' + encodeURIComponent(el.value); return; }
+    const chip = e.target.closest('.ask .chip[data-q]');
+    if (chip) ask(chip.dataset.q, chip.dataset.persona || null);
+  });
+  form.addEventListener('submit', e => { e.preventDefault(); const v = input.value; input.value = ''; ask(v); });
+})();

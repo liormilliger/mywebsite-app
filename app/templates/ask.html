@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Ask Lior's site | Lior Milliger{% endblock %}
+
+{% block head %}
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ask.css') }}">
+<meta name="description" content="Ask questions about Lior Milliger's platform engineering and AI work. Answers come from his CV and projects, with sources.">
+{% endblock %}
+
+{% block content %}
+<div class="ask">
+  <div class="ask-head">
+    <div>
+      <span class="ask-eyebrow">AI-first view · beta</span>
+      <h1>Ask the engineer.</h1>
+    </div>
+    <p>Answers come only from Lior's CV and project write-ups. Prefer to scroll? <a href="/">Classic site</a>.</p>
+  </div>
+
+  <div class="ask-app">
+    <aside class="ask-rail">
+      <div class="ask-me">
+        <img src="{{ url_for('static', filename='files/LiorPhoto.jpg') }}" alt="Lior Milliger">
+        <div><b>{{ profile.person.name }}</b><span>Platform Engineer · AI Systems</span></div>
+      </div>
+      <span class="ask-status">● {{ profile.person.status | lower }}</span>
+
+      <div class="ask-hide-sm">
+        <h4>What the agent knows about you</h4>
+        <div class="ask-ctx">
+          <div><span>Role</span><span id="ctxRole">not set</span></div>
+          <div><span>Questions</span><span id="ctxQ">0</span></div>
+        </div>
+      </div>
+
+      <div class="ask-hide-sm">
+        <h4>This session</h4>
+        <div class="ask-health">
+          <div><b id="hLat">–</b><span>last answer</span></div>
+          <div><b id="hTok">0</b><span>tokens used</span></div>
+          <div class="wide"><b id="hModel">–</b><span>model</span></div>
+        </div>
+      </div>
+
+      <div class="ask-links ask-hide-sm">
+        <a href="{{ profile.person.cv_url }}" target="_blank" rel="noopener noreferrer">CV (PDF)</a>
+        <a href="{{ profile.person.github }}" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="{{ profile.person.linkedin }}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </div>
+    </aside>
+
+    <section class="ask-thread-col" aria-label="Conversation">
+      <div class="ask-thread" id="thread" aria-live="polite">
+        <div class="turn">
+          <div class="who"><b>lior.agent</b> · grounded in CV and {{ profile.projects | length }} projects</div>
+          <div class="answer"><p>Hi, I'm the site. I answer from Lior's own material and show where each answer comes from. Tell me who you are and I'll put the relevant work first.</p></div>
+          <div class="gcard">
+            <div class="gcard-h"><div><span class="kind">At a glance</span><h3>Platform engineer who ships AI to production</h3></div>
+              <button class="pin" type="button" data-pin="At a glance: {% for s in profile.stats %}{{ s.value }} {{ s.label }}{% if not loop.last %}, {% endif %}{% endfor %}">Pin</button></div>
+            <div class="stats">
+              {% for s in profile.stats[:4] %}<div><b>{{ s.value }}</b><span>{{ s.label }}</span></div>{% endfor %}
+            </div>
+          </div>
+          <div class="sugs">
+            <button class="chip persona" type="button" data-persona="Recruiter" data-q="I'm hiring. Is Lior a fit for a senior platform engineer role?">I'm hiring</button>
+            <button class="chip persona" type="button" data-persona="Engineer" data-q="I'm an engineer. How does Lior build and ship systems?">I'm an engineer</button>
+            <button class="chip persona" type="button" data-persona="Founder" data-q="I'm building with AI. What AI systems has Lior built?">I'm building with AI</button>
+            <button class="chip" type="button" data-q="Show me the AI projects">Show the AI projects</button>
+            <button class="chip" type="button" data-q="How is this website built and deployed?">How is this site served?</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ask-composer">
+        <form id="askForm" autocomplete="off">
+          <label for="q" class="sr-only">Ask about Lior's work</label>
+          <input id="q" name="q" maxlength="1000" placeholder="Ask about Kubernetes, Quorum, the music years…">
+          <button class="send" type="submit">Ask</button>
+        </form>
+        <div class="hint">
+          {% if logging_enabled %}<span>Questions and answers are saved to improve this site.</span>{% else %}<span>Local mode · nothing is saved.</span>{% endif %}
+          <span>Try: “paste a job description”</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="ask-brief" id="brief" aria-label="Your brief">
+      <h4>Your brief</h4>
+      <p class="sub">Pin cards from the conversation, then turn them into a one-pager for your team.</p>
+      <div class="pins" id="pins"><div class="empty">Nothing pinned yet. Use “Pin” on any card.</div></div>
+      <button class="btn" id="gen" type="button">Generate one-pager</button>
+      <div id="onepager"></div>
+    </aside>
+  </div>
+</div>
+
+<script>window.ASK_CONTACT = {{ {"email": profile.person.email, "linkedin": profile.person.linkedin} | tojson }};</script>
+<script src="{{ url_for('static', filename='js/ask.js') }}"></script>
+{% endblock %}

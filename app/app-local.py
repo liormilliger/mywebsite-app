@@ -3,6 +3,8 @@ from prometheus_flask_exporter import PrometheusMetrics
 import os
 import logging
 import time
+from agent import init_agent
+from chat_store import NullChatStore
 
 app = Flask(__name__)
 
@@ -17,6 +19,9 @@ formatter.converter = time.gmtime
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.INFO)
+
+# --- AI agent (/ask); no database locally, so nothing is logged ---
+init_agent(app, NullChatStore())
 
 @app.route('/')
 def home():
@@ -62,4 +67,4 @@ def contact():
     return render_template('contact.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)
