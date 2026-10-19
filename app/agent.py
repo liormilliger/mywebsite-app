@@ -51,6 +51,11 @@ DAILY_BUDGET_USD = float(os.environ.get('ASK_DAILY_BUDGET_USD', 0.50))
 # USD per million tokens; defaults are Claude Haiku 5.5 list prices.
 PRICE_IN = float(os.environ.get('ANTHROPIC_PRICE_INPUT_PER_MTOK', 0.10))
 PRICE_OUT = float(os.environ.get('ANTHROPIC_PRICE_OUTPUT_PER_MTOK', 0.50))
+# Haiku 5.5 thinks adaptively before answering (default effort "medium") and thinking
+# tokens count toward max_tokens. "low" keeps answers fast and cheap for this use.
+EFFORT = os.environ.get('ANTHROPIC_EFFORT', 'low')
+MAX_TOKENS = int(os.environ.get('ANTHROPIC_MAX_TOKENS', 2000))
+MAX_TOKENS_JOB_POST = int(os.environ.get('ANTHROPIC_MAX_TOKENS_JOB_POST', 5000))
 MAX_HISTORY = 10
 PERSONAS = {'Recruiter', 'Engineer', 'Founder'}
 
@@ -364,20 +369,28 @@ def api_ask():
                     messages = history + [{"role": "user", "content": user_content}]
                     yield step(f"model · {MODEL}")
                     with client.messages.stream(
-                        model=MODEL, max_tokens=2000 if is_job_post else 900,
+                        # max_tokens is a ceiling (billed only for what's used) and includes any thinking.
+                        model=MODEL, max_tokens=MAX_TOKENS_JOB_POST if is_job_post else MAX_TOKENS,
+                        output_config={"effort": EFFORT},
                         system=[{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
                         tools=TOOLS, messages=messages,
                     ) as stream:
                         for event in stream:
                             if event.type == 'text':
                                 yield emit_text(event.text)
-                            elif event.type == 'content_block_start' and getattr(event.content_block, 'type', '') == 'tool_use':
-                                yield step(f"tool · {event.content_block.name}")
+                            elif event.type == 'content_block_start':
+                                kind = getattr(event.content_block, 'type', '')
+                                if kind == 'tool_use':
+                                    yield step(f"tool · {event.content_block.name}")
+                                elif kind in ('thinking', 'redacted_thinking'):
+                                    yield step("thinking")
                         final = stream.get_final_message()
                     u = final.usage
                     st["usage"] = {"input_tokens": u.input_tokens, "output_tokens": u.output_tokens,
                                    "cache_read_input_tokens": getattr(u, 'cache_read_input_tokens', None),
-                                   "cache_creation_input_tokens": getattr(u, 'cache_creation_input_tokens', None)}
+                                   "cache_creation_input_tokens": getattr(u, 'cache_creation_input_tokens', None),
+                                   "thinking_tokens": getattr(getattr(u, 'output_tokens_details', None), 'thinking_tokens', None),
+                                   "stop_reason": final.stop_reason}
                     st["cost"] = claude_cost_usd(st["usage"])
                     st["tool_calls"] = [(b.name, b.input) for b in final.content if b.type == 'tool_use']
                     st["model"] = final.model
