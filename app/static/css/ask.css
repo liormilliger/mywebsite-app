@@ -50,7 +50,7 @@
 .ask-thread{flex:1;overflow:auto;padding:22px 26px;display:flex;flex-direction:column;gap:22px}
 .ask .turn{display:flex;flex-direction:column;gap:10px;min-width:0}
 .ask .turn.user{align-items:flex-end}
-.ask .bubble{background:var(--panel-2);border:1px solid var(--line);padding:9px 14px;border-radius:14px 14px 4px 14px;max-width:80%;white-space:pre-wrap;overflow-wrap:anywhere}
+.ask .bubble{max-height:260px;overflow-y:auto;background:var(--panel-2);border:1px solid var(--line);padding:9px 14px;border-radius:14px 14px 4px 14px;max-width:80%;white-space:pre-wrap;overflow-wrap:anywhere}
 .ask .who{font-family:var(--f-mono);font-size:11px;color:var(--muted);letter-spacing:.05em}
 .ask .who b{color:var(--signal);font-weight:500}
 .ask .answer{max-width:70ch;overflow-wrap:anywhere}
@@ -106,6 +106,8 @@
 .ask .lvl.strong{background:rgba(91,214,155,.14);color:var(--ok)}
 .ask .lvl.good{background:rgba(76,194,240,.14);color:var(--signal)}
 .ask .lvl.growing{background:rgba(242,179,91,.14);color:var(--amber)}
+.ask .lvl.gap{background:rgba(240,138,138,.14);color:#F08A8A}
+.ask-composer textarea:focus-visible{outline:none}
 .ask .stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .ask .stack h5{margin:0 0 6px;font-family:var(--f-mono);font-size:11px;font-weight:500;color:var(--amber);letter-spacing:.06em;text-transform:uppercase}
 .ask .tl{position:relative;display:flex;flex-direction:column;gap:14px;padding-left:18px}
@@ -132,9 +134,9 @@
 
 /* composer */
 .ask-composer{border-top:1px solid var(--line);padding:12px 18px 14px;background:#091627}
-.ask-composer form{display:flex;gap:8px;align-items:center;background:var(--ink);border:1px solid var(--line-strong);border-radius:12px;padding:6px 6px 6px 14px}
+.ask-composer form{display:flex;gap:8px;align-items:flex-end;background:var(--ink);border:1px solid var(--line-strong);border-radius:12px;padding:6px 6px 6px 14px}
 .ask-composer form:focus-within{border-color:var(--signal)}
-.ask-composer input{flex:1;min-width:0;background:none;border:0;color:var(--cream);font:inherit;font-size:15px;outline:none}
+.ask-composer textarea{flex:1;min-width:0;background:none;border:0;color:var(--cream);font:inherit;font-size:15px;line-height:1.45;outline:none;resize:none;padding:6px 0;max-height:200px;overflow-y:auto}
 .ask-composer .send{font:inherit;font-weight:600;font-size:13px;background:var(--signal);color:var(--on-signal);border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
 .ask-composer .send:disabled{opacity:.5;cursor:default}
 .ask-composer .hint{display:flex;justify-content:space-between;gap:10px;margin-top:7px;font-family:var(--f-mono);font-size:11px;color:var(--muted);flex-wrap:wrap}

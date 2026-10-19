@@ -79,12 +79,12 @@
       <div class="ask-composer">
         <form id="askForm" autocomplete="off">
           <label for="q" class="sr-only">Ask about Lior's work</label>
-          <input id="q" name="q" maxlength="1000" placeholder="Ask about Kubernetes, Quorum, the music years…">
+          <textarea id="q" name="q" rows="1" maxlength="6000" placeholder="Ask about Kubernetes, Quorum, the music years… or paste a job description"></textarea>
           <button class="send" type="submit">Ask</button>
         </form>
         <div class="hint">
           {% if logging_enabled %}<span>Questions and answers are saved to improve this site.</span>{% else %}<span>Local mode · nothing is saved.</span>{% endif %}
-          <span>Try: “paste a job description”</span>
+          <span id="qHint">Enter to send · Shift+Enter for a new line</span>
         </div>
       </div>
     </section>

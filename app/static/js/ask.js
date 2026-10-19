@@ -233,5 +233,27 @@
     const chip = e.target.closest('.ask .chip[data-q]');
     if (chip) ask(chip.dataset.q, chip.dataset.persona || null);
   });
-  form.addEventListener('submit', e => { e.preventDefault(); const v = input.value; input.value = ''; ask(v); });
+  // ── composer: Enter sends; Shift/Cmd/Ctrl/Alt+Enter adds a new line; grows with the text ──
+  const hint = document.getElementById('qHint');
+  const HINT = hint ? hint.textContent : '';
+  function grow() {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 200) + 'px';
+    if (hint) hint.textContent = input.value.length > 1500 ? `${input.value.length.toLocaleString()} / 6,000 characters` : HINT;
+  }
+  input.addEventListener('input', grow);
+  input.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || e.isComposing) return;
+    if (e.shiftKey) return; // browser inserts the new line
+    e.preventDefault();
+    if (e.metaKey || e.ctrlKey || e.altKey) {
+      const { selectionStart: a, selectionEnd: b, value } = input;
+      input.value = value.slice(0, a) + '\n' + value.slice(b);
+      input.selectionStart = input.selectionEnd = a + 1;
+      grow();
+      return;
+    }
+    form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit', { cancelable: true }));
+  });
+  form.addEventListener('submit', e => { e.preventDefault(); const v = input.value; input.value = ''; grow(); ask(v); });
 })();
