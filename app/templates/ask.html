@@ -60,8 +60,7 @@
           <div class="who"><b>lior.agent</b> · grounded in CV and {{ profile.projects | length }} projects</div>
           <div class="answer"><p>Hi, I'm the site. I answer from Lior's own material and show where each answer comes from. Tell me who you are and I'll put the relevant work first.</p></div>
           <div class="gcard">
-            <div class="gcard-h"><div><span class="kind">At a glance</span><h3>Platform engineer who ships AI to production</h3></div>
-              <button class="pin" type="button" data-pin="At a glance: {% for s in profile.stats %}{{ s.value }} {{ s.label }}{% if not loop.last %}, {% endif %}{% endfor %}">Pin</button></div>
+            <div class="gcard-h"><div><span class="kind">At a glance</span><h3>Platform engineer who ships AI to production</h3></div></div>
             <div class="stats">
               {% for s in profile.stats[:4] %}<div><b>{{ s.value }}</b><span>{{ s.label }}</span></div>{% endfor %}
             </div>
@@ -91,8 +90,8 @@
 
     <aside class="ask-brief" id="brief" aria-label="Your brief">
       <h4>Your brief</h4>
-      <p class="sub">Pin cards from the conversation, then turn them into a one-pager for your team.</p>
-      <div class="pins" id="pins"><div class="empty">Nothing pinned yet. Use “Pin” on any card.</div></div>
+      <p class="sub">Pin questions and answers from the conversation, then turn them into a one-pager for your team.</p>
+      <div class="pins" id="pins"><div class="empty">Nothing pinned yet. Use “Pin this Q&amp;A” under any answer.</div></div>
       <button class="btn" id="gen" type="button">Generate one-pager</button>
       <div id="onepager"></div>
     </aside>

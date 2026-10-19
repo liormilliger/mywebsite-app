@@ -171,3 +171,19 @@
   .ask .certs{grid-template-columns:1fr 1fr}
 }
 @media (prefers-reduced-motion:reduce){.ask *{animation:none!important;transition:none!important}}
+
+/* one-line references under an answer; click to expand the full card */
+.ask details.ref{border:1px solid var(--line);border-radius:8px;background:var(--panel);min-width:0}
+.ask details.ref>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:7px 12px;cursor:pointer;font-size:13px;min-width:0}
+.ask details.ref>summary::-webkit-details-marker{display:none}
+.ask .ref-k{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);white-space:nowrap}
+.ask .ref-t{flex:1;min-width:0;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ask .ref-links{display:flex;gap:6px;flex-shrink:0;font-family:var(--f-mono);font-size:11px}
+.ask .ref-links a{text-decoration:none;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--muted)}
+.ask .ref-links a:hover{color:var(--signal);border-color:var(--signal)}
+.ask .ref-more::after{content:"▸";color:var(--muted);font-size:12px}
+.ask details.ref[open] .ref-more::after{content:"▾"}
+.ask details.ref[open]>summary{border-bottom:1px solid var(--line)}
+.ask details.ref>.gcard{border:0;border-radius:0 0 8px 8px;animation:none}
+.ask .qa-actions{display:flex;justify-content:flex-end}
+@media (max-width:760px){.ask .ref-links{display:none}}

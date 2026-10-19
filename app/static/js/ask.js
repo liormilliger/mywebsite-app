@@ -27,15 +27,35 @@
   }
 
   // ── component renderers (data comes from the server, always escaped) ──
-  const head = (kind, title, pin) =>
-    `<div class="gcard-h"><div><span class="kind">${esc(kind)}</span><h3>${esc(title)}</h3></div>` +
-    `<button class="pin" type="button" data-pin="${esc(pin)}">Pin</button></div>`;
+  const head = (kind, title) =>
+    `<div class="gcard-h"><div><span class="kind">${esc(kind)}</span><h3>${esc(title)}</h3></div></div>`;
   // Sources open in a new tab so the conversation stays put. Site sections point to the
   // classic page (/classic#section), which doesn't switch the visitor's home view.
   const src = (href, label) => `<a href="${safeUrl(href)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`;
   const srcs = (...links) => `<div class="srcs"><span>sources</span>${links.filter(Boolean).join('')}</div>`;
   const FIT_LABEL = { strong: 'strong', good: 'good', growing: 'transferable', gap: 'to confirm' };
   const chipsOf = arr => '<div class="tchips">' + (arr || []).map(t => `<span>${esc(t)}</span>`).join('') + '</div>';
+
+  // Reference cards collapse to one line under the answer; click it to expand the full card.
+  // The role-fit table and the intro draft are the answer itself, so they stay open.
+  const REF_LINE = {
+    projects: c => ['Projects', c.items.map(p => p.name).join(' · '),
+      [c.items[0] && c.items[0].url && src(c.items[0].url, c.items[0].name), src('/classic#projects', 'all projects')]],
+    stack: c => ['Tech stack', c.groups.map(g => g.category).join(' · '), [src('/classic#tech', 'tech stack')]],
+    timeline: c => ['Career story', c.items.map(i => i.title).join(' → '), [src('/classic#about', 'about'), src('/about-me', 'full story')]],
+    stats: c => ['Impact', c.items.slice(0, 4).map(s => s.value + ' ' + s.label).join(' · '), [src('/classic#hero', 'home')]],
+    certifications: c => ['Certifications', c.items.map(x => x.name).join(' · '), [src('/classic#education', 'education')]],
+    architecture: c => ['How this site runs', c.title || '', [src('https://github.com/liormilliger/mywebsite-app', 'repo')]],
+  };
+  function renderComponent(c) {
+    const fn = R[c.type];
+    if (!fn) return '';
+    const line = REF_LINE[c.type];
+    if (!line) return fn(c);
+    const [kind, text, links] = line(c);
+    return `<details class="ref"><summary><span class="ref-k">${esc(kind)}</span><span class="ref-t">${esc(text)}</span>` +
+      `<span class="ref-links">${links.filter(Boolean).join('')}</span><span class="ref-more" aria-hidden="true"></span></summary>${fn(c)}</details>`;
+  }
 
   const R = {
     projects(c) {
@@ -44,46 +64,45 @@
       if (first) {
         const img = first.image ? `<img src="${safeUrl(first.image)}" alt="${esc(first.name)} screenshot" loading="lazy">` : '';
         const links = [first.url && src(first.url, 'details'), first.repo && src(first.repo, 'repo'), src('/classic#projects', 'projects')].filter(Boolean).join('');
-        html += `<div class="gcard">${head(first.featured ? 'Featured project' : 'Project', first.name, first.name + ': ' + first.summary.split('. ')[0])}
+        html += `<div class="gcard">${head(first.featured ? 'Featured project' : 'Project', first.name)}
           <div class="proj${img ? '' : ' noimg'}">${img}<div><p>${esc(first.summary)}</p>${chipsOf(first.tags)}</div></div>
           ${links ? `<div class="srcs"><span>sources</span>${links}</div>` : ''}</div>`;
       }
       if (rest.length) {
-        html += `<div class="gcard">${head('Also relevant', 'Ranked for you', 'Projects: ' + rest.map(p => p.name).join(', '))}<div class="plist">` +
+        html += `<div class="gcard">${head('Also relevant', 'Ranked for you')}<div class="plist">` +
           rest.map(p => `<div><span>${esc(p.name)}<small>${esc(p.summary)}</small></span>${p.repo ? `<a href="${safeUrl(p.repo)}" target="_blank" rel="noopener noreferrer">repo ↗</a>` : ''}</div>`).join('') +
           '</div>' + srcs(src('/classic#projects', 'all projects')) + '</div>';
       }
       return html;
     },
     role_fit(c) {
-      const strong = c.rows.filter(r => r.fit === 'strong').map(r => r.requirement);
-      return `<div class="gcard">${head('Role fit', c.role, 'Fit for ' + c.role + ': strong on ' + (strong.join(', ') || '—'))}
+      return `<div class="gcard">${head('Role fit', c.role)}
         <div class="fit-wrap"><table class="fit"><tr><th>Requirement</th><th>Evidence</th><th>Fit</th></tr>` +
         c.rows.map(r => `<tr><td>${esc(r.requirement)}</td><td>${esc(r.evidence)}</td><td><span class="lvl ${esc(r.fit)}">${esc(FIT_LABEL[r.fit] || r.fit)}</span></td></tr>`).join('') +
         `</table></div>${srcs(src('/static/files/LiorMilligerCV.pdf', 'CV'), src('/classic#about', 'about'), src('/classic#tech', 'tech stack'))}</div>`;
     },
     stack(c) {
-      return `<div class="gcard">${head('Stack', 'Tools by area', 'Stack: ' + c.groups.map(g => g.category).join(', '))}<div class="stack">` +
+      return `<div class="gcard">${head('Stack', 'Tools by area')}<div class="stack">` +
         c.groups.map(g => `<div><h5>${esc(g.category)}</h5>${chipsOf(g.items)}</div>`).join('') +
         '</div>' + srcs(src('/classic#tech', 'tech stack')) + '</div>';
     },
     timeline(c) {
-      return `<div class="gcard">${head('Timeline', 'From jazz clubs to clusters', 'Story: ' + c.items.map(i => i.title).join(' → '))}<div class="tl">` +
+      return `<div class="gcard">${head('Timeline', 'From jazz clubs to clusters')}<div class="tl">` +
         c.items.map(i => `<div><b>${esc(i.title)}</b><i>${esc(i.tag)}</i><p>${esc(i.text)}</p></div>`).join('') +
         '</div>' + srcs(src('/classic#about', 'about'), src('/about-me', 'full story')) + '</div>';
     },
     stats(c) {
-      return `<div class="gcard">${head('Impact', 'In numbers', 'Impact: ' + c.items.map(s => s.value + ' ' + s.label).join(', '))}<div class="stats">` +
+      return `<div class="gcard">${head('Impact', 'In numbers')}<div class="stats">` +
         c.items.slice(0, 4).map(s => `<div><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join('') + '</div></div>';
     },
     certifications(c) {
-      return `<div class="gcard">${head('Credentials', 'Certifications', 'Certifications: ' + c.items.map(x => x.name).join(', '))}<div class="certs">` +
+      return `<div class="gcard">${head('Credentials', 'Certifications')}<div class="certs">` +
         c.items.map(x => `<a href="${safeUrl(x.url)}" target="_blank" rel="noopener noreferrer"><img src="${safeUrl(x.badge)}" alt="" loading="lazy">${esc(x.name)}</a>`).join('') +
         `</div><p class="note" style="margin-top:10px">Degrees: ${esc((c.education.degrees || []).join(' · '))}</p>${srcs(src('/classic#education', 'education'))}</div>`;
     },
     architecture(c) {
       const path = steps => `<div class="path">${(steps || []).map(esc).map(s => `<span>${s}</span>`).join('<i>→</i>')}</div>`;
-      return `<div class="gcard">${head('How this site runs', c.title || 'How this site runs', 'This site: ' + c.summary)}
+      return `<div class="gcard">${head('How this site runs', c.title || 'How this site runs')}
         <p style="margin:0 0 10px;font-size:14px">${esc(c.summary)}</p>
         <p class="note" style="margin:0 0 6px">Production · Docker Compose on EC2</p>${path(c.pipeline)}
         ${c.pipeline_k8s ? `<p class="note" style="margin:10px 0 6px">Kubernetes path · EKS + ArgoCD, ready to switch on</p>${path(c.pipeline_k8s)}` : ''}
@@ -91,7 +110,7 @@
     },
     intro(c) {
       const id = 'intro' + Math.random().toString(36).slice(2, 8);
-      return `<div class="gcard">${head('Action · needs your OK', 'Intro to Lior', 'Contact: ' + c.to)}
+      return `<div class="gcard">${head('Action · needs your OK', 'Intro to Lior')}
         <div class="form"><label for="${id}to">To</label><input id="${id}to" value="${esc(c.to)}" readonly>
         <label for="${id}">Message</label><textarea id="${id}">${esc(c.message)}</textarea>
         <div class="row"><button class="btn" type="button" data-copy="${id}">Copy message</button>
@@ -133,6 +152,7 @@
     const trace = t.querySelector('.trace');
     const answerEl = t.querySelector('.answer');
     let answer = '', steps = 0, done = null;
+    const comps = [];
 
     try {
       const res = await fetch('/api/ask', {
@@ -167,8 +187,8 @@
             answerEl.innerHTML = md(answer);
             const last = answerEl.lastElementChild; if (last) last.insertAdjacentHTML('beforeend', '<span class="caret"></span>');
           } else if (ev === 'component') {
-            const fn = R[data.type];
-            if (fn) t.insertAdjacentHTML('beforeend', fn(data));
+            comps.push(data);
+            t.insertAdjacentHTML('beforeend', renderComponent(data));
           } else if (ev === 'done') {
             done = data;
           }
@@ -191,6 +211,7 @@
       document.getElementById('hModel').textContent = done.model;
     }
     if (answer) {
+      addQaPin(t, text, answer, comps);
       state.history.push({ role: 'user', content: text }, { role: 'assistant', content: answer });
       state.history = state.history.slice(-10);
     }
@@ -201,32 +222,52 @@
     scroll();
   }
 
-  // ── brief ──
+  // ── brief: pin a whole question + answer ──
   const pins = [];
+  const clip = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s);
+  function addQaPin(turnEl, question, answer, comps) {
+    const fit = comps.find(c => c.type === 'role_fit');
+    let detail = answer.replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
+    if (fit) {
+      const by = lvl => fit.rows.filter(r => r.fit === lvl).map(r => r.requirement);
+      const strong = by('strong'), trans = by('growing');
+      detail += (strong.length ? ` Strong: ${strong.join(', ')}.` : '') + (trans.length ? ` Transferable: ${trans.join(', ')}.` : '');
+    }
+    const bar = document.createElement('div');
+    bar.className = 'qa-actions';
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'pin'; btn.textContent = 'Pin this Q&A';
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('done')) return;
+      pins.push({ q: question, a: detail });
+      renderPins();
+      btn.textContent = 'Pinned'; btn.classList.add('done');
+    });
+    bar.appendChild(btn);
+    turnEl.appendChild(bar);
+  }
   function renderPins() {
     const box = document.getElementById('pins');
-    box.innerHTML = pins.length ? '' : '<div class="empty">Nothing pinned yet. Use “Pin” on any card.</div>';
+    box.innerHTML = pins.length ? '' : '<div class="empty">Nothing pinned yet. Use “Pin this Q&amp;A” under any answer.</div>';
     pins.forEach((p, i) => {
       const d = document.createElement('div');
       d.innerHTML = '<span></span><button type="button" aria-label="Remove">×</button>';
-      d.firstChild.textContent = p.split(':')[0];
+      d.firstChild.textContent = clip(p.q, 70);
       d.lastChild.addEventListener('click', () => { pins.splice(i, 1); renderPins(); });
       box.appendChild(d);
     });
   }
   document.getElementById('gen').addEventListener('click', () => {
     const out = document.getElementById('onepager');
-    if (!pins.length) { out.innerHTML = '<p class="note">Pin at least one card first.</p>'; return; }
+    if (!pins.length) { out.innerHTML = '<p class="note">Pin at least one answer first.</p>'; return; }
     const aud = { Recruiter: 'hiring team', Engineer: 'engineering review', Founder: 'founding team' }[state.persona] || 'your team';
     out.innerHTML = `<div class="onepager"><h5>Lior Milliger</h5><div class="r">Platform Engineer · AI Systems · prepared for ${esc(aud)}</div><ul>` +
-      pins.map(p => `<li>${esc(p)}</li>`).join('') +
+      pins.map(p => `<li><b>${esc(clip(p.q, 120))}</b><br>${esc(clip(p.a, 420))}</li>`).join('') +
       `</ul><div class="r" style="margin-top:8px">${esc(CONTACT.email || '')} · ${esc((CONTACT.linkedin || '').replace(/^https?:\/\/(www\.)?/, ''))}</div></div>`;
   });
 
   // ── events ──
   document.addEventListener('click', e => {
-    const pb = e.target.closest('.ask .pin');
-    if (pb) { if (!pins.includes(pb.dataset.pin)) { pins.push(pb.dataset.pin); renderPins(); } pb.textContent = 'Pinned'; pb.classList.add('done'); return; }
     const cp = e.target.closest('[data-copy]');
     if (cp) {
       const el = document.getElementById(cp.dataset.copy);
