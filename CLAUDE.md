@@ -49,6 +49,8 @@ This is a personal portfolio/CV site built with Python/Flask, backed by PostgreS
 
 **Database schema** (`init/init.sql`): two tables — `visitors` (keyed on `ip_address INET`, upserted on repeat visits) and `page_views` (append-only log with FK to `visitors`). The schema is auto-applied by Postgres on first container start via `./init` mounted to `/docker-entrypoint-initdb.d`.
 
+**Database access:** the `db` service publishes Postgres on `127.0.0.1:5432` of the host only. Connect from a laptop through an SSH tunnel (e.g. DBeaver's SSH tab → host `localhost`, port 5432). Never bind it to `0.0.0.0` or open 5432 in the security group.
+
 **Nginx** (`nginx/nginx.conf`) acts as a TLS-terminating reverse proxy on ports 80/443. HTTP redirects to HTTPS. Error pages (404/500/502/503/504) are served directly by Nginx from a mounted `error.html` rather than by Flask.
 
 ## CI/CD Pipeline

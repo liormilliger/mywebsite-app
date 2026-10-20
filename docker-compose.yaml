@@ -79,6 +79,10 @@ services:
     image: postgres:15-alpine
     container_name: mywebsite-db
     restart: always
+    # Reachable only from the instance itself (for DBeaver/psql over an SSH tunnel).
+    # Never publish 5432 on 0.0.0.0 or open it in the security group.
+    ports:
+      - "127.0.0.1:5432:5432"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
