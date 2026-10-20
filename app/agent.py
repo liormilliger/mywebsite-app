@@ -209,7 +209,7 @@ INTENTS = {
                    {"requirement": "GitOps & CI/CD", "evidence": "ArgoCD and FluxCD; Jenkins, GitHub Actions, Bitbucket Pipelines", "fit": "strong"},
                    {"requirement": "IaC on AWS", "evidence": "AWS SAA; Terraform, Terragrunt, CloudFormation/SAM multi-region", "fit": "strong"},
                    {"requirement": "Cost ownership", "evidence": "Terraform + Lambda FinOps at JFrog: 80% cloud waste removed, 30% spend cut", "fit": "good"},
-                   {"requirement": "AI / LLM systems", "evidence": "Quorum; RAG pipelines with AWS Bedrock and Qdrant", "fit": "strong"},
+                   {"requirement": "AI / LLM systems", "evidence": "Quorum; RAG pipelines with Qdrant and n8n", "fit": "strong"},
                    {"requirement": "Ownership & teamwork", "evidence": "End-to-end owner; go-to person for DevOps peers", "fit": "strong"},
                    {"requirement": "Learning speed", "evidence": "New tools in hours; music to CKA and production in ~3 years", "fit": "strong"}]}),
                 ("show_projects", {"ids": ["quorum"]})]),

@@ -92,7 +92,7 @@ td.poc{color:var(--muted)}
   <h2 id="h-sys">The system</h2>
   <figure>
     <div class="scroll">
-    <svg viewBox="0 0 1120 640" role="img" aria-label="Users reach Quorum through an ALB (CloudFront later); the wiki reaches it through API Gateway. Webhooks are verified by Lambda, queued in SQS FIFO per page, and applied by a worker to Aurora PostgreSQL in one transaction. The web service answers with Bedrock and fans out through ElastiCache.">
+    <svg viewBox="0 0 1120 640" role="img" aria-label="Users reach Quorum through an ALB (CloudFront later); the wiki reaches it through API Gateway. Webhooks are verified by Lambda, queued in SQS FIFO per page, and applied by a worker to Aurora PostgreSQL in one transaction. The web service answers with Claude through OpenRouter and fans out through ElastiCache.">
       <defs>
         <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk" d="M0,0 L10,5 L0,10 z"/></marker>
         <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk wiki" d="M0,0 L10,5 L0,10 z"/></marker>
@@ -101,7 +101,7 @@ td.poc{color:var(--muted)}
 
       <!-- VPC -->
       <rect class="vpc" x="105" y="262" width="985" height="362" rx="14"/>
-      <text class="vpcl" x="120" y="284">VPC · PRIVATE SUBNETS · 2 AZ · S3, BEDROCK, SECRETS VIA VPC ENDPOINTS</text>
+      <text class="vpcl" x="120" y="284">VPC · PRIVATE SUBNETS · 2 AZ · S3, SQS, SECRETS VIA VPC ENDPOINTS</text>
 
       <!-- row 1: who talks to it -->
       <rect class="box" x="150" y="20" width="190" height="56" rx="9"/>
@@ -150,7 +150,7 @@ td.poc{color:var(--muted)}
       <text class="t" x="205" y="567" text-anchor="middle">S3</text>
       <text class="s" x="205" y="586" text-anchor="middle">documents · versions</text>
       <rect class="box store" x="310" y="540" width="170" height="64" rx="9"/>
-      <text class="t" x="395" y="567" text-anchor="middle">Bedrock</text>
+      <text class="t" x="395" y="567" text-anchor="middle">OpenRouter</text>
       <text class="s" x="395" y="586" text-anchor="middle">Claude · embeddings</text>
       <rect class="box store" x="500" y="540" width="360" height="64" rx="9"/>
       <text class="t" x="680" y="567" text-anchor="middle">Aurora PostgreSQL + pgvector</text>
@@ -210,7 +210,7 @@ td.poc{color:var(--muted)}
     <li><b>Wiki fires a webhook</b><span>page created, updated, moved, deleted, attachment added.</span></li>
     <li><b>Lambda verifies and queues</b><span>checks the signature, writes <code>{page, version}</code> to SQS FIFO with the page as message group and page+version as dedup id. Returns 200.</span></li>
     <li><b>Worker fetches vN</b><span>webhooks are thin, so the worker reads the page body and restrictions from the wiki REST API.</span></li>
-    <li><b>Embed</b><span>chunks the page and gets vectors from Bedrock.</span></li>
+    <li><b>Embed</b><span>chunks the page and gets vectors from the embeddings model through OpenRouter.</span></li>
     <li><b>One transaction</b><span>page row, chunks, vectors and permissions, applied only if vN is newer than what is stored. Readers see the old page or the new one, never half.</span></li>
     <li><b>Live sessions hear about it</b><span>“The runbook you're discussing changed (v12 → v13)” in every session that uses the page.</span></li>
   </ol>
@@ -256,7 +256,7 @@ td.poc{color:var(--muted)}
   <table>
     <thead><tr><th>Component</th><th>Job in Quorum</th><th>Replaces in the POC</th></tr></thead>
     <tbody>
-      <tr><td>VPC</td><td>2 AZs, public and private subnets, NAT for outbound calls, VPC endpoints for S3, SQS, Secrets, ECR and Bedrock</td><td class="poc">default VPC</td></tr>
+      <tr><td>VPC</td><td>2 AZs, public and private subnets, NAT for outbound calls, VPC endpoints for S3, SQS, Secrets and ECR; model calls to OpenRouter go out through NAT</td><td class="poc">default VPC</td></tr>
       <tr><td>ALB + ACM + Route 53</td><td>HTTPS and WebSocket entry, a real hostname and certificate</td><td class="poc">EC2 public IP, port 8000</td></tr>
       <tr><td>CloudFront + WAF<span class="tag">later</span></td><td>edge caching of static files, rate limits, IP rules</td><td class="poc">security group allow-list</td></tr>
       <tr><td>Cognito</td><td>the existing pool, plus a machine client and scopes for the wiki</td><td class="poc">same pool</td></tr>
@@ -268,7 +268,7 @@ td.poc{color:var(--muted)}
       <tr><td>Lambda</td><td>webhook signature check and enqueue; also the Cognito password setter you already have</td><td class="poc">none</td></tr>
       <tr><td>SQS FIFO + DLQ</td><td>ordered wiki changes per page; report and document jobs</td><td class="poc">debounce timer in the process</td></tr>
       <tr><td>EventBridge Scheduler</td><td>15-minute reconcile, nightly re-embed and cleanup</td><td class="poc">none</td></tr>
-      <tr><td>Bedrock</td><td>Claude for answers, an embeddings model for retrieval; IAM instead of an API key</td><td class="poc">OpenRouter key (keep as fallback)</td></tr>
+      <tr><td>OpenRouter</td><td>Claude for answers and an embeddings model for retrieval; API key kept in Secrets Manager</td><td class="poc">same OpenRouter key</td></tr>
       <tr><td>Secrets Manager + KMS</td><td>DB credentials with rotation, wiki API token, webhook secret</td><td class="poc">same</td></tr>
       <tr><td>SES</td><td>invitations from your own domain, no 50-a-day limit</td><td class="poc">Cognito default email</td></tr>
       <tr><td>CloudWatch + X-Ray</td><td>logs, queue-age and DLQ alarms, traces, token usage per session</td><td class="poc"><code>docker logs</code></td></tr>
@@ -276,7 +276,6 @@ td.poc{color:var(--muted)}
     </tbody>
   </table>
   </div>
-  <p>Check which Claude and embedding models Bedrock offers in eu-south-1 directly, and which need the EU cross-region inference profile.</p>
 </section>
 
 <section aria-labelledby="h-cfn">

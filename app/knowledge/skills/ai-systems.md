@@ -21,4 +21,4 @@ infrastructure, cost controls and safety around them.
   (streaming, WebSockets, Cognito, MCP connectors, living documents with versioned diffs).
 - **This website's agent:** Claude with tool use rendering UI cards, a daily budget and per-visitor
   limits, API key from Secrets Manager, local-model fallback, full conversation logging.
-- **Also:** AWS Bedrock, LangChain, n8n workflows, Gemini API, embeddings.
+- **Also:** LangChain, n8n workflows, Gemini API, embeddings.

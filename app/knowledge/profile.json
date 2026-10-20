@@ -63,7 +63,7 @@
       "id": "now",
       "title": "Second Movement: Platform & AI Engineering",
       "tag": "current",
-      "text": "At Polus Tech: owns the full migration of an edge intelligence platform to a 13-microservice K3s cluster, architects AI-Ops ingestion pipelines with RAG and AWS Bedrock, and engineers per-unit provisioning automation with Ansible. In a parallel role, building a full-stack web platform from scratch, owning frontend, backend, Kubernetes infrastructure and authentication end-to-end."
+      "text": "At Polus Tech: owns the full migration of an edge intelligence platform to a 13-microservice K3s cluster, architects AI-Ops ingestion pipelines with RAG (n8n, S3 triggers, Qdrant), and engineers per-unit provisioning automation with Ansible. In a parallel role, building a full-stack web platform from scratch, owning frontend, backend, Kubernetes infrastructure and authentication end-to-end."
     }
   ],
   "stack": [
@@ -104,8 +104,7 @@
       "items": [
         "AWS",
         "Cloud Practitioner",
-        "Solutions Architect",
-        "SysOps Administrator"
+        "Solutions Architect"
       ]
     },
     {
@@ -118,8 +117,7 @@
         "RAG",
         "Embeddings",
         "Ollama",
-        "LangChain",
-        "AWS Bedrock"
+        "LangChain"
       ]
     },
     {
